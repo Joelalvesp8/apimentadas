@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// AUTHENTICATION & USER MODELS
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String?   // Null for OAuth users
+  provider      String    @default("credentials") // "credentials" | "google"
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  profile       Profile?
+  gameSessions  GameSession[]
+  userCards     UserCard[]
+  cardLikes     CardLike[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  nickname    String   @unique
+  bio         String?
+  orientation String?  // "heterosexual" | "homosexual" | "bisexual" | "other"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connectionsFrom       Connection[]          @relation("ConnectionFrom")
+  connectionsTo         Connection[]          @relation("ConnectionTo")
+  sessionParticipants   SessionParticipant[]
+
+  @@map("profiles")
+}
+
+// ============================================================================
+// SOCIAL NETWORK MODELS
+// ============================================================================
+
+model Connection {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  status    String   @default("pending") // "pending" | "accepted" | "rejected"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  from Profile @relation("ConnectionFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Profile @relation("ConnectionTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+  @@map("connections")
+}
+
+// ============================================================================
+// CARD MODELS
+// ============================================================================
+
+model Card {
+  id          String   @id @default(cuid())
+  type        String   // "pergunta" | "tarefa"
+  category    String   // "casais" | "trios" | "grupos"
+  difficulty  String   // "facil" | "medio" | "dificil" | "extremo"
+  content     String   @db.Text
+  isOfficial  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  playedCards PlayedCard[]
+  cardLikes   CardLike[]
+
+  @@map("cards")
+}
+
+model UserCard {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // "pergunta" | "tarefa"
+  category    String   // "casais" | "trios" | "grupos"
+  difficulty  String   // "facil" | "medio" | "dificil" | "extremo"
+  content     String   @db.Text
+  approved    Boolean  @default(false)
+  likesCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardLikes CardLike[]
+
+  @@map("user_cards")
+}
+
+model CardLike {
+  id         String   @id @default(cuid())
+  userId     String
+  cardId     String?
+  userCardId String?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card     Card?     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userCard UserCard? @relation(fields: [userCardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId])
+  @@unique([userId, userCardId])
+  @@map("card_likes")
+}
+
+// ============================================================================
+// GAME SESSION MODELS
+// ============================================================================
+
+model GameSession {
+  id            String   @id @default(cuid())
+  creatorId     String
+  sessionType   String   // "casal" | "trisal" | "grupo" (determined by participant count)
+  status        String   @default("active") // "active" | "finished"
+  averageRating Float?
+  cardsPlayed   Int      @default(0)
+  createdAt     DateTime @default(now())
+  finishedAt    DateTime?
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  creator             User                  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  sessionParticipants SessionParticipant[]
+  playedCards         PlayedCard[]
+
+  @@map("game_sessions")
+}
+
+model SessionParticipant {
+  id        String   @id @default(cuid())
+  sessionId String
+  profileId String
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  profile Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, profileId])
+  @@map("session_participants")
+}
+
+model PlayedCard {
+  id        String   @id @default(cuid())
+  sessionId String
+  cardId    String
+  rating    Int?     // 0-5 stars
+  playedAt  DateTime @default(now())
+
+  // Relations
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  card    Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("played_cards")
+}
