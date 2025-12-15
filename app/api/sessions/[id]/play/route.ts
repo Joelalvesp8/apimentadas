@@ -42,7 +42,15 @@ export async function POST(
     const session = await prisma.gameSession.findUnique({
       where: { id: params.id },
       include: {
-        sessionParticipants: true,
+        sessionParticipants: {
+          include: {
+            profile: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
         playedCards: true,
       },
     });
