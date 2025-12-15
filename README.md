@@ -250,14 +250,50 @@ O projeto suporta dois métodos de autenticação:
    GOOGLE_CLIENT_SECRET="seu-client-secret"
    ```
 
+## 🚀 Deploy em Produção
+
+**Guia Completo:** [DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md)
+
+### Deploy Rápido (Vercel + Neon)
+
+```bash
+# 1. Criar banco PostgreSQL gratuito
+https://neon.tech → New Project → Copiar DATABASE_URL
+
+# 2. Gerar secret
+openssl rand -base64 32
+
+# 3. Deploy na Vercel
+https://vercel.com → Import apimentadas
+Configurar variáveis:
+  - DATABASE_URL
+  - NEXTAUTH_SECRET
+  - NEXTAUTH_URL
+
+# 4. Executar migrations
+npx prisma migrate deploy
+npx prisma db seed
+
+# 5. Pronto! 🎉
+```
+
+**Tempo total:** 15-20 minutos
+**Custo:** Gratuito (Vercel Hobby + Neon Free Tier)
+
+Veja o [guia completo](./DEPLOY_GUIDE.md) com instruções detalhadas, troubleshooting e configurações opcionais.
+
 ## 📱 PWA (Progressive Web App)
 
-O projeto está configurado para ser um PWA (será implementado na Fase 6):
+**Guia Completo:** [PWA_GUIDE.md](./PWA_GUIDE.md)
 
-- Service Workers para cache
-- Manifest.json para instalação
-- Funciona offline
-- Instalável em dispositivos móveis
+O projeto é um PWA completo:
+
+- ✅ Service Workers para cache
+- ✅ Manifest.json para instalação
+- ✅ Funciona offline
+- ✅ Instalável em Android, iOS e Desktop
+- ✅ Modo standalone
+- ✅ Otimizado para mobile
 
 ## 🧪 Testando a Aplicação
 
