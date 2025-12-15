@@ -130,8 +130,9 @@ npm run db:studio
 
 ## 🎮 Funcionalidades
 
-### ✅ Fase 1 & 2 (Implementadas)
+### ✅ Fases 1-5 (Implementadas - Aplicação Funcional!)
 
+**Fase 1 & 2 - Fundação e Perfis:**
 - [x] Autenticação segura (Credentials + Google OAuth)
 - [x] Sistema de perfis com nickname único
 - [x] Onboarding de usuários
@@ -140,12 +141,38 @@ npm run db:studio
 - [x] Landing page responsiva
 - [x] Páginas de login e registro
 
-### 🚧 Próximas Fases
+**Fase 3 - Rede Social:**
+- [x] Sistema completo de conexões entre usuários
+- [x] Solicitações de conexão (enviar/aceitar/rejeitar)
+- [x] Busca de perfis por nickname
+- [x] Gerenciamento de conexões aceitas e pendentes
 
-- [ ] **Fase 3**: Rede social (conexões entre usuários)
-- [ ] **Fase 4**: Sistema completo de cartas (curtidas, cartas personalizadas)
-- [ ] **Fase 5**: Sessões de jogo (recurso principal)
-- [ ] **Fase 6**: PWA e polimento final
+**Fase 4 - Sistema de Cartas:**
+- [x] Busca de cartas aleatórias com filtros
+- [x] Componente GameCard com animação flip
+- [x] Componente RatingStars (0-5 estrelas)
+- [x] Sistema de curtidas em cartas
+- [x] Criação de cartas personalizadas
+- [x] Listagem de cartas populares
+
+**Fase 5 - Sessões de Jogo (Core Feature):**
+- [x] Criação de sessões com múltiplos participantes
+- [x] Determinação automática de tipo (casal/trisal/grupo)
+- [x] Busca e revelação de cartas durante o jogo
+- [x] Sistema de avaliação de experiências
+- [x] Estatísticas em tempo real (cartas jogadas, rating médio)
+- [x] Finalização de sessões
+- [x] Histórico de sessões jogadas
+
+**Páginas Implementadas:**
+- [x] Dashboard com estatísticas
+- [x] Página de Conexões (com tabs)
+- [x] Página de Nova Sessão
+- [x] Página de Jogo completa
+
+### 🚧 Próxima Fase
+
+- [ ] **Fase 6**: PWA e polimento final (manifest, service workers, ícones, otimizações mobile)
 
 ## 📂 Estrutura do Projeto
 
@@ -320,4 +347,4 @@ Error: Please define NEXTAUTH_SECRET environment variable
 
 ---
 
-**Status do Projeto**: 🟡 Em desenvolvimento ativo (Fase 2 completa, Fases 3-6 pendentes)
+**Status do Projeto**: 🟢 **Aplicação Funcional Completa!** (Fases 1-5 implementadas, Fase 6 PWA opcional)
