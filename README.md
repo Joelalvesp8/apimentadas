@@ -170,9 +170,21 @@ npm run db:studio
 - [x] Página de Nova Sessão
 - [x] Página de Jogo completa
 
-### 🚧 Próxima Fase
+**Fase 6 - PWA e Polimento Final:**
+- [x] Progressive Web App completo
+- [x] Service Worker com cache strategies
+- [x] Manifest.json configurado
+- [x] Página offline customizada
+- [x] Meta tags PWA (iOS + Android)
+- [x] Otimizações mobile (CSS)
+- [x] Safe area insets para notch
+- [x] Guia completo de instalação e testes
+- [x] Instalável em todos os dispositivos
+- [x] Funciona offline
 
-- [ ] **Fase 6**: PWA e polimento final (manifest, service workers, ícones, otimizações mobile)
+### 🎉 Projeto 100% Completo!
+
+Todas as 6 fases implementadas com sucesso!
 
 ## 📂 Estrutura do Projeto
 
@@ -347,4 +359,21 @@ Error: Please define NEXTAUTH_SECRET environment variable
 
 ---
 
-**Status do Projeto**: 🟢 **Aplicação Funcional Completa!** (Fases 1-5 implementadas, Fase 6 PWA opcional)
+**Status do Projeto**: 🎉 **100% COMPLETO - PWA Pronto!** (Todas as 6 fases implementadas)
+
+## 📱 PWA - Progressive Web App
+
+O projeto agora é um PWA completo! Veja o guia detalhado em [PWA_GUIDE.md](./PWA_GUIDE.md).
+
+**Para usar o PWA:**
+1. Gere os ícones: siga `scripts/generate-icons.md`
+2. Faça build: `npm run build && npm start`
+3. Acesse via HTTPS (use ngrok para testar)
+4. Instale no seu dispositivo!
+
+**Funcionalidades PWA:**
+- 📱 Instalável em Android, iOS e Desktop
+- 🔄 Funciona offline
+- ⚡ Cache inteligente
+- 🎨 Ícone personalizado
+- 📵 Modo standalone
