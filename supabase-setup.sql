@@ -187,21 +187,27 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Aplicar trigger em todas as tabelas relevantes
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_connections_updated_at ON connections;
 CREATE TRIGGER update_connections_updated_at BEFORE UPDATE ON connections
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_cards_updated_at ON cards;
 CREATE TRIGGER update_cards_updated_at BEFORE UPDATE ON cards
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_user_cards_updated_at ON user_cards;
 CREATE TRIGGER update_user_cards_updated_at BEFORE UPDATE ON user_cards
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_game_sessions_updated_at ON game_sessions;
 CREATE TRIGGER update_game_sessions_updated_at BEFORE UPDATE ON game_sessions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
