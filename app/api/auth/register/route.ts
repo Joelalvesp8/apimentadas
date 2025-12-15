@@ -59,8 +59,9 @@ export async function POST(request: NextRequest) {
       },
       201
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in register:', error);
-    return errorResponse('Erro ao criar usuário');
+    const errorMessage = error?.message || 'Erro ao criar usuário';
+    return errorResponse(errorMessage);
   }
 }
