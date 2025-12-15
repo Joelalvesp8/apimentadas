@@ -97,3 +97,173 @@
 .flip-card-back {
   transform: rotateY(180deg);
 }
+
+/* ========================================
+   PWA & MOBILE OPTIMIZATIONS
+   ======================================== */
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Prevent zoom on inputs (iOS) */
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize tap targets for mobile (44x44 minimum) */
+button,
+a,
+input[type="button"],
+input[type="submit"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Remove tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Better font rendering on mobile */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Prevent text selection on UI elements */
+button,
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Optimize animations for mobile */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Pull-to-refresh custom styling */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Standalone mode specific styles */
+@media all and (display-mode: standalone) {
+  /* Hide address bar gap on iOS */
+  body {
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  /* Add safe padding for standalone mode */
+  .standalone-header {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+}
+
+/* Mobile breakpoints optimization */
+@media (max-width: 640px) {
+  /* Reduce padding on small screens */
+  .mobile-compact {
+    padding: 0.5rem !important;
+  }
+
+  /* Stack cards vertically */
+  .mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Full width buttons on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Haptic feedback simulation */
+@media (hover: none) and (pointer: coarse) {
+  button:active,
+  a:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fix for iOS Safari input zoom */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Fix for iOS bounce scroll */
+  body {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  #__next {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: 100vh;
+  }
+}
+
+/* Android specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  /* Android Chrome address bar compensation */
+  .full-height {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Jogo Adulto</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 500px;
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #1f2937;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #db2777, #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .button {
+      display: inline-block;
+      background: linear-gradient(to right, #db2777, #9333ea);
+      color: white;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(147, 51, 234, 0.3);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .tips {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    .tips h2 {
+      font-size: 18px;
+      color: #1f2937;
+      margin-bottom: 15px;
+    }
+
+    .tips ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tips li {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 8px;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .tips li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #9333ea;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .icon {
+        font-size: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📵</div>
+    <h1>Você está Offline</h1>
+    <p>
+      Parece que você está sem conexão com a internet.
+      Algumas funcionalidades podem estar limitadas até que você se reconecte.
+    </p>
+
+    <button class="button" onclick="window.location.reload()">
+      Tentar Novamente
+    </button>
+
+    <div class="tips">
+      <h2>Dicas:</h2>
+      <ul>
+        <li>Verifique sua conexão Wi-Fi ou dados móveis</li>
+        <li>Tente recarregar a página</li>
+        <li>Algumas páginas visitadas recentemente podem estar disponíveis offline</li>
+        <li>O app voltará a funcionar normalmente quando você estiver online</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Check for connection and auto-reload when back online
+    window.addEventListener('online', () => {
+      console.log('Connection restored, reloading...');
+      window.location.reload();
+    });
+
+    // Show connection status
+    function updateConnectionStatus() {
+      if (navigator.onLine) {
+        window.location.reload();
+      }
+    }
+
+    // Check every 5 seconds
+    setInterval(updateConnectionStatus, 5000);
+  </script>
+</body>
+</html>
