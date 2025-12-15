@@ -32,7 +32,7 @@ export default function OnboardingPage() {
       await createProfile.mutateAsync({
         nickname,
         bio: bio || undefined,
-        orientation: orientation || undefined,
+        orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
       });
 
       router.push('/dashboard');
