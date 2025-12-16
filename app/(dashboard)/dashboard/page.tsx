@@ -181,7 +181,7 @@ export default function DashboardPage() {
               O que você gostaria de fazer agora?
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-4">
+          <CardContent className="grid md:grid-cols-3 gap-4">
             <Link href="/new-session">
               <Button className="w-full h-20" size="lg">
                 <GamepadIcon className="mr-2 h-5 w-5" />
@@ -192,6 +192,12 @@ export default function DashboardPage() {
               <Button variant="outline" className="w-full h-20" size="lg">
                 <Users className="mr-2 h-5 w-5" />
                 Ver Conexões
+              </Button>
+            </Link>
+            <Link href="/create-card">
+              <Button variant="outline" className="w-full h-20 border-purple-300 hover:bg-purple-50" size="lg">
+                <span className="mr-2 text-xl">🎴</span>
+                Criar Carta
               </Button>
             </Link>
           </CardContent>
