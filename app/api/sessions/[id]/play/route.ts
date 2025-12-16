@@ -127,8 +127,8 @@ export async function POST(
       });
 
       // Calculate next turn (move to answerer for next round)
-      const nextTurnIndex = (nextIndex + 1) % session.sessionParticipants.length;
-      const nextTurnProfileId = session.sessionParticipants[nextTurnIndex].profileId;
+      // The person who answered becomes the next one to pick a card
+      const nextTurnProfileId = answererProfileId;
 
       // Update session stats and turn
       const allPlayedCards = await tx.playedCard.findMany({
