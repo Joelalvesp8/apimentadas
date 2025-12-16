@@ -77,17 +77,20 @@ export default function GamePage() {
     if (!selectedCard) return;
 
     try {
-      await playCard.mutateAsync({
+      // Play card and get updated session
+      const result = await playCard.mutateAsync({
         cardId: selectedCard.id,
         qualitativeRating: rating,
       });
 
-      // Reset state
+      // Reset state immediately
       setSelectedCard(null);
       setIsCardFlipped(false);
 
-      // Refresh session to get updated turn
-      await refetchSession();
+      // Force refetch to ensure UI updates
+      setTimeout(() => {
+        refetchSession();
+      }, 100);
     } catch (error: any) {
       console.error('Error playing card:', error);
       alert(error.message || 'Erro ao avaliar resposta');

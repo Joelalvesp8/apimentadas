@@ -81,7 +81,12 @@ export function usePlayCard(sessionId: string) {
   return useMutation({
     mutationFn: (data: PlayCardInput) =>
       apiClient.post<any>(`/api/sessions/${sessionId}/play`, data),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Update the cache with the new session data
+      if (data.session) {
+        queryClient.setQueryData(['sessions', sessionId], data.session);
+      }
+      // Also invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['sessions', sessionId] });
     },
   });
