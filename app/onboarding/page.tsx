@@ -63,7 +63,7 @@ export default function OnboardingPage() {
               <Input
                 id="nickname"
                 type="text"
-                placeholder="@seunickname"
+                placeholder="seunickname"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 required
@@ -72,7 +72,7 @@ export default function OnboardingPage() {
                 maxLength={20}
               />
               <p className="text-xs text-muted-foreground">
-                Apenas letras, números e underscores (3-20 caracteres)
+                Apenas letras, números e underscores (3-20 caracteres). Sem @ ou caracteres especiais.
               </p>
             </div>
 

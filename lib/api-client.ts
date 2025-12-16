@@ -20,10 +20,19 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({
+      const errorData = await response.json().catch(() => ({
         error: 'An error occurred',
       }));
-      throw new Error(error.error || 'An error occurred');
+
+      // If validation errors exist, format them into a readable message
+      if (errorData.errors) {
+        const fieldErrors = Object.entries(errorData.errors)
+          .map(([field, messages]) => `${field}: ${(messages as string[]).join(', ')}`)
+          .join('; ');
+        throw new Error(fieldErrors);
+      }
+
+      throw new Error(errorData.error || 'An error occurred');
     }
 
     const data = await response.json();
