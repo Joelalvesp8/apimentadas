@@ -34,6 +34,18 @@ export default function GamePage() {
 
   const { data: myProfile } = useProfile();
   const { data: session, isLoading, refetch: refetchSession } = useSession(sessionId);
+
+  // Auto-refresh session every 3 seconds to see turn changes
+  useEffect(() => {
+    if (!session || session.status !== 'active') return;
+
+    const interval = setInterval(() => {
+      refetchSession();
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [session, refetchSession]);
+
   const cardCategory = session?.sessionType ? getCardCategory(session.sessionType) : undefined;
   const {
     data: currentCard,
