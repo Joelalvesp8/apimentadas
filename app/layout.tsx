@@ -7,24 +7,24 @@ import { PWARegister } from "@/components/pwa-register";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Jogo Adulto Gamificado",
-  description: "Aplicação web PWA de jogo adulto gamificado para casais, trios e grupos",
+  title: "APIMENTADAS 🌶️",
+  description: "Jogo adulto picante e divertido para casais, trios e grupos. Esquente sua relação!",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Jogo Adulto",
+    title: "APIMENTADAS",
   },
-  applicationName: "Jogo Adulto Gamificado",
-  keywords: ["jogo adulto", "casais", "trios", "grupos", "gamificado", "pwa"],
-  authors: [{ name: "DeepAgent" }],
+  applicationName: "APIMENTADAS",
+  keywords: ["apimentadas", "jogo adulto", "casais", "trios", "grupos", "gamificado", "pwa", "picante"],
+  authors: [{ name: "APIMENTADAS" }],
   viewport: {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
   },
-  themeColor: "#9333ea",
+  themeColor: "#dc2626",
 };
 
 export default function RootLayout({
@@ -36,11 +36,11 @@ export default function RootLayout({
     <html lang="pt-BR">
       <head>
         {/* PWA Meta Tags */}
-        <meta name="theme-color" content="#9333ea" />
+        <meta name="theme-color" content="#dc2626" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Jogo Adulto" />
+        <meta name="apple-mobile-web-app-title" content="APIMENTADAS" />
 
         {/* Icons */}
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />

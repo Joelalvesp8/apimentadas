@@ -14,11 +14,14 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Jogo Adulto Gamificado
-          </h1>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="text-6xl">🌶️</span>
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+              APIMENTADAS
+            </h1>
+          </div>
           <p className="text-xl text-muted-foreground mb-8">
-            Uma experiência única e divertida para casais, trios e grupos
+            Esquente sua relação! Jogo adulto picante para casais, trios e grupos
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/register">

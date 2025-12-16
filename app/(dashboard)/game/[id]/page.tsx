@@ -135,8 +135,8 @@ export default function GamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 overflow-y-auto">
+      <div className="max-w-4xl mx-auto pb-20">
         {/* Turn Banner */}
         <Card className={`mb-6 ${isMyTurn ? 'border-4 border-green-500 bg-green-50' : 'border-2 border-orange-300 bg-orange-50'}`}>
           <CardContent className="py-6">
@@ -313,6 +313,8 @@ export default function GamePage() {
             variant="destructive"
             onClick={handleFinishSession}
             disabled={finishSession.isPending}
+            className="mb-8"
+            size="lg"
           >
             {finishSession.isPending ? 'Finalizando...' : 'Finalizar Sessão'}
           </Button>

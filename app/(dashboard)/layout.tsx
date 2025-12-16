@@ -25,8 +25,9 @@ export default function DashboardLayout({
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Jogo Adulto
+            <span className="text-3xl">🌶️</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+              APIMENTADAS
             </span>
           </Link>
 

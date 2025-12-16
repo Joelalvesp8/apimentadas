@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, GamepadIcon, Star, Clock, Shield } from 'lucide-react';
+import { Users, GamepadIcon, Star, Clock, Shield, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -211,7 +211,7 @@ export default function DashboardPage() {
               O que você gostaria de fazer agora?
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid md:grid-cols-3 gap-4">
+          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/new-session">
               <Button className="w-full h-20" size="lg">
                 <GamepadIcon className="mr-2 h-5 w-5" />
@@ -228,6 +228,12 @@ export default function DashboardPage() {
               <Button variant="outline" className="w-full h-20 border-purple-300 hover:bg-purple-50" size="lg">
                 <span className="mr-2 text-xl">🎴</span>
                 Criar Carta
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Button variant="outline" className="w-full h-20 border-blue-300 hover:bg-blue-50" size="lg">
+                <User className="mr-2 h-5 w-5" />
+                Meu Perfil
               </Button>
             </Link>
           </CardContent>

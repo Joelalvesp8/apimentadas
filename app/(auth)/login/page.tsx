@@ -51,8 +51,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-100 to-purple-100">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Entrar</CardTitle>
-          <CardDescription>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-4xl">🌶️</span>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+              APIMENTADAS
+            </h1>
+          </div>
+          <CardTitle className="text-2xl text-center">Entrar</CardTitle>
+          <CardDescription className="text-center">
             Entre com suas credenciais para acessar o jogo
           </CardDescription>
         </CardHeader>

@@ -61,3 +61,16 @@ export function useSearchProfiles(query: string) {
     enabled: query.length >= 2,
   });
 }
+
+export function useUpdateProfileImage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (image: string) =>
+      apiClient.patch('/api/user/image', { image }),
+    onSuccess: () => {
+      // Invalidate both profile and session queries
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+}
