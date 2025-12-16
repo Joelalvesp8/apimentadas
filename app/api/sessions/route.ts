@@ -9,6 +9,72 @@ import {
 } from '@/lib/utils/responses';
 import { createSessionSchema } from '@/lib/validations/session';
 
+// GET /api/sessions - List active sessions where I'm a participant
+export async function GET() {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return unauthorizedResponse();
+    }
+
+    // Get user's profile
+    const profile = await prisma.profile.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!profile) {
+      return errorResponse('Perfil não encontrado', 404);
+    }
+
+    // Get all active sessions where user is a participant
+    const sessions = await prisma.gameSession.findMany({
+      where: {
+        status: 'active',
+        sessionParticipants: {
+          some: {
+            profileId: profile.id,
+          },
+        },
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        sessionParticipants: {
+          include: {
+            profile: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            joinedAt: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return successResponse(sessions);
+  } catch (error) {
+    console.error('Error in GET /api/sessions:', error);
+    return errorResponse('Erro ao buscar sessões');
+  }
+}
+
 // POST /api/sessions - Create game session
 export async function POST(request: NextRequest) {
   try {

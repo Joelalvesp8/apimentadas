@@ -55,6 +55,14 @@ export interface GameSession {
   }>;
 }
 
+export function useActiveSessions() {
+  return useQuery({
+    queryKey: ['sessions', 'active'],
+    queryFn: () => apiClient.get<GameSession[]>('/api/sessions'),
+    refetchInterval: 5000, // Poll every 5 seconds for new sessions
+  });
+}
+
 export function useCreateSession() {
   const queryClient = useQueryClient();
 

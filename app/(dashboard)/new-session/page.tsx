@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useConnections } from '@/hooks/useConnections';
+import { useProfile } from '@/hooks/useProfile';
 import { useCreateSession } from '@/hooks/useSessions';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 
 export default function NewSessionPage() {
   const router = useRouter();
+  const { data: myProfile } = useProfile();
   const { data: connections, isLoading } = useConnections('accepted');
   const createSession = useCreateSession();
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
@@ -80,11 +82,10 @@ export default function NewSessionPage() {
               <>
                 <div className="space-y-2 mb-6">
                   {connections.map((connection) => {
-                    // Determine which profile to show (not the current user)
-                    const profile =
-                      connection.from.userId !== connection.from.user.id
-                        ? connection.from
-                        : connection.to;
+                    // Show the OTHER person (not me)
+                    const profile = connection.from.id === myProfile?.id
+                      ? connection.to
+                      : connection.from;
 
                     const isSelected = selectedParticipants.includes(profile.id);
 

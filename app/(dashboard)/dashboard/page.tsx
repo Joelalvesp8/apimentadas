@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useProfile } from '@/hooks/useProfile';
 import { useConnections } from '@/hooks/useConnections';
-import { useSessionHistory } from '@/hooks/useSessions';
+import { useSessionHistory, useActiveSessions } from '@/hooks/useSessions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,7 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, GamepadIcon, Star } from 'lucide-react';
+import { Users, GamepadIcon, Star, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -22,6 +24,7 @@ export default function DashboardPage() {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: connections } = useConnections('accepted');
   const { data: sessionHistory } = useSessionHistory();
+  const { data: activeSessions, isLoading: activeSessionsLoading } = useActiveSessions();
 
   // If no profile, redirect to onboarding
   if (!profileLoading && !profile) {
@@ -96,6 +99,79 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Active Sessions */}
+        {activeSessions && activeSessions.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-purple-500" />
+                    Sessões Ativas
+                  </CardTitle>
+                  <CardDescription>
+                    Você foi convidado para {activeSessions.length} sessão(ões)
+                  </CardDescription>
+                </div>
+                <Badge variant="default" className="bg-purple-500">
+                  {activeSessions.length} {activeSessions.length === 1 ? 'sessão' : 'sessões'}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {activeSessions.map((gameSession) => {
+                  const isMyTurn = gameSession.currentTurnProfileId === profile?.id;
+                  return (
+                    <Link key={gameSession.id} href={`/game/${gameSession.id}`}>
+                      <div className={`p-4 border rounded-lg cursor-pointer transition hover:shadow-md ${
+                        isMyTurn ? 'border-green-500 bg-green-50' : 'hover:bg-gray-50'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant={isMyTurn ? 'default' : 'secondary'} className={isMyTurn ? 'bg-green-600' : ''}>
+                                {gameSession.sessionType === 'casal' ? 'Casal' : gameSession.sessionType === 'trisal' ? 'Trisal' : 'Grupo'}
+                              </Badge>
+                              {isMyTurn && (
+                                <Badge className="bg-green-600">🎯 Sua vez!</Badge>
+                              )}
+                              <span className="text-sm text-muted-foreground">
+                                {gameSession.cardsPlayed} cartas jogadas
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium">Participantes:</p>
+                              <div className="flex -space-x-2">
+                                {gameSession.sessionParticipants.slice(0, 3).map((participant) => (
+                                  <Avatar key={participant.id} className="w-8 h-8 border-2 border-white">
+                                    <AvatarImage src={participant.profile.user.image || undefined} />
+                                    <AvatarFallback className="text-xs">
+                                      {participant.profile.nickname[0].toUpperCase()}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ))}
+                                {gameSession.sessionParticipants.length > 3 && (
+                                  <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
+                                    <span className="text-xs font-medium">+{gameSession.sessionParticipants.length - 3}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <Button variant={isMyTurn ? "default" : "outline"} className={isMyTurn ? "bg-green-600 hover:bg-green-700" : ""}>
+                            {isMyTurn ? 'Jogar Agora' : 'Entrar'}
+                          </Button>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <Card>
