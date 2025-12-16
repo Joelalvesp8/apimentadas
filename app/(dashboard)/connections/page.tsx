@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useConnections, useUpdateConnection, useDeleteConnection } from '@/hooks/useConnections';
-import { useSearchProfiles } from '@/hooks/useProfile';
+import { useSearchProfiles, useProfile } from '@/hooks/useProfile';
 import { useCreateConnection } from '@/hooks/useConnections';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ConnectionsPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { data: myProfile } = useProfile();
   const { data: acceptedConnections } = useConnections('accepted');
   const { data: pendingConnections } = useConnections('pending');
   const { data: searchResults } = useSearchProfiles(searchQuery);
@@ -83,10 +84,10 @@ export default function ConnectionsPage() {
                 {acceptedConnections && acceptedConnections.length > 0 ? (
                   <div className="space-y-2">
                     {acceptedConnections.map((connection) => {
-                      const profile =
-                        connection.from.userId !== connection.from.user.id
-                          ? connection.from
-                          : connection.to;
+                      // Show the OTHER person (not me)
+                      const profile = connection.from.id === myProfile?.id
+                        ? connection.to
+                        : connection.from;
 
                       return (
                         <div
@@ -137,8 +138,10 @@ export default function ConnectionsPage() {
                 {pendingConnections && pendingConnections.length > 0 ? (
                   <div className="space-y-2">
                     {pendingConnections.map((connection) => {
-                      const profile = connection.from;
-                      const isReceiver = connection.toId !== profile.id;
+                      // Am I the receiver (to) or sender (from)?
+                      const isReceiver = connection.to.id === myProfile?.id;
+                      // Show the OTHER person
+                      const profile = isReceiver ? connection.from : connection.to;
 
                       return (
                         <div
@@ -157,6 +160,11 @@ export default function ConnectionsPage() {
                               <p className="text-sm text-muted-foreground">
                                 {profile.user.name}
                               </p>
+                              {isReceiver && (
+                                <Badge variant="secondary" className="mt-1">
+                                  Quer se conectar com você
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           {isReceiver ? (
@@ -176,7 +184,7 @@ export default function ConnectionsPage() {
                               </Button>
                             </div>
                           ) : (
-                            <Badge variant="secondary">Enviado</Badge>
+                            <Badge variant="secondary">Aguardando resposta</Badge>
                           )}
                         </div>
                       );
