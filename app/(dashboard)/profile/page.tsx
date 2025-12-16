@@ -82,7 +82,7 @@ export default function ProfilePage() {
       await updateProfile.mutateAsync({
         nickname,
         bio,
-        orientation,
+        orientation: orientation || undefined,
       });
       alert('Perfil atualizado com sucesso!');
     } catch (error: any) {
@@ -246,7 +246,7 @@ export default function ProfilePage() {
                 <select
                   id="orientation"
                   value={orientation}
-                  onChange={(e) => setOrientation(e.target.value)}
+                  onChange={(e) => setOrientation(e.target.value as 'heterosexual' | 'homosexual' | 'bisexual' | 'other' | '')}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <option value="">Selecione...</option>
