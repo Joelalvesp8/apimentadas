@@ -9,6 +9,7 @@ export const createSessionSchema = z.object({
 
 export const playCardSchema = z.object({
   cardId: z.string().min(1, 'Card ID é obrigatório'),
+  qualitativeRating: z.enum(['ruim', 'satisfatoria', 'excelente']).optional(),
   rating: z
     .number()
     .int('Rating deve ser um número inteiro')

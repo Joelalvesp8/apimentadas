@@ -71,12 +71,13 @@ export async function POST(request: NextRequest) {
 
     // Create session with participants in a transaction
     const session = await prisma.$transaction(async (tx) => {
-      // Create session
+      // Create session with first turn set to creator
       const newSession = await tx.gameSession.create({
         data: {
           creatorId: user.id,
           sessionType,
           status: 'active',
+          currentTurnProfileId: profile.id, // Creator starts the game
         },
       });
 

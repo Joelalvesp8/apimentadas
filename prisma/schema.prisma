@@ -134,15 +134,16 @@ model CardLike {
 // ============================================================================
 
 model GameSession {
-  id            String   @id @default(cuid())
-  creatorId     String   @map("creator_id")
-  sessionType   String   @map("session_type") // "casal" | "trisal" | "grupo" (determined by participant count)
-  status        String   @default("active") // "active" | "finished"
-  averageRating Float?   @map("average_rating")
-  cardsPlayed   Int      @default(0) @map("cards_played")
-  createdAt     DateTime @default(now()) @map("created_at")
-  finishedAt    DateTime? @map("finished_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id                  String    @id @default(cuid())
+  creatorId           String    @map("creator_id")
+  sessionType         String    @map("session_type") // "casal" | "trisal" | "grupo" (determined by participant count)
+  status              String    @default("active") // "active" | "finished"
+  currentTurnProfileId String?  @map("current_turn_profile_id") // Profile ID of who is picking the card
+  averageRating       Float?    @map("average_rating")
+  cardsPlayed         Int       @default(0) @map("cards_played")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  finishedAt          DateTime? @map("finished_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
 
   // Relations
   creator             User                  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
@@ -167,11 +168,14 @@ model SessionParticipant {
 }
 
 model PlayedCard {
-  id        String   @id @default(cuid())
-  sessionId String   @map("session_id")
-  cardId    String   @map("card_id")
-  rating    Int?     // 0-5 stars
-  playedAt  DateTime @default(now()) @map("played_at")
+  id                  String   @id @default(cuid())
+  sessionId           String   @map("session_id")
+  cardId              String   @map("card_id")
+  pickedByProfileId   String   @map("picked_by_profile_id") // Who picked/drew the card
+  answeredByProfileId String?  @map("answered_by_profile_id") // Who answered/executed
+  qualitativeRating   String?  @map("qualitative_rating") // "ruim" | "satisfatoria" | "excelente"
+  rating              Int?     // Legacy numeric rating (0-5 stars) - kept for compatibility
+  playedAt            DateTime @default(now()) @map("played_at")
 
   // Relations
   session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)

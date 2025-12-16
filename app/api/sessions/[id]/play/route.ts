@@ -9,7 +9,7 @@ import {
 } from '@/lib/utils/responses';
 import { playCardSchema } from '@/lib/validations/session';
 
-// POST /api/sessions/:id/play
+// POST /api/sessions/:id/play - Pick a card (turn-based)
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -18,6 +18,15 @@ export async function POST(
     const user = await getAuthenticatedUser();
     if (!user) {
       return unauthorizedResponse();
+    }
+
+    // Get user's profile
+    const userProfile = await prisma.profile.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!userProfile) {
+      return errorResponse('Perfil não encontrado', 404);
     }
 
     const body = await request.json();
@@ -36,9 +45,9 @@ export async function POST(
       return validationErrorResponse(errors);
     }
 
-    const { cardId, rating } = validation.data;
+    const { cardId, qualitativeRating } = validation.data;
 
-    // Get session
+    // Get session with participants
     const session = await prisma.gameSession.findUnique({
       where: { id: params.id },
       include: {
@@ -50,8 +59,16 @@ export async function POST(
               },
             },
           },
+          orderBy: {
+            joinedAt: 'asc',
+          },
         },
-        playedCards: true,
+        playedCards: {
+          orderBy: {
+            playedAt: 'desc',
+          },
+          take: 1,
+        },
       },
     });
 
@@ -64,12 +81,17 @@ export async function POST(
     }
 
     // Check if user is participant
-    const isParticipant = session.sessionParticipants.some(
+    const userParticipant = session.sessionParticipants.find(
       (p) => p.profile.userId === user.id
     );
 
-    if (!isParticipant && session.creatorId !== user.id) {
+    if (!userParticipant) {
       return errorResponse('Você não é participante desta sessão', 403);
+    }
+
+    // Check if it's user's turn to pick a card
+    if (session.currentTurnProfileId !== userProfile.id) {
+      return errorResponse('Não é sua vez de pegar uma carta', 403);
     }
 
     // Check if card exists
@@ -81,18 +103,34 @@ export async function POST(
       return errorResponse('Carta não encontrada', 404);
     }
 
-    // Play card and update session stats in transaction
+    // Determine who should answer (next participant in rotation)
+    const currentIndex = session.sessionParticipants.findIndex(
+      (p) => p.profileId === session.currentTurnProfileId
+    );
+    const nextIndex = (currentIndex + 1) % session.sessionParticipants.length;
+    const answererProfileId = session.sessionParticipants[nextIndex].profileId;
+
+    // Play card and update turn in transaction
     const result = await prisma.$transaction(async (tx) => {
       // Create played card
       const playedCard = await tx.playedCard.create({
         data: {
           sessionId: params.id,
           cardId,
-          rating,
+          pickedByProfileId: userProfile.id,
+          answeredByProfileId: answererProfileId,
+          qualitativeRating,
+        },
+        include: {
+          card: true,
         },
       });
 
-      // Update session stats
+      // Calculate next turn (move to answerer for next round)
+      const nextTurnIndex = (nextIndex + 1) % session.sessionParticipants.length;
+      const nextTurnProfileId = session.sessionParticipants[nextTurnIndex].profileId;
+
+      // Update session stats and turn
       const allPlayedCards = await tx.playedCard.findMany({
         where: { sessionId: params.id },
       });
@@ -110,6 +148,27 @@ export async function POST(
         data: {
           cardsPlayed,
           averageRating,
+          currentTurnProfileId: nextTurnProfileId,
+        },
+        include: {
+          sessionParticipants: {
+            include: {
+              profile: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                      image: true,
+                    },
+                  },
+                },
+              },
+            },
+            orderBy: {
+              joinedAt: 'asc',
+            },
+          },
         },
       });
 
