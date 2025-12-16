@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useProfile } from '@/hooks/useProfile';
 import { useConnections } from '@/hooks/useConnections';
 import { useSessionHistory, useActiveSessions } from '@/hooks/useSessions';
+import { useIsAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, GamepadIcon, Star, Clock } from 'lucide-react';
+import { Users, GamepadIcon, Star, Clock, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const { data: connections } = useConnections('accepted');
   const { data: sessionHistory } = useSessionHistory();
   const { data: activeSessions, isLoading: activeSessionsLoading } = useActiveSessions();
+  const { data: adminData } = useIsAdmin();
 
   // If no profile, redirect to onboarding
   if (!profileLoading && !profile) {
@@ -169,6 +171,34 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Admin Panel */}
+        {adminData?.isAdmin && (
+          <Card className="mb-8 border-2 border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-purple-700">
+                    <Shield className="h-6 w-6" />
+                    Painel Administrativo
+                  </CardTitle>
+                  <CardDescription>
+                    Gerencie cartas criadas pelos usuários
+                  </CardDescription>
+                </div>
+                <Badge className="bg-purple-600">Admin</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin">
+                <Button className="w-full bg-purple-600 hover:bg-purple-700" size="lg">
+                  <Shield className="mr-2 h-5 w-5" />
+                  Acessar Painel Admin
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         )}

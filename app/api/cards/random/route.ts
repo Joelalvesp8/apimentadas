@@ -19,32 +19,82 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type') || undefined;
     const category = searchParams.get('category') || undefined;
 
-    // Build where clause
-    const where: any = {
+    // Build where clause for official cards
+    const whereOfficial: any = {
       isOfficial: true,
     };
 
     if (type) {
-      where.type = type;
+      whereOfficial.type = type;
     }
 
     if (category) {
-      where.category = category;
+      whereOfficial.category = category;
     }
 
-    // Get total count
-    const total = await prisma.card.count({ where });
+    // Build where clause for approved user cards
+    const whereUserCards: any = {
+      approved: true,
+    };
+
+    if (type) {
+      whereUserCards.type = type;
+    }
+
+    if (category) {
+      whereUserCards.category = category;
+    }
+
+    // Get total count of both official and approved user cards
+    const totalOfficial = await prisma.card.count({ where: whereOfficial });
+    const totalUserCards = await prisma.userCard.count({ where: whereUserCards });
+    const total = totalOfficial + totalUserCards;
 
     if (total === 0) {
       return errorResponse('Nenhuma carta encontrada com esses filtros', 404);
     }
 
-    // Get random card
-    const skip = Math.floor(Math.random() * total);
-    const card = await prisma.card.findFirst({
-      where,
-      skip,
-    });
+    // Randomly decide if we pick official or user card (weighted by availability)
+    const randomIndex = Math.floor(Math.random() * total);
+
+    let card;
+    if (randomIndex < totalOfficial) {
+      // Pick from official cards
+      const skip = Math.floor(Math.random() * totalOfficial);
+      card = await prisma.card.findFirst({
+        where: whereOfficial,
+        skip,
+      });
+    } else {
+      // Pick from user cards
+      const skip = Math.floor(Math.random() * totalUserCards);
+      const userCard = await prisma.userCard.findFirst({
+        where: whereUserCards,
+        skip,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      // Transform userCard to look like a regular card
+      if (userCard) {
+        card = {
+          id: userCard.id,
+          type: userCard.type,
+          category: userCard.category,
+          difficulty: userCard.difficulty,
+          content: userCard.content,
+          isOfficial: false,
+          createdAt: userCard.createdAt,
+          updatedAt: userCard.updatedAt,
+          createdBy: userCard.user.name, // Extra field to show who created it
+        };
+      }
+    }
 
     return successResponse(card);
   } catch (error) {
