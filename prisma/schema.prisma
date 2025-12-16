@@ -20,10 +20,10 @@ model User {
   name          String
   password      String?   // Null for OAuth users
   provider      String    @default("credentials") // "credentials" | "google"
-  emailVerified DateTime?
+  emailVerified DateTime? @map("email_verified")
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
   profile       Profile?
@@ -36,12 +36,12 @@ model User {
 
 model Profile {
   id          String   @id @default(cuid())
-  userId      String   @unique
+  userId      String   @unique @map("user_id")
   nickname    String   @unique
   bio         String?
   orientation String?  // "heterosexual" | "homosexual" | "bisexual" | "other"
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
   user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -58,11 +58,11 @@ model Profile {
 
 model Connection {
   id        String   @id @default(cuid())
-  fromId    String
-  toId      String
+  fromId    String   @map("from_id")
+  toId      String   @map("to_id")
   status    String   @default("pending") // "pending" | "accepted" | "rejected"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   from Profile @relation("ConnectionFrom", fields: [fromId], references: [id], onDelete: Cascade)
@@ -82,9 +82,9 @@ model Card {
   category    String   // "casais" | "trios" | "grupos"
   difficulty  String   // "facil" | "medio" | "dificil" | "extremo"
   content     String   @db.Text
-  isOfficial  Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isOfficial  Boolean  @default(true) @map("is_official")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
   playedCards PlayedCard[]
@@ -95,15 +95,15 @@ model Card {
 
 model UserCard {
   id          String   @id @default(cuid())
-  userId      String
+  userId      String   @map("user_id")
   type        String   // "pergunta" | "tarefa"
   category    String   // "casais" | "trios" | "grupos"
   difficulty  String   // "facil" | "medio" | "dificil" | "extremo"
   content     String   @db.Text
   approved    Boolean  @default(false)
-  likesCount  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  likesCount  Int      @default(0) @map("likes_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -114,10 +114,10 @@ model UserCard {
 
 model CardLike {
   id         String   @id @default(cuid())
-  userId     String
-  cardId     String?
-  userCardId String?
-  createdAt  DateTime @default(now())
+  userId     String   @map("user_id")
+  cardId     String?  @map("card_id")
+  userCardId String?  @map("user_card_id")
+  createdAt  DateTime @default(now()) @map("created_at")
 
   // Relations
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -135,14 +135,14 @@ model CardLike {
 
 model GameSession {
   id            String   @id @default(cuid())
-  creatorId     String
-  sessionType   String   // "casal" | "trisal" | "grupo" (determined by participant count)
+  creatorId     String   @map("creator_id")
+  sessionType   String   @map("session_type") // "casal" | "trisal" | "grupo" (determined by participant count)
   status        String   @default("active") // "active" | "finished"
-  averageRating Float?
-  cardsPlayed   Int      @default(0)
-  createdAt     DateTime @default(now())
-  finishedAt    DateTime?
-  updatedAt     DateTime @updatedAt
+  averageRating Float?   @map("average_rating")
+  cardsPlayed   Int      @default(0) @map("cards_played")
+  createdAt     DateTime @default(now()) @map("created_at")
+  finishedAt    DateTime? @map("finished_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Relations
   creator             User                  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
@@ -154,9 +154,9 @@ model GameSession {
 
 model SessionParticipant {
   id        String   @id @default(cuid())
-  sessionId String
-  profileId String
-  joinedAt  DateTime @default(now())
+  sessionId String   @map("session_id")
+  profileId String   @map("profile_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
 
   // Relations
   session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -168,10 +168,10 @@ model SessionParticipant {
 
 model PlayedCard {
   id        String   @id @default(cuid())
-  sessionId String
-  cardId    String
+  sessionId String   @map("session_id")
+  cardId    String   @map("card_id")
   rating    Int?     // 0-5 stars
-  playedAt  DateTime @default(now())
+  playedAt  DateTime @default(now()) @map("played_at")
 
   // Relations
   session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
