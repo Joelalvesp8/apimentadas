@@ -7,6 +7,7 @@ export interface GameSession {
   creatorId: string;
   sessionType: string;
   status: string;
+  currentTurnProfileId: string | null;
   averageRating: number | null;
   cardsPlayed: number;
   createdAt: string;
@@ -39,6 +40,9 @@ export interface GameSession {
     id: string;
     sessionId: string;
     cardId: string;
+    pickedByProfileId: string;
+    answeredByProfileId: string | null;
+    qualitativeRating: string | null;
     rating: number | null;
     playedAt: string;
     card: {
