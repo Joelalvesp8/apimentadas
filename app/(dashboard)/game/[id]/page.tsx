@@ -16,17 +16,28 @@ import { RatingStars } from '@/components/rating-stars';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 
+// Map sessionType to card category
+function getCardCategory(sessionType: string): string {
+  const mapping: Record<string, string> = {
+    'casal': 'casais',
+    'trisal': 'trios',
+    'grupo': 'grupos',
+  };
+  return mapping[sessionType] || sessionType;
+}
+
 export default function GamePage() {
   const params = useParams();
   const sessionId = params.id as string;
   const router = useRouter();
 
   const { data: session, isLoading } = useSession(sessionId);
+  const cardCategory = session?.sessionType ? getCardCategory(session.sessionType) : undefined;
   const {
     data: currentCard,
     refetch: fetchCard,
     isLoading: cardLoading,
-  } = useRandomCard(undefined, session?.sessionType);
+  } = useRandomCard(undefined, cardCategory);
 
   const playCard = usePlayCard(sessionId);
   const finishSession = useFinishSession();
