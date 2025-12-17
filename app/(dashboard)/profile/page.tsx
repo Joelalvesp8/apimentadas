@@ -25,7 +25,7 @@ export default function ProfilePage() {
 
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
-  const [orientation, setOrientation] = useState('');
+  const [orientation, setOrientation] = useState<'heterosexual' | 'homosexual' | 'bisexual' | 'other' | ''>('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
