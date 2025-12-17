@@ -34,7 +34,7 @@ export default function ProfilePage() {
     if (profile) {
       setNickname(profile.nickname);
       setBio(profile.bio || '');
-      setOrientation(profile.orientation || '');
+      setOrientation((profile.orientation || '') as 'heterosexual' | 'homosexual' | 'bisexual' | 'other' | '');
     }
   });
 
