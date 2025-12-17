@@ -4,7 +4,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home, Users, LogOut } from 'lucide-react';
+import { Home, Users, LogOut, Store } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -36,6 +36,12 @@ export default function DashboardLayout({
               <Button variant="ghost" size="sm" className="px-2 sm:px-3">
                 <Home className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Dashboard</span>
+              </Button>
+            </Link>
+            <Link href="/marketplace">
+              <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                <Store className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Marketplace</span>
               </Button>
             </Link>
             <Link href="/connections">
