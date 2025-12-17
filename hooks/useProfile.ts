@@ -11,6 +11,11 @@ export interface Profile {
   nickname: string;
   bio: string | null;
   orientation: string | null;
+  // Marketplace - Seller fields
+  isVendor: boolean;
+  pixKey: string | null;
+  storeName: string | null;
+  storeDescription: string | null;
   createdAt: string;
   updatedAt: string;
   user: {

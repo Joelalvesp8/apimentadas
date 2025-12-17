@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
       return validationErrorResponse(errors);
     }
 
-    const { nickname, bio, orientation } = validation.data;
+    const { nickname, bio, orientation, isVendor, pixKey, storeName, storeDescription } = validation.data;
 
     // Check if profile exists
     const existingProfile = await prisma.profile.findUnique({
@@ -159,6 +159,11 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // If activating vendor mode, require PIX key
+    if (isVendor && !pixKey && !existingProfile.pixKey) {
+      return errorResponse('Chave PIX é obrigatória para vendedores', 400);
+    }
+
     // Update profile
     const profile = await prisma.profile.update({
       where: { userId: user.id },
@@ -166,6 +171,10 @@ export async function PUT(request: NextRequest) {
         ...(nickname && { nickname }),
         ...(bio !== undefined && { bio }),
         ...(orientation && { orientation }),
+        ...(isVendor !== undefined && { isVendor }),
+        ...(pixKey !== undefined && { pixKey }),
+        ...(storeName !== undefined && { storeName }),
+        ...(storeDescription !== undefined && { storeDescription }),
       },
       include: {
         user: {

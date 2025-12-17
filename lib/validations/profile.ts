@@ -19,6 +19,11 @@ export const updateProfileSchema = z.object({
     .optional(),
   bio: z.string().max(500, 'Bio deve ter no máximo 500 caracteres').optional(),
   orientation: z.enum(['heterosexual', 'homosexual', 'bisexual', 'other']).optional(),
+  // Marketplace - Seller fields
+  isVendor: z.boolean().optional(),
+  pixKey: z.string().max(100, 'Chave PIX deve ter no máximo 100 caracteres').optional(),
+  storeName: z.string().max(50, 'Nome da loja deve ter no máximo 50 caracteres').optional(),
+  storeDescription: z.string().max(1000, 'Descrição da loja deve ter no máximo 1000 caracteres').optional(),
 });
 
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
