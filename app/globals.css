@@ -174,9 +174,10 @@ body {
 
 /* Standalone mode specific styles */
 @media all and (display-mode: standalone) {
-  /* Hide address bar gap on iOS */
-  body {
-    height: 100vh;
+  /* Enable scrolling in PWA mode */
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
   }
 
@@ -245,17 +246,12 @@ body {
     font-size: 16px;
   }
 
-  /* Fix for iOS bounce scroll */
-  body {
-    position: fixed;
-    overflow: hidden;
-    width: 100%;
-  }
-
-  #__next {
+  /* Enable smooth scrolling on iOS */
+  html, body {
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    height: 100vh;
+    height: 100%;
   }
 }
 
