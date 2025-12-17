@@ -47,19 +47,19 @@ export default function DashboardPage() {
       : '0.0';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-3 md:p-4 pb-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold mb-2">
             Olá, {profile?.nickname || session?.user?.name}!
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Bem-vindo(a) ao seu painel de controle
           </p>
         </div>
 
         {/* Statistics */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Conexões</CardTitle>
@@ -211,29 +211,29 @@ export default function DashboardPage() {
               O que você gostaria de fazer agora?
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/new-session">
-              <Button className="w-full h-20" size="lg">
-                <GamepadIcon className="mr-2 h-5 w-5" />
-                Iniciar Nova Sessão
+          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <Link href="/new-session" className="w-full">
+              <Button className="w-full h-24 md:h-20 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                <GamepadIcon className="h-5 w-5 md:h-5 md:w-5" />
+                <span className="text-xs md:text-sm text-center leading-tight">Iniciar Nova Sessão</span>
               </Button>
             </Link>
-            <Link href="/connections">
-              <Button variant="outline" className="w-full h-20" size="lg">
-                <Users className="mr-2 h-5 w-5" />
-                Ver Conexões
+            <Link href="/connections" className="w-full">
+              <Button variant="outline" className="w-full h-24 md:h-20 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                <Users className="h-5 w-5 md:h-5 md:w-5" />
+                <span className="text-xs md:text-sm text-center leading-tight">Ver Conexões</span>
               </Button>
             </Link>
-            <Link href="/create-card">
-              <Button variant="outline" className="w-full h-20 border-purple-300 hover:bg-purple-50" size="lg">
-                <span className="mr-2 text-xl">🎴</span>
-                Criar Carta
+            <Link href="/create-card" className="w-full">
+              <Button variant="outline" className="w-full h-24 md:h-20 border-purple-300 hover:bg-purple-50 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                <span className="text-xl md:text-xl">🎴</span>
+                <span className="text-xs md:text-sm text-center leading-tight">Criar Carta</span>
               </Button>
             </Link>
-            <Link href="/profile">
-              <Button variant="outline" className="w-full h-20 border-blue-300 hover:bg-blue-50" size="lg">
-                <User className="mr-2 h-5 w-5" />
-                Meu Perfil
+            <Link href="/profile" className="w-full">
+              <Button variant="outline" className="w-full h-24 md:h-20 border-blue-300 hover:bg-blue-50 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                <User className="h-5 w-5 md:h-5 md:w-5" />
+                <span className="text-xs md:text-sm text-center leading-tight">Meu Perfil</span>
               </Button>
             </Link>
           </CardContent>

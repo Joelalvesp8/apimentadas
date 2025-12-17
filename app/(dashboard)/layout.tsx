@@ -23,41 +23,42 @@ export default function DashboardLayout({
     <div className="min-h-screen">
       {/* Header */}
       <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-3xl">🌶️</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between gap-2">
+          <Link href="/dashboard" className="flex items-center gap-1 sm:gap-2">
+            <span className="text-2xl sm:text-3xl">🌶️</span>
+            <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
               APIMENTADAS
             </span>
           </Link>
 
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-1 sm:gap-2">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <Home className="mr-2 h-4 w-4" />
-                Dashboard
+              <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                <Home className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Dashboard</span>
               </Button>
             </Link>
             <Link href="/connections">
-              <Button variant="ghost" size="sm">
-                <Users className="mr-2 h-4 w-4" />
-                Conexões
+              <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                <Users className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Conexões</span>
               </Button>
             </Link>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => signOut({ callbackUrl: '/' })}
+              className="px-2 sm:px-3"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
+              <LogOut className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Sair</span>
             </Button>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main>{children}</main>
+      <main className="overflow-y-auto">{children}</main>
     </div>
   );
 }
