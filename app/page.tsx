@@ -21,7 +21,7 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-xl text-muted-foreground mb-8">
-            Esquente sua relação! Jogo adulto picante para casais, trios e grupos
+            🔥 Esquente sua relação! Jogo adulto picante para casais, trios e grupos 🔥
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/register">
