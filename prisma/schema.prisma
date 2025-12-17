@@ -40,6 +40,13 @@ model Profile {
   nickname    String   @unique
   bio         String?
   orientation String?  // "heterosexual" | "homosexual" | "bisexual" | "other"
+
+  // Marketplace - Seller fields
+  isVendor        Boolean @default(false) @map("is_vendor")
+  pixKey          String? @map("pix_key")
+  storeName       String? @map("store_name")
+  storeDescription String? @map("store_description") @db.Text
+
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -48,6 +55,12 @@ model Profile {
   connectionsFrom       Connection[]          @relation("ConnectionFrom")
   connectionsTo         Connection[]          @relation("ConnectionTo")
   sessionParticipants   SessionParticipant[]
+
+  // Marketplace relations
+  products              Product[]
+  cartItems             CartItem[]
+  ordersAsBuyer         Order[]               @relation("BuyerOrders")
+  ordersAsSeller        Order[]               @relation("SellerOrders")
 
   @@map("profiles")
 }
@@ -182,4 +195,85 @@ model PlayedCard {
   card    Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@map("played_cards")
+}
+
+// ============================================================================
+// MARKETPLACE MODELS
+// ============================================================================
+
+model Product {
+  id          String   @id @default(cuid())
+  sellerId    String   @map("seller_id")
+  name        String
+  description String   @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  category    String   // "vibradores" | "lingerie" | "acessorios" | "lubrificantes" | "fantasias" | "outros"
+  stock       Int      @default(0)
+  images      Json     @default("[]") // Array de URLs ou base64
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  seller      Profile      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user    Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id                      String    @id @default(cuid())
+  buyerId                 String    @map("buyer_id")
+  sellerId                String    @map("seller_id")
+  totalAmount             Decimal   @db.Decimal(10, 2) @map("total_amount")
+  status                  String    @default("pending") // "pending" | "paid_awaiting_confirmation" | "confirmed" | "shipped" | "delivered" | "cancelled"
+  pixKey                  String    @map("pix_key") // Snapshot da chave PIX do vendedor
+  paymentProof            String?   @map("payment_proof") @db.Text // Imagem base64 do comprovante
+  paymentProofUploadedAt  DateTime? @map("payment_proof_uploaded_at")
+  confirmedAt             DateTime? @map("confirmed_at")
+  shippedAt               DateTime? @map("shipped_at")
+  deliveredAt             DateTime? @map("delivered_at")
+  cancelledAt             DateTime? @map("cancelled_at")
+  cancellationReason      String?   @map("cancellation_reason") @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  buyer      Profile     @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller     Profile     @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String  @map("order_id")
+  productId    String  @map("product_id")
+  productName  String  @map("product_name") // Snapshot do nome
+  productPrice Decimal @db.Decimal(10, 2) @map("product_price") // Snapshot do preço
+  quantity     Int
+  subtotal     Decimal @db.Decimal(10, 2)
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@map("order_items")
 }
