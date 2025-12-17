@@ -41,7 +41,7 @@ const statusConfig = {
 };
 
 export default function OrdersPage() {
-  const { data: orders, isLoading } = useOrders({ type: 'buyer' });
+  const { data: orders, isLoading } = useOrders('buyer');
 
   if (isLoading) {
     return (
