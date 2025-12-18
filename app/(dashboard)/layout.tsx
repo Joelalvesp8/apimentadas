@@ -4,7 +4,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home, Users, LogOut, Store, Package } from 'lucide-react';
+import { Home, Users, LogOut, Store, Package, ShoppingBag } from 'lucide-react';
+import { useProfile } from '@/hooks/useProfile';
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const { data: profile } = useProfile();
 
   if (!session) {
     router.push('/login');
@@ -50,6 +52,14 @@ export default function DashboardLayout({
                 <span className="hidden sm:inline">Pedidos</span>
               </Button>
             </Link>
+            {profile?.isVendor && (
+              <Link href="/seller">
+                <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                  <ShoppingBag className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Vendas</span>
+                </Button>
+              </Link>
+            )}
             <Link href="/connections">
               <Button variant="ghost" size="sm" className="px-2 sm:px-3">
                 <Users className="h-4 w-4 sm:mr-2" />
