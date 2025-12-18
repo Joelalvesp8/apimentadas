@@ -1,6 +1,6 @@
 'use client';
 
-import { useOrders, useConfirmOrder } from '@/hooks/useMarketplace';
+import { useOrders, useConfirmOrderMutation } from '@/hooks/useMarketplace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +53,7 @@ const statusConfig = {
 
 export default function SellerOrdersPage() {
   const { data: orders, isLoading } = useOrders('seller');
+  const confirmOrder = useConfirmOrderMutation();
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   const handleConfirmPayment = async (orderId: string) => {
@@ -61,10 +62,9 @@ export default function SellerOrdersPage() {
     }
 
     setConfirmingId(orderId);
-    const confirmOrder = useConfirmOrder(orderId);
 
     try {
-      await confirmOrder.mutateAsync();
+      await confirmOrder.mutateAsync(orderId);
       alert('Pagamento confirmado com sucesso!');
     } catch (error: any) {
       alert(error.message || 'Erro ao confirmar pagamento');

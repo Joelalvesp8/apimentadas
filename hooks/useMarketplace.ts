@@ -153,6 +153,28 @@ export function useUpdateProduct(id: string) {
   });
 }
 
+export function useUpdateProductMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: {
+      id: string;
+      data: {
+        name?: string;
+        description?: string;
+        price?: number;
+        category?: string;
+        stock?: number;
+        images?: string[];
+        active?: boolean;
+      };
+    }) => apiClient.patch<Product>(`/api/products/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
 export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
@@ -264,6 +286,17 @@ export function useConfirmOrder(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders', id] });
+    },
+  });
+}
+
+export function useConfirmOrderMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (orderId: string) => apiClient.post(`/api/orders/${orderId}/confirm`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
 }

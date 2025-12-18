@@ -1,7 +1,7 @@
 'use client';
 
 import { useProfile } from '@/hooks/useProfile';
-import { useProducts, useDeleteProduct, useUpdateProduct } from '@/hooks/useMarketplace';
+import { useProducts, useDeleteProduct, useUpdateProductMutation } from '@/hooks/useMarketplace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ export default function SellerProductsPage() {
     activeOnly: false
   });
   const deleteProduct = useDeleteProduct();
+  const updateProduct = useUpdateProductMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string, name: string) => {
@@ -35,9 +36,11 @@ export default function SellerProductsPage() {
   };
 
   const handleToggleActive = async (product: any) => {
-    const updateProduct = useUpdateProduct(product.id);
     try {
-      await updateProduct.mutateAsync({ active: !product.active });
+      await updateProduct.mutateAsync({
+        id: product.id,
+        data: { active: !product.active }
+      });
     } catch (error) {
       alert('Erro ao atualizar produto');
     }
