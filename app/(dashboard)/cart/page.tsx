@@ -74,11 +74,18 @@ export default function CartPage() {
                     <div className="space-y-3">
                       {items.map((item) => {
                         // Normalize images to always be an array (defensive programming)
-                        const normalizedImages = Array.isArray(item.product.images)
-                          ? item.product.images
-                          : (typeof item.product.images === 'string'
-                            ? (item.product.images.startsWith('[') ? JSON.parse(item.product.images) : [item.product.images])
-                            : []);
+                        let normalizedImages: string[] = [];
+                        if (Array.isArray(item.product.images)) {
+                          normalizedImages = item.product.images;
+                        } else if (typeof item.product.images === 'string') {
+                          try {
+                            normalizedImages = item.product.images.startsWith('[')
+                              ? JSON.parse(item.product.images)
+                              : [item.product.images];
+                          } catch {
+                            normalizedImages = [item.product.images];
+                          }
+                        }
 
                         const imageUrl = normalizedImages?.[0] || '/placeholder-product.png';
                         const subtotal = Number(item.product.price) * item.quantity;
