@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
 
+// Force dynamic rendering - used by authenticated and public routes
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Helper functions
 function successResponse(data: any, status = 200) {
   return NextResponse.json({ data }, { status });
