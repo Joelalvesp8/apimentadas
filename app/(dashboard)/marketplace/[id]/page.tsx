@@ -60,8 +60,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  const imageUrl = product.images && product.images.length > 0
-    ? product.images[0]
+  // Normalize images to always be an array (defensive programming)
+  const normalizedImages = Array.isArray(product.images)
+    ? product.images
+    : (typeof product.images === 'string'
+      ? (product.images.startsWith('[') ? JSON.parse(product.images) : [product.images])
+      : []);
+
+  const imageUrl = normalizedImages && normalizedImages.length > 0
+    ? normalizedImages[0]
     : '/placeholder-product.png';
 
   return (

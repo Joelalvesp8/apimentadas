@@ -73,7 +73,14 @@ export default function CartPage() {
                     </h3>
                     <div className="space-y-3">
                       {items.map((item) => {
-                        const imageUrl = item.product.images?.[0] || '/placeholder-product.png';
+                        // Normalize images to always be an array (defensive programming)
+                        const normalizedImages = Array.isArray(item.product.images)
+                          ? item.product.images
+                          : (typeof item.product.images === 'string'
+                            ? (item.product.images.startsWith('[') ? JSON.parse(item.product.images) : [item.product.images])
+                            : []);
+
+                        const imageUrl = normalizedImages?.[0] || '/placeholder-product.png';
                         const subtotal = Number(item.product.price) * item.quantity;
 
                         return (
