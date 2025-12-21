@@ -2,10 +2,11 @@
 
 import { use } from 'react';
 import { useProduct, useAddToCart } from '@/hooks/useMarketplace';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, Store, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, Store, ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -13,11 +14,20 @@ import { useState } from 'react';
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: product, isLoading } = useProduct(id);
   const addToCart = useAddToCart();
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = async () => {
+    // Check if user has a profile
+    if (!profile) {
+      if (confirm('Você precisa completar seu perfil antes de comprar. Deseja ir para o onboarding?')) {
+        router.push('/onboarding');
+      }
+      return;
+    }
+
     try {
       await addToCart.mutateAsync({ productId: id, quantity });
       alert('Produto adicionado ao carrinho!');
@@ -27,7 +37,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   };
 
-  if (isLoading) {
+  if (isLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
         <p>Carregando...</p>
@@ -63,6 +73,26 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             Voltar
           </Button>
         </Link>
+
+        {/* Warning if no profile */}
+        {!profile && (
+          <Card className="mb-4 border-yellow-200 bg-yellow-50">
+            <CardContent className="p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-yellow-900 mb-1">Complete seu perfil</h3>
+                <p className="text-sm text-yellow-800 mb-3">
+                  Você precisa completar seu perfil antes de fazer compras no marketplace.
+                </p>
+                <Link href="/onboarding">
+                  <Button size="sm" variant="default">
+                    Completar Perfil
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardContent className="p-4 md:p-6">
