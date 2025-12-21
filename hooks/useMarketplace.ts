@@ -13,7 +13,7 @@ export interface Product {
   price: number;
   category: string;
   stock: number;
-  images: string[];
+  images: string[] | string | any; // Can be array, string, or Prisma Json type
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -81,7 +81,7 @@ export interface OrderItem {
   subtotal: number;
   product: {
     id: string;
-    images: string[];
+    images: string[] | string | any; // Can be array, string, or Prisma Json type
   };
 }
 
