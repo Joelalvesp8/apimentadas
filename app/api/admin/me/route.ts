@@ -5,6 +5,10 @@ import {
   unauthorizedResponse,
 } from '@/lib/utils/responses';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // GET /api/admin/me - Check if current user is admin
 export async function GET() {
   try {

@@ -8,6 +8,10 @@ import {
   unauthorizedResponse,
 } from '@/lib/utils/responses';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // GET /api/admin/user-cards - List all user cards
 export async function GET(request: NextRequest) {
   try {

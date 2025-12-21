@@ -7,6 +7,10 @@ import {
   unauthorizedResponse,
 } from '@/lib/utils/responses';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // GET /api/sessions/history
 export async function GET(request: NextRequest) {
   try {

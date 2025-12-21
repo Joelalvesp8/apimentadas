@@ -3,6 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
 import { errorResponse, successResponse, unauthorizedResponse } from '@/lib/utils/responses';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // GET /api/profile/search?q=nickname
 export async function GET(request: NextRequest) {
   try {
