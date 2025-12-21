@@ -84,7 +84,26 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return successResponse(orders);
+    // Normalize orders data
+    const normalizedOrders = orders.map(order => ({
+      ...order,
+      totalAmount: Number(order.totalAmount),
+      orderItems: order.orderItems.map(item => ({
+        ...item,
+        productPrice: Number(item.productPrice),
+        subtotal: Number(item.subtotal),
+        product: item.product ? {
+          ...item.product,
+          images: Array.isArray(item.product.images)
+            ? item.product.images
+            : (typeof item.product.images === 'string'
+              ? JSON.parse(item.product.images as string)
+              : []),
+        } : null,
+      })),
+    }));
+
+    return successResponse(normalizedOrders);
   } catch (error: any) {
     console.error('Error fetching orders:', error);
     return errorResponse('Erro ao buscar pedidos', 500);

@@ -78,7 +78,21 @@ export async function PATCH(
       },
     });
 
-    return successResponse(updatedItem);
+    // Normalize cart item data
+    const normalizedItem = {
+      ...updatedItem,
+      product: {
+        ...updatedItem.product,
+        images: Array.isArray(updatedItem.product.images)
+          ? updatedItem.product.images
+          : (typeof updatedItem.product.images === 'string'
+            ? JSON.parse(updatedItem.product.images as string)
+            : []),
+        price: Number(updatedItem.product.price),
+      },
+    };
+
+    return successResponse(normalizedItem);
   } catch (error: any) {
     console.error('Error updating cart item:', error);
     return errorResponse('Erro ao atualizar item do carrinho', 500);

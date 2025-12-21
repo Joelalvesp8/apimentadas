@@ -83,7 +83,26 @@ export async function GET(
       return errorResponse('Você não tem permissão para ver este pedido', 403);
     }
 
-    return successResponse(order);
+    // Normalize order data
+    const normalizedOrder = {
+      ...order,
+      totalAmount: Number(order.totalAmount),
+      orderItems: order.orderItems.map(item => ({
+        ...item,
+        productPrice: Number(item.productPrice),
+        subtotal: Number(item.subtotal),
+        product: item.product ? {
+          ...item.product,
+          images: Array.isArray(item.product.images)
+            ? item.product.images
+            : (typeof item.product.images === 'string'
+              ? JSON.parse(item.product.images as string)
+              : []),
+        } : null,
+      })),
+    };
+
+    return successResponse(normalizedOrder);
   } catch (error: any) {
     console.error('Error fetching order:', error);
     return errorResponse('Erro ao buscar pedido', 500);

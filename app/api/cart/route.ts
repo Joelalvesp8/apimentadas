@@ -50,12 +50,26 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Normalize cart items data
+    const normalizedItems = cartItems.map(item => ({
+      ...item,
+      product: {
+        ...item.product,
+        images: Array.isArray(item.product.images)
+          ? item.product.images
+          : (typeof item.product.images === 'string'
+            ? JSON.parse(item.product.images as string)
+            : []),
+        price: Number(item.product.price),
+      },
+    }));
+
     // Calculate total
-    const total = cartItems.reduce((sum, item) => {
-      return sum + Number(item.product.price) * item.quantity;
+    const total = normalizedItems.reduce((sum, item) => {
+      return sum + item.product.price * item.quantity;
     }, 0);
 
-    return successResponse({ items: cartItems, total });
+    return successResponse({ items: normalizedItems, total });
   } catch (error: any) {
     console.error('Error fetching cart:', error);
     return errorResponse('Erro ao buscar carrinho', 500);
@@ -146,7 +160,21 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return successResponse(updatedItem);
+      // Normalize images
+      const normalizedItem = {
+        ...updatedItem,
+        product: {
+          ...updatedItem.product,
+          images: Array.isArray(updatedItem.product.images)
+            ? updatedItem.product.images
+            : (typeof updatedItem.product.images === 'string'
+              ? JSON.parse(updatedItem.product.images as string)
+              : []),
+          price: Number(updatedItem.product.price),
+        },
+      };
+
+      return successResponse(normalizedItem);
     }
 
     // Create new cart item
@@ -171,7 +199,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return successResponse(cartItem, 201);
+    // Normalize images
+    const normalizedItem = {
+      ...cartItem,
+      product: {
+        ...cartItem.product,
+        images: Array.isArray(cartItem.product.images)
+          ? cartItem.product.images
+          : (typeof cartItem.product.images === 'string'
+            ? JSON.parse(cartItem.product.images as string)
+            : []),
+        price: Number(cartItem.product.price),
+      },
+    };
+
+    return successResponse(normalizedItem, 201);
   } catch (error: any) {
     console.error('Error adding to cart:', error);
     return errorResponse('Erro ao adicionar ao carrinho', 500);

@@ -66,7 +66,18 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return successResponse(products);
+    // Normalize products data
+    const normalizedProducts = products.map(product => ({
+      ...product,
+      images: Array.isArray(product.images)
+        ? product.images
+        : (typeof product.images === 'string'
+          ? JSON.parse(product.images as string)
+          : []),
+      price: Number(product.price),
+    }));
+
+    return successResponse(normalizedProducts);
   } catch (error: any) {
     console.error('Error fetching products:', error);
     return errorResponse('Erro ao buscar produtos', 500);
@@ -141,7 +152,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return successResponse(product, 201);
+    // Normalize product data
+    const normalizedProduct = {
+      ...product,
+      images: Array.isArray(product.images)
+        ? product.images
+        : (typeof product.images === 'string'
+          ? JSON.parse(product.images as string)
+          : []),
+      price: Number(product.price),
+    };
+
+    return successResponse(normalizedProduct, 201);
   } catch (error: any) {
     console.error('Error creating product:', error);
     return errorResponse('Erro ao criar produto', 500);

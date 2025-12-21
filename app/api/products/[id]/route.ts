@@ -44,7 +44,18 @@ export async function GET(
       return errorResponse('Produto não encontrado', 404);
     }
 
-    return successResponse(product);
+    // Normalize images and price
+    const normalizedProduct = {
+      ...product,
+      images: Array.isArray(product.images)
+        ? product.images
+        : (typeof product.images === 'string'
+          ? JSON.parse(product.images as string)
+          : []),
+      price: Number(product.price),
+    };
+
+    return successResponse(normalizedProduct);
   } catch (error: any) {
     console.error('Error fetching product:', error);
     return errorResponse('Erro ao buscar produto', 500);
