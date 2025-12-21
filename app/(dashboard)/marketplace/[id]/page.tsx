@@ -9,15 +9,29 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Store, ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { data: profile, isLoading: profileLoading } = useProfile();
-  const { data: product, isLoading } = useProduct(id);
+  const { data: product, isLoading, error } = useProduct(id);
   const addToCart = useAddToCart();
   const [quantity, setQuantity] = useState(1);
+
+  // Debug logging
+  useEffect(() => {
+    if (product) {
+      console.log('Product data:', {
+        id: product.id,
+        name: product.name,
+        hasImages: !!product.images,
+        imagesType: typeof product.images,
+        hasSeller: !!product.seller,
+        hasPrice: !!product.price,
+      });
+    }
+  }, [product]);
 
   const handleAddToCart = async () => {
     // Check if user has a profile
@@ -45,6 +59,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     );
   }
 
+  if (error) {
+    console.error('Error loading product:', error);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="mb-4 text-red-600">Erro ao carregar produto</p>
+            <p className="mb-4 text-sm text-gray-600">{String(error)}</p>
+            <Link href="/marketplace">
+              <Button>Voltar ao Marketplace</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
@@ -60,25 +91,46 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  // Normalize images to always be an array (defensive programming)
-  const images = product.images as string | string[] | null;
-  let normalizedImages: string[] = [];
+  // Defensive checks
+  if (!product.seller) {
+    console.error('Product missing seller:', product);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="mb-4">Erro: Dados do vendedor não encontrados</p>
+            <Link href="/marketplace">
+              <Button>Voltar ao Marketplace</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  if (Array.isArray(images)) {
-    normalizedImages = images;
-  } else if (typeof images === 'string') {
-    try {
+  // Normalize images to always be an array (defensive programming)
+  let normalizedImages: string[] = [];
+  try {
+    const images = product.images as string | string[] | null;
+
+    if (Array.isArray(images)) {
+      normalizedImages = images;
+    } else if (typeof images === 'string') {
       normalizedImages = images.startsWith('[')
         ? JSON.parse(images)
         : [images];
-    } catch {
-      normalizedImages = [];
     }
+  } catch (err) {
+    console.error('Error normalizing images:', err);
+    normalizedImages = [];
   }
 
   const imageUrl = normalizedImages && normalizedImages.length > 0
     ? normalizedImages[0]
     : '/placeholder-product.png';
+
+  // Defensive price access
+  const productPrice = product.price != null ? Number(product.price) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-3 md:p-4">
@@ -131,7 +183,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </div>
 
                 <div className="text-3xl font-bold text-purple-600">
-                  R$ {Number(product.price).toFixed(2)}
+                  R$ {productPrice.toFixed(2)}
                 </div>
 
                 <div>
