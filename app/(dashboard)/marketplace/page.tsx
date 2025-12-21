@@ -125,16 +125,18 @@ export default function MarketplacePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {products.map((product) => {
               // Normalize images to always be an array (defensive programming)
+              const images = product.images as string | string[] | null;
               let normalizedImages: string[] = [];
-              if (Array.isArray(product.images)) {
-                normalizedImages = product.images;
-              } else if (typeof product.images === 'string') {
+
+              if (Array.isArray(images)) {
+                normalizedImages = images;
+              } else if (typeof images === 'string') {
                 try {
-                  normalizedImages = product.images.startsWith('[')
-                    ? JSON.parse(product.images)
-                    : [product.images];
+                  normalizedImages = images.startsWith('[')
+                    ? JSON.parse(images)
+                    : [images];
                 } catch {
-                  normalizedImages = [product.images];
+                  normalizedImages = [];
                 }
               }
 

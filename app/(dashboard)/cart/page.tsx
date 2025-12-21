@@ -74,16 +74,18 @@ export default function CartPage() {
                     <div className="space-y-3">
                       {items.map((item) => {
                         // Normalize images to always be an array (defensive programming)
+                        const images = item.product.images as string | string[] | null;
                         let normalizedImages: string[] = [];
-                        if (Array.isArray(item.product.images)) {
-                          normalizedImages = item.product.images;
-                        } else if (typeof item.product.images === 'string') {
+
+                        if (Array.isArray(images)) {
+                          normalizedImages = images;
+                        } else if (typeof images === 'string') {
                           try {
-                            normalizedImages = item.product.images.startsWith('[')
-                              ? JSON.parse(item.product.images)
-                              : [item.product.images];
+                            normalizedImages = images.startsWith('[')
+                              ? JSON.parse(images)
+                              : [images];
                           } catch {
-                            normalizedImages = [item.product.images];
+                            normalizedImages = [];
                           }
                         }
 
