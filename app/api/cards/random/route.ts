@@ -11,7 +11,7 @@ import {
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// GET /api/cards/random?type=&category=
+// GET /api/cards/random?type=&category=&sessionId=
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser();
@@ -22,6 +22,18 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type') || undefined;
     const category = searchParams.get('category') || undefined;
+    const sessionId = searchParams.get('sessionId');
+
+    // Get cards already played in this session to exclude them
+    let excludedCardIds: string[] = [];
+    if (sessionId) {
+      const playedCards = await prisma.playedCard.findMany({
+        where: { sessionId },
+        select: { cardId: true },
+      });
+      excludedCardIds = playedCards.map(pc => pc.cardId);
+      console.log(`[Session ${sessionId}] Excluding ${excludedCardIds.length} already played cards`);
+    }
 
     // Build where clause for official cards
     const whereOfficial: any = {
@@ -34,6 +46,13 @@ export async function GET(request: NextRequest) {
 
     if (category) {
       whereOfficial.category = category;
+    }
+
+    // Exclude already played cards
+    if (excludedCardIds.length > 0) {
+      whereOfficial.id = {
+        notIn: excludedCardIds,
+      };
     }
 
     // Build where clause for approved user cards
@@ -49,12 +68,25 @@ export async function GET(request: NextRequest) {
       whereUserCards.category = category;
     }
 
-    // Get total count of both official and approved user cards
+    // Exclude already played cards (user cards use the same IDs)
+    if (excludedCardIds.length > 0) {
+      whereUserCards.id = {
+        notIn: excludedCardIds,
+      };
+    }
+
+    // Get total count of both official and approved user cards (excluding played ones)
     const totalOfficial = await prisma.card.count({ where: whereOfficial });
     const totalUserCards = await prisma.userCard.count({ where: whereUserCards });
     const total = totalOfficial + totalUserCards;
 
+    console.log(`[Session ${sessionId}] Available cards: ${total} (${totalOfficial} official + ${totalUserCards} user)`);
+
     if (total === 0) {
+      // If no cards available, check if it's because all were played
+      if (excludedCardIds.length > 0) {
+        return errorResponse('Todas as cartas disponíveis já foram jogadas nesta sessão! Parabéns! 🎉', 404);
+      }
       return errorResponse('Nenhuma carta encontrada com esses filtros', 404);
     }
 

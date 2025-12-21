@@ -51,7 +51,7 @@ export default function GamePage() {
     data: currentCard,
     refetch: fetchCard,
     isLoading: cardLoading,
-  } = useRandomCard(undefined, cardCategory);
+  } = useRandomCard(undefined, cardCategory, sessionId);
 
   const playCard = usePlayCard(sessionId);
   const finishSession = useFinishSession();
