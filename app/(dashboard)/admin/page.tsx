@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAdminUserCards, useApproveUserCard, useDeleteUserCard, UserCard } from '@/hooks/useAdmin';
+import { useAdminUserCards, useApproveUserCard, useDeleteUserCard, useAllCards, UserCard, AllCard } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,7 +11,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, Trash2, Shield } from 'lucide-react';
+import { Check, X, Trash2, Shield, List } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -22,10 +30,11 @@ import {
 } from "@/components/ui/dialog";
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'all'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'all' | 'all-cards'>('pending');
   const [deleteDialogCard, setDeleteDialogCard] = useState<UserCard | null>(null);
 
-  const { data: userCards, isLoading } = useAdminUserCards(activeTab);
+  const { data: userCards, isLoading } = useAdminUserCards(activeTab === 'all-cards' ? 'all' : activeTab);
+  const { data: allCards, isLoading: allCardsLoading } = useAllCards();
   const approveCard = useApproveUserCard();
   const deleteCard = useDeleteUserCard();
 
@@ -98,7 +107,7 @@ export default function AdminPage() {
         </Card>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           <Button
             variant={activeTab === 'pending' ? 'default' : 'outline'}
             onClick={() => setActiveTab('pending')}
@@ -123,12 +132,119 @@ export default function AdminPage() {
             onClick={() => setActiveTab('all')}
             className={activeTab === 'all' ? 'bg-purple-600' : ''}
           >
-            Todas
+            Cartas de Usuários
+          </Button>
+          <Button
+            variant={activeTab === 'all-cards' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('all-cards')}
+            className={activeTab === 'all-cards' ? 'bg-purple-600' : ''}
+          >
+            <List className="w-4 h-4 mr-2" />
+            Todas as Cartas
+            {allCards && (
+              <Badge variant="secondary" className="ml-2">
+                {allCards.length}
+              </Badge>
+            )}
           </Button>
         </div>
 
         {/* Cards List */}
-        {isLoading ? (
+        {activeTab === 'all-cards' ? (
+          // Table view for all cards
+          allCardsLoading ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">Carregando cartas...</p>
+              </CardContent>
+            </Card>
+          ) : !allCards || allCards.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">Nenhuma carta encontrada</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Origem</TableHead>
+                        <TableHead className="w-[120px]">Tipo</TableHead>
+                        <TableHead className="w-[120px]">Categoria</TableHead>
+                        <TableHead className="w-[120px]">Dificuldade</TableHead>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead className="w-[150px]">Criado por</TableHead>
+                        <TableHead className="w-[100px]">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allCards.map((card) => (
+                        <TableRow key={card.id}>
+                          <TableCell>
+                            {card.isOfficial ? (
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                                Oficial
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                                Usuário
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {card.type === 'pergunta' ? '❓ Pergunta' : '✨ Tarefa'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize">
+                              {card.category}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getDifficultyColor(card.difficulty)}>
+                              {getDifficultyLabel(card.difficulty)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="max-w-md">
+                            <div className="line-clamp-2 text-sm">
+                              {card.content}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              <div className="font-medium">{card.createdBy}</div>
+                              {card.createdByEmail && (
+                                <div className="text-xs text-muted-foreground truncate max-w-[150px]">
+                                  {card.createdByEmail}
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {card.approved ? (
+                              <Badge className="bg-green-600">
+                                <Check className="w-3 h-3 mr-1" />
+                                Aprovada
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-orange-300 text-orange-700">
+                                ⏳ Pendente
+                              </Badge>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        ) : isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">Carregando cartas...</p>

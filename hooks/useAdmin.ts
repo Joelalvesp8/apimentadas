@@ -19,6 +19,20 @@ export interface UserCard {
   };
 }
 
+export interface AllCard {
+  id: string;
+  type: string;
+  category: string;
+  difficulty: string;
+  content: string;
+  isOfficial: boolean;
+  approved: boolean;
+  createdBy: string;
+  createdByEmail?: string;
+  createdAt: string;
+  likesCount: number;
+}
+
 export function useAdminUserCards(status: 'pending' | 'approved' | 'all' = 'pending') {
   return useQuery({
     queryKey: ['admin', 'user-cards', status],
@@ -57,5 +71,12 @@ export function useIsAdmin() {
     queryKey: ['admin', 'me'],
     queryFn: () => apiClient.get<{ isAdmin: boolean }>('/api/admin/me'),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+}
+
+export function useAllCards() {
+  return useQuery({
+    queryKey: ['admin', 'all-cards'],
+    queryFn: () => apiClient.get<AllCard[]>('/api/admin/cards'),
   });
 }
