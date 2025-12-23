@@ -163,7 +163,20 @@ export async function PUT(request: NextRequest) {
       return validationErrorResponse(errors);
     }
 
-    const { nickname, bio, orientation, isVendor, pixKey, storeName, storeDescription } = validation.data;
+    const { 
+      nickname, 
+      bio, 
+      orientation, 
+      isVendor, 
+      pixKey, 
+      storeName, 
+      storeDescription,
+      deliveryAddress,
+      deliveryCity,
+      deliveryState,
+      deliveryZipCode,
+      deliveryComplement,
+    } = validation.data;
 
     // Check if profile exists
     const existingProfile = await prisma.profile.findUnique({
@@ -201,6 +214,11 @@ export async function PUT(request: NextRequest) {
         ...(pixKey !== undefined && { pixKey }),
         ...(storeName !== undefined && { storeName }),
         ...(storeDescription !== undefined && { storeDescription }),
+        ...(deliveryAddress !== undefined && { deliveryAddress }),
+        ...(deliveryCity !== undefined && { deliveryCity }),
+        ...(deliveryState !== undefined && { deliveryState }),
+        ...(deliveryZipCode !== undefined && { deliveryZipCode }),
+        ...(deliveryComplement !== undefined && { deliveryComplement }),
       },
       include: {
         user: {

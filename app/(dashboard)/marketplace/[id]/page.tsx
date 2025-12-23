@@ -54,10 +54,21 @@ export default function ProductPage() {
   }, []);
 
   const handleAddToCart = async () => {
-    // Check if user has a profile
+    // Check if user has a profile with delivery address
     if (!profile) {
-      if (confirm('Você precisa completar seu perfil antes de comprar. Deseja ir para o onboarding?')) {
+      if (confirm('Você precisa completar seu perfil antes de comprar. Deseja completar agora?')) {
         router.push('/onboarding');
+      }
+      return;
+    }
+
+    // Check if user has delivery address
+    const hasAddress = profile.deliveryAddress && profile.deliveryCity && 
+                       profile.deliveryState && profile.deliveryZipCode;
+    
+    if (!hasAddress) {
+      if (confirm('Você precisa cadastrar seu endereço de entrega antes de comprar. Deseja cadastrar agora?')) {
+        router.push('/complete-profile');
       }
       return;
     }
@@ -162,7 +173,7 @@ export default function ProductPage() {
           </Button>
         </Link>
 
-        {/* Warning if no profile */}
+        {/* Warning if no profile or missing address */}
         {!profile && (
           <Card className="mb-4 border-yellow-200 bg-yellow-50">
             <CardContent className="p-4 flex items-start gap-3">
@@ -174,7 +185,27 @@ export default function ProductPage() {
                 </p>
                 <Link href="/onboarding">
                   <Button size="sm" variant="default">
-                    Completar Perfil
+                    Criar Perfil
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Warning if profile exists but missing address */}
+        {profile && !(profile.deliveryAddress && profile.deliveryCity && profile.deliveryState && profile.deliveryZipCode) && (
+          <Card className="mb-4 border-purple-200 bg-purple-50">
+            <CardContent className="p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-purple-900 mb-1">Cadastre seu endereço de entrega</h3>
+                <p className="text-sm text-purple-800 mb-3">
+                  Você precisa cadastrar seu endereço para receber as entregas do marketplace.
+                </p>
+                <Link href="/complete-profile">
+                  <Button size="sm" variant="default" className="bg-purple-600 hover:bg-purple-700">
+                    Cadastrar Endereço
                   </Button>
                 </Link>
               </div>
