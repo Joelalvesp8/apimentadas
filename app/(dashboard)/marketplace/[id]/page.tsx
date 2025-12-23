@@ -1,6 +1,5 @@
 'use client';
 
-import { use } from 'react';
 import { useProduct, useAddToCart } from '@/hooks/useMarketplace';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
@@ -8,11 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Store, ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function ProductPage() {
+  const params = useParams();
+  const id = params.id as string;
   const router = useRouter();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: product, isLoading, error } = useProduct(id);
