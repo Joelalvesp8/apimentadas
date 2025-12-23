@@ -22,16 +22,29 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   // Debug logging
   useEffect(() => {
     if (product) {
-      console.log('Product data:', {
-        id: product.id,
-        name: product.name,
-        hasImages: !!product.images,
-        imagesType: typeof product.images,
-        hasSeller: !!product.seller,
-        hasPrice: !!product.price,
-      });
+      console.log('=== PRODUCT DEBUG ===');
+      console.log('Product data:', product);
+      console.log('Product.seller:', product.seller);
+      console.log('Product.images:', product.images);
+      console.log('Product.images type:', typeof product.images);
+      console.log('Product.price:', product.price);
+      console.log('=====================');
     }
   }, [product]);
+
+  // Global error handler
+  useEffect(() => {
+    const errorHandler = (event: ErrorEvent) => {
+      console.error('=== GLOBAL ERROR ===');
+      console.error('Error:', event.error);
+      console.error('Message:', event.message);
+      console.error('Stack:', event.error?.stack);
+      console.error('====================');
+    };
+
+    window.addEventListener('error', errorHandler);
+    return () => window.removeEventListener('error', errorHandler);
+  }, []);
 
   const handleAddToCart = async () => {
     // Check if user has a profile
