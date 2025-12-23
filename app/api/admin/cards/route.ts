@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getAuthenticatedUser } from '@/lib/auth';
+import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
+import {
+  errorResponse,
+  successResponse,
+  unauthorizedResponse,
+} from '@/lib/utils/responses';
 
 // Force dynamic rendering for authenticated routes
 export const dynamic = 'force-dynamic';
@@ -11,11 +17,11 @@ export async function GET() {
     const user = await getAuthenticatedUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Check if user is admin
-    if (!user.isAdmin) {
+    if (!(await isAdmin(user.id))) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
     }
 
@@ -75,12 +81,9 @@ export async function GET() {
       })),
     ];
 
-    return NextResponse.json(allCards);
+    return successResponse(allCards);
   } catch (error) {
     console.error('Error fetching all cards:', error);
-    return NextResponse.json(
-      { error: 'Erro ao buscar cartas' },
-      { status: 500 }
-    );
+    return errorResponse('Erro ao buscar cartas', 500);
   }
 }
