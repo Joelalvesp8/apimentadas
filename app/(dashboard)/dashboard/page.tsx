@@ -33,10 +33,25 @@ export default function DashboardPage() {
   if (!profileLoading && !profile && profileError) {
     // Check if it's a 404 error (profile doesn't exist)
     const errorMessage = String(profileError);
+    console.log('[DEBUG] Dashboard - Profile check failed:', { 
+      profileLoading, 
+      hasProfile: !!profile, 
+      errorMessage 
+    });
+    
     if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
+      console.log('[DEBUG] Dashboard - Redirecting to onboarding (404 error)');
       router.push('/onboarding');
       return null;
+    } else {
+      console.log('[DEBUG] Dashboard - NOT redirecting, error is not 404');
     }
+  } else {
+    console.log('[DEBUG] Dashboard - Profile status:', { 
+      profileLoading, 
+      hasProfile: !!profile,
+      nickname: profile?.nickname 
+    });
   }
 
   const totalConnections = connections?.length || 0;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCreateProfile } from '@/hooks/useProfile';
+import { useCreateProfile, useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,7 +27,13 @@ export default function OnboardingPage() {
 
   // If user already has a profile with nickname, redirect to dashboard
   // This prevents users from being stuck in onboarding loop
+  console.log('[DEBUG] Onboarding - Profile check:', { 
+    hasProfile: !!existingProfile, 
+    nickname: existingProfile?.nickname 
+  });
+  
   if (existingProfile && existingProfile.nickname) {
+    console.log('[DEBUG] Onboarding - Profile exists, redirecting to dashboard');
     router.push('/dashboard');
     return null;
   }
@@ -36,6 +42,8 @@ export default function OnboardingPage() {
     e.preventDefault();
     setError('');
 
+    console.log('[DEBUG] Onboarding - Submitting profile:', { nickname, hasBio: !!bio, orientation });
+
     try {
       await createProfile.mutateAsync({
         nickname,
@@ -43,12 +51,15 @@ export default function OnboardingPage() {
         orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
       });
 
+      console.log('[DEBUG] Onboarding - Profile created successfully, redirecting to dashboard');
       router.push('/dashboard');
     } catch (error: any) {
       const errorMessage = error.message || 'Erro ao criar perfil';
+      console.log('[DEBUG] Onboarding - Error creating profile:', errorMessage);
       
       // If profile already exists, redirect to dashboard instead of showing error
       if (errorMessage.includes('já existe') || errorMessage.includes('already exists')) {
+        console.log('[DEBUG] Onboarding - Profile already exists, redirecting to dashboard');
         router.push('/dashboard');
         return;
       }

@@ -13,7 +13,10 @@ import { createProfileSchema, updateProfileSchema } from '@/lib/validations/prof
 export async function GET() {
   try {
     const user = await getAuthenticatedUser();
+    console.log('[DEBUG] GET /api/profile - User:', user ? { id: user.id, email: user.email } : 'null');
+    
     if (!user) {
+      console.log('[DEBUG] GET /api/profile - Unauthorized: no user found');
       return unauthorizedResponse();
     }
 
@@ -31,13 +34,21 @@ export async function GET() {
       },
     });
 
+    console.log('[DEBUG] GET /api/profile - Profile:', profile ? { 
+      id: profile.id, 
+      nickname: profile.nickname, 
+      userId: profile.userId 
+    } : 'null');
+
     if (!profile) {
+      console.log('[DEBUG] GET /api/profile - Profile not found for userId:', user.id);
       return errorResponse('Perfil não encontrado', 404);
     }
 
+    console.log('[DEBUG] GET /api/profile - Success, returning profile');
     return successResponse(profile);
   } catch (error) {
-    console.error('Error in GET /api/profile:', error);
+    console.error('[ERROR] GET /api/profile:', error);
     return errorResponse('Erro ao buscar perfil');
   }
 }
@@ -46,7 +57,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser();
+    console.log('[DEBUG] POST /api/profile - User:', user ? { id: user.id, email: user.email } : 'null');
+    
     if (!user) {
+      console.log('[DEBUG] POST /api/profile - Unauthorized: no user found');
       return unauthorizedResponse();
     }
 
@@ -55,7 +69,13 @@ export async function POST(request: NextRequest) {
       where: { userId: user.id },
     });
 
+    console.log('[DEBUG] POST /api/profile - Existing profile check:', existingProfile ? { 
+      id: existingProfile.id, 
+      nickname: existingProfile.nickname 
+    } : 'null');
+
     if (existingProfile) {
+      console.log('[DEBUG] POST /api/profile - Profile already exists, returning error');
       return errorResponse('Perfil já existe', 400);
     }
 
@@ -106,9 +126,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log('[DEBUG] POST /api/profile - Profile created successfully:', { 
+      id: profile.id, 
+      nickname: profile.nickname,
+      userId: profile.userId 
+    });
+
     return successResponse(profile, 201);
   } catch (error) {
-    console.error('Error in POST /api/profile:', error);
+    console.error('[ERROR] POST /api/profile:', error);
     return errorResponse('Erro ao criar perfil');
   }
 }
