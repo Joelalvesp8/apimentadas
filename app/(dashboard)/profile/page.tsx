@@ -165,11 +165,11 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center gap-4">
               <Avatar className="w-32 h-32">
                 <AvatarImage
-                  src={imagePreview || profile.user.image || undefined}
-                  alt={profile.user.name}
+                  src={imagePreview || profile?.user?.image || undefined}
+                  alt={profile?.user?.name || 'User'}
                 />
                 <AvatarFallback className="text-4xl">
-                  {profile.nickname[0].toUpperCase()}
+                  {profile?.nickname?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
 
@@ -234,7 +234,7 @@ export default function ProfilePage() {
                 <Input
                   id="email"
                   type="email"
-                  value={profile.user.email}
+                  value={profile?.user?.email || ''}
                   disabled
                   className="bg-gray-100"
                 />
@@ -249,7 +249,7 @@ export default function ProfilePage() {
                 <Input
                   id="name"
                   type="text"
-                  value={profile.user.name}
+                  value={profile?.user?.name || ''}
                   disabled
                   className="bg-gray-100"
                 />
