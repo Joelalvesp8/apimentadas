@@ -21,8 +21,8 @@ export async function GET() {
     }
 
     // Check if user is admin
-    if (!(await isAdmin(user.id))) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!isAdmin(user)) {
+      return errorResponse('Acesso negado. Apenas administradores podem acessar esta página.', 403);
     }
 
     // Get all official cards
