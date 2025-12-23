@@ -28,7 +28,7 @@ export function PWARegister() {
     const handleControllerChange = () => {
       console.log('[PWA] New Service Worker activated');
       // Optionally show a notification to reload
-      if (typeof window !== 'undefined' && window.confirm && window.location) {
+      if (typeof window !== 'undefined') {
         if (confirm('Nova versão disponível! Deseja atualizar?')) {
           window.location.reload();
         }
@@ -50,10 +50,8 @@ export function PWARegister() {
       navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
     }
 
-    if (window) {
-      window.addEventListener('online', handleOnline);
-      window.addEventListener('offline', handleOffline);
-    }
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     // Cleanup
     return () => {
