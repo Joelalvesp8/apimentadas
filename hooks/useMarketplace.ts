@@ -43,6 +43,12 @@ export interface Order {
   totalAmount: number;
   status: string;
   pixKey: string;
+  // Delivery address fields
+  deliveryAddress: string;
+  deliveryCity: string;
+  deliveryState: string;
+  deliveryZipCode: string;
+  deliveryComplement: string | null;
   paymentProof: string | null;
   paymentProofUploadedAt: string | null;
   confirmedAt: string | null;
