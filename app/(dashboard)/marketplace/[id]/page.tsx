@@ -34,6 +34,9 @@ export default function ProductPage() {
 
   // Global error handler
   useEffect(() => {
+    // Ensure we're in a browser environment
+    if (typeof window === 'undefined') return;
+
     const errorHandler = (event: ErrorEvent) => {
       console.error('=== GLOBAL ERROR ===');
       console.error('Error:', event.error);
@@ -43,7 +46,11 @@ export default function ProductPage() {
     };
 
     window.addEventListener('error', errorHandler);
-    return () => window.removeEventListener('error', errorHandler);
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('error', errorHandler);
+      }
+    };
   }, []);
 
   const handleAddToCart = async () => {
