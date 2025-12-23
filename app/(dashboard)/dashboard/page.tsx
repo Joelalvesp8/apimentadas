@@ -22,16 +22,21 @@ import Link from 'next/link';
 export default function DashboardPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const { data: profile, isLoading: profileLoading } = useProfile();
+  const { data: profile, isLoading: profileLoading, error: profileError } = useProfile();
   const { data: connections } = useConnections('accepted');
   const { data: sessionHistory } = useSessionHistory();
   const { data: activeSessions, isLoading: activeSessionsLoading } = useActiveSessions();
   const { data: adminData } = useIsAdmin();
 
-  // If no profile, redirect to onboarding
-  if (!profileLoading && !profile) {
-    router.push('/onboarding');
-    return null;
+  // Only redirect to onboarding if profile truly doesn't exist (404 error)
+  // Don't redirect if there's a temporary error or if profile has nickname
+  if (!profileLoading && !profile && profileError) {
+    // Check if it's a 404 error (profile doesn't exist)
+    const errorMessage = String(profileError);
+    if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
+      router.push('/onboarding');
+      return null;
+    }
   }
 
   const totalConnections = connections?.length || 0;

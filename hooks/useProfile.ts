@@ -36,7 +36,8 @@ export function useProfile() {
   return useQuery({
     queryKey: ['profile'],
     queryFn: () => apiClient.get<Profile>('/api/profile'),
-    retry: false,
+    retry: 1, // Retry once to handle transient errors
+    retryDelay: 1000, // Wait 1 second before retrying
   });
 }
 

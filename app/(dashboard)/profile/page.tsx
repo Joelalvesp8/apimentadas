@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { data: profile, isLoading } = useProfile();
+  const { data: profile, isLoading, error: profileError } = useProfile();
   const updateProfile = useUpdateProfile();
   const updateImage = useUpdateProfileImage();
 
@@ -119,9 +119,28 @@ export default function ProfilePage() {
     );
   }
 
-  if (!profile) {
-    router.push('/onboarding');
-    return null;
+  // Only redirect to onboarding if profile truly doesn't exist (404 error)
+  if (!profile && profileError) {
+    const errorMessage = String(profileError);
+    if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
+      router.push('/onboarding');
+      return null;
+    }
+  }
+
+  // Show error if profile couldn't be loaded for other reasons
+  if (!profile && !isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="mb-4 text-red-600">Erro ao carregar perfil</p>
+            <p className="mb-4 text-sm text-gray-600">{profileError ? String(profileError) : 'Erro desconhecido'}</p>
+            <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

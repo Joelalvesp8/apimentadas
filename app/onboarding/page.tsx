@@ -18,11 +18,19 @@ import {
 export default function OnboardingPage() {
   const router = useRouter();
   const createProfile = useCreateProfile();
+  const { data: existingProfile } = useProfile();
 
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
   const [orientation, setOrientation] = useState<string>('');
   const [error, setError] = useState('');
+
+  // If user already has a profile with nickname, redirect to dashboard
+  // This prevents users from being stuck in onboarding loop
+  if (existingProfile && existingProfile.nickname) {
+    router.push('/dashboard');
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +45,15 @@ export default function OnboardingPage() {
 
       router.push('/dashboard');
     } catch (error: any) {
-      setError(error.message || 'Erro ao criar perfil');
+      const errorMessage = error.message || 'Erro ao criar perfil';
+      
+      // If profile already exists, redirect to dashboard instead of showing error
+      if (errorMessage.includes('já existe') || errorMessage.includes('already exists')) {
+        router.push('/dashboard');
+        return;
+      }
+      
+      setError(errorMessage);
     }
   };
 
