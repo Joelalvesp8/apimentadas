@@ -16,6 +16,12 @@ export interface Profile {
   pixKey: string | null;
   storeName: string | null;
   storeDescription: string | null;
+  // Delivery address fields
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
+  deliveryZipCode: string | null;
+  deliveryComplement: string | null;
   createdAt: string;
   updatedAt: string;
   user: {

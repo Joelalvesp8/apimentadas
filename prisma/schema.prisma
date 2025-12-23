@@ -47,6 +47,13 @@ model Profile {
   storeName       String? @map("store_name")
   storeDescription String? @map("store_description") @db.Text
 
+  // Delivery address fields
+  deliveryAddress    String? @map("delivery_address")
+  deliveryCity       String? @map("delivery_city")
+  deliveryState      String? @map("delivery_state")
+  deliveryZipCode    String? @map("delivery_zip_code")
+  deliveryComplement String? @map("delivery_complement")
+
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -244,6 +251,14 @@ model Order {
   totalAmount             Decimal   @db.Decimal(10, 2) @map("total_amount")
   status                  String    @default("pending") // "pending" | "paid_awaiting_confirmation" | "confirmed" | "shipped" | "delivered" | "cancelled"
   pixKey                  String    @map("pix_key") // Snapshot da chave PIX do vendedor
+
+  // Delivery address (snapshot from buyer's profile at order time)
+  deliveryAddress         String    @map("delivery_address")
+  deliveryCity            String    @map("delivery_city")
+  deliveryState           String    @map("delivery_state")
+  deliveryZipCode         String    @map("delivery_zip_code")
+  deliveryComplement      String?   @map("delivery_complement")
+
   paymentProof            String?   @map("payment_proof") @db.Text // Imagem base64 do comprovante
   paymentProofUploadedAt  DateTime? @map("payment_proof_uploaded_at")
   confirmedAt             DateTime? @map("confirmed_at")
