@@ -2,19 +2,32 @@
 
 import { useState, useRef } from 'react';
 import { useCart, useCreateOrder } from '@/hooks/useMarketplace';
+import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { CreditCard, Upload, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { CreditCard, Upload, ArrowLeft, CheckCircle, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { data: cart } = useCart();
+  const { data: profile } = useProfile();
+  const updateProfile = useUpdateProfile();
   const createOrder = useCreateOrder();
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Address form state
+  const [address, setAddress] = useState({
+    deliveryAddress: profile?.deliveryAddress || '',
+    deliveryCity: profile?.deliveryCity || '',
+    deliveryState: profile?.deliveryState || '',
+    deliveryZipCode: profile?.deliveryZipCode || '',
+    deliveryComplement: profile?.deliveryComplement || '',
+  });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,12 +53,22 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate address
+    if (!address.deliveryAddress || !address.deliveryCity || !address.deliveryState || !address.deliveryZipCode) {
+      alert('Por favor, preencha todos os campos de endereço obrigatórios');
+      return;
+    }
+
     if (!paymentProof) {
       alert('Por favor, envie o comprovante de pagamento');
       return;
     }
 
     try {
+      // Save address to profile first
+      await updateProfile.mutateAsync(address);
+
+      // Then create the order
       const result = await createOrder.mutateAsync({ paymentProof });
       alert(result.message || 'Pedido criado com sucesso!');
       router.push('/orders');
@@ -151,10 +174,76 @@ export default function CheckoutPage() {
                     <li>Abra o app do seu banco</li>
                     <li>Faça o PIX para cada vendedor</li>
                     <li>Tire um print do comprovante</li>
+                    <li>Preencha seu endereço de entrega</li>
                     <li>Envie o comprovante abaixo</li>
                   </ol>
                 </CardContent>
               </Card>
+
+              {/* Endereço de Entrega */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5" />
+                  <h3 className="font-semibold">Endereço de Entrega</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="address">Endereço *</Label>
+                    <Input
+                      id="address"
+                      placeholder="Rua, Avenida, número"
+                      value={address.deliveryAddress}
+                      onChange={(e) => setAddress({ ...address, deliveryAddress: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="city">Cidade *</Label>
+                    <Input
+                      id="city"
+                      placeholder="Ex: São Paulo"
+                      value={address.deliveryCity}
+                      onChange={(e) => setAddress({ ...address, deliveryCity: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="state">Estado (UF) *</Label>
+                    <Input
+                      id="state"
+                      placeholder="Ex: SP"
+                      maxLength={2}
+                      value={address.deliveryState}
+                      onChange={(e) => setAddress({ ...address, deliveryState: e.target.value.toUpperCase() })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="zipcode">CEP *</Label>
+                    <Input
+                      id="zipcode"
+                      placeholder="00000-000"
+                      value={address.deliveryZipCode}
+                      onChange={(e) => setAddress({ ...address, deliveryZipCode: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="complement">Complemento</Label>
+                    <Input
+                      id="complement"
+                      placeholder="Apto, bloco, etc"
+                      value={address.deliveryComplement}
+                      onChange={(e) => setAddress({ ...address, deliveryComplement: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Upload do Comprovante */}
               <div className="space-y-3">
@@ -209,12 +298,12 @@ export default function CheckoutPage() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={!paymentProof || createOrder.isPending}
+                disabled={!paymentProof || createOrder.isPending || updateProfile.isPending}
                 className="w-full"
                 size="lg"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                {createOrder.isPending ? 'Finalizando...' : 'Finalizar Pedido'}
+                {(createOrder.isPending || updateProfile.isPending) ? 'Finalizando...' : 'Finalizar Pedido'}
               </Button>
             </form>
           </CardContent>

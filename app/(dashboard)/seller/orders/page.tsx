@@ -13,7 +13,9 @@ import {
   Clock,
   XCircle,
   Eye,
-  AlertCircle
+  AlertCircle,
+  MapPin,
+  Truck
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -166,6 +168,20 @@ export default function SellerOrdersPage() {
                         <span className="font-mono text-purple-600">{order.pixKey}</span>
                       </div>
 
+                      {/* Delivery Address */}
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-purple-600" />
+                          <p className="text-sm font-semibold text-purple-800">Endereço de Entrega:</p>
+                        </div>
+                        <div className="text-sm space-y-1">
+                          <p>{order.deliveryAddress}</p>
+                          <p>{order.deliveryCity} - {order.deliveryState}</p>
+                          <p>CEP: {order.deliveryZipCode}</p>
+                          {order.deliveryComplement && <p>Complemento: {order.deliveryComplement}</p>}
+                        </div>
+                      </div>
+
                       {/* Order Items */}
                       <div className="border-t pt-3">
                         <p className="text-sm font-semibold mb-2">Itens:</p>
@@ -262,6 +278,20 @@ export default function SellerOrdersPage() {
                           <span className="text-muted-foreground">Data:</span>
                           <span>{new Date(order.createdAt).toLocaleDateString('pt-BR')}</span>
                         </div>
+
+                        {/* Delivery Address for other orders */}
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Truck className="w-4 h-4 text-gray-600" />
+                            <p className="text-xs font-semibold text-gray-700">Endereço de Entrega:</p>
+                          </div>
+                          <div className="text-xs space-y-0.5 text-gray-600">
+                            <p>{order.deliveryAddress}</p>
+                            <p>{order.deliveryCity} - {order.deliveryState}, CEP: {order.deliveryZipCode}</p>
+                            {order.deliveryComplement && <p>Compl: {order.deliveryComplement}</p>}
+                          </div>
+                        </div>
+
                         <div className="flex justify-between items-center pt-2 border-t">
                           <span className="font-bold">Total:</span>
                           <span className="font-bold text-green-600">

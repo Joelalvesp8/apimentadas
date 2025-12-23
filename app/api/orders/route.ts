@@ -136,6 +136,11 @@ export async function POST(request: NextRequest) {
       return errorResponse('Comprovante de pagamento (imagem) é obrigatório');
     }
 
+    // Validate delivery address
+    if (!profile.deliveryAddress || !profile.deliveryCity || !profile.deliveryState || !profile.deliveryZipCode) {
+      return errorResponse('Endereço de entrega incompleto. Por favor, preencha todos os campos obrigatórios no checkout.');
+    }
+
     // Get cart items
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: profile.id },
@@ -195,6 +200,12 @@ export async function POST(request: NextRequest) {
           sellerId,
           totalAmount,
           pixKey: seller.pixKey,
+          // Delivery address (snapshot from buyer's profile)
+          deliveryAddress: profile.deliveryAddress,
+          deliveryCity: profile.deliveryCity,
+          deliveryState: profile.deliveryState,
+          deliveryZipCode: profile.deliveryZipCode,
+          deliveryComplement: profile.deliveryComplement || undefined,
           paymentProof,
           paymentProofUploadedAt: new Date(),
           status: 'paid_awaiting_confirmation',
