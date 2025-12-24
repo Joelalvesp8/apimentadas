@@ -260,7 +260,7 @@ export default function CheckoutPage() {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Digite o CEP e clique em "Buscar CEP" ou pressione Tab para buscar automaticamente
+                      Digite o CEP e clique em &quot;Buscar CEP&quot; ou pressione Tab para buscar automaticamente
                     </p>
                   </div>
 
