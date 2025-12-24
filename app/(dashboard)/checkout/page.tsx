@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { CreditCard, Upload, ArrowLeft, CheckCircle, MapPin } from 'lucide-react';
+import { CreditCard, Upload, ArrowLeft, CheckCircle, MapPin, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -19,6 +19,7 @@ export default function CheckoutPage() {
   const createOrder = useCreateOrder();
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loadingCep, setLoadingCep] = useState(false);
 
   // Address form state
   const [address, setAddress] = useState({
@@ -28,6 +29,40 @@ export default function CheckoutPage() {
     deliveryZipCode: profile?.deliveryZipCode || '',
     deliveryComplement: profile?.deliveryComplement || '',
   });
+
+  // Buscar endereço pelo CEP usando ViaCEP API
+  const handleCepSearch = async (cep: string) => {
+    // Remove caracteres não numéricos
+    const cleanCep = cep.replace(/\D/g, '');
+
+    if (cleanCep.length !== 8) return;
+
+    setLoadingCep(true);
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        alert('CEP não encontrado');
+        return;
+      }
+
+      // Preencher campos automaticamente
+      setAddress({
+        ...address,
+        deliveryZipCode: cep,
+        deliveryAddress: data.logradouro || '',
+        deliveryCity: data.localidade || '',
+        deliveryState: data.uf || '',
+      });
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error);
+      alert('Erro ao buscar CEP. Por favor, preencha manualmente.');
+    } finally {
+      setLoadingCep(false);
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -188,17 +223,61 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* CEP - Primeiro campo */}
                   <div className="md:col-span-2">
-                    <Label htmlFor="address">Endereço *</Label>
+                    <Label htmlFor="zipcode">CEP *</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="zipcode"
+                        placeholder="00000-000"
+                        value={address.deliveryZipCode}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/\D/g, '');
+                          if (value.length > 5) {
+                            value = value.slice(0, 5) + '-' + value.slice(5, 8);
+                          }
+                          setAddress({ ...address, deliveryZipCode: value });
+                        }}
+                        onBlur={(e) => handleCepSearch(e.target.value)}
+                        maxLength={9}
+                        required
+                        disabled={loadingCep}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleCepSearch(address.deliveryZipCode)}
+                        disabled={loadingCep || address.deliveryZipCode.replace(/\D/g, '').length !== 8}
+                      >
+                        {loadingCep ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Buscando...
+                          </>
+                        ) : (
+                          'Buscar CEP'
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Digite o CEP e clique em "Buscar CEP" ou pressione Tab para buscar automaticamente
+                    </p>
+                  </div>
+
+                  {/* Endereço/Rua + Número */}
+                  <div className="md:col-span-2">
+                    <Label htmlFor="address">Endereço (Rua, Avenida) e Número *</Label>
                     <Input
                       id="address"
-                      placeholder="Rua, Avenida, número"
+                      placeholder="Ex: Rua das Flores, 123"
                       value={address.deliveryAddress}
                       onChange={(e) => setAddress({ ...address, deliveryAddress: e.target.value })}
                       required
+                      disabled={loadingCep}
                     />
                   </div>
 
+                  {/* Cidade */}
                   <div>
                     <Label htmlFor="city">Cidade *</Label>
                     <Input
@@ -207,9 +286,11 @@ export default function CheckoutPage() {
                       value={address.deliveryCity}
                       onChange={(e) => setAddress({ ...address, deliveryCity: e.target.value })}
                       required
+                      disabled={loadingCep}
                     />
                   </div>
 
+                  {/* Estado */}
                   <div>
                     <Label htmlFor="state">Estado (UF) *</Label>
                     <Input
@@ -219,27 +300,19 @@ export default function CheckoutPage() {
                       value={address.deliveryState}
                       onChange={(e) => setAddress({ ...address, deliveryState: e.target.value.toUpperCase() })}
                       required
+                      disabled={loadingCep}
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="zipcode">CEP *</Label>
-                    <Input
-                      id="zipcode"
-                      placeholder="00000-000"
-                      value={address.deliveryZipCode}
-                      onChange={(e) => setAddress({ ...address, deliveryZipCode: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="complement">Complemento</Label>
+                  {/* Complemento */}
+                  <div className="md:col-span-2">
+                    <Label htmlFor="complement">Complemento (Apartamento, Bloco, etc.)</Label>
                     <Input
                       id="complement"
-                      placeholder="Apto, bloco, etc"
+                      placeholder="Ex: Apto 101, Bloco B"
                       value={address.deliveryComplement}
                       onChange={(e) => setAddress({ ...address, deliveryComplement: e.target.value })}
+                      disabled={loadingCep}
                     />
                   </div>
                 </div>
