@@ -41,12 +41,6 @@ model Profile {
   bio         String?
   orientation String?  // "heterosexual" | "homosexual" | "bisexual" | "other"
 
-  // Marketplace - Seller fields
-  isVendor        Boolean @default(false) @map("is_vendor")
-  pixKey          String? @map("pix_key")
-  storeName       String? @map("store_name")
-  storeDescription String? @map("store_description") @db.Text
-
   // Delivery address fields
   deliveryAddress    String? @map("delivery_address")
   deliveryCity       String? @map("delivery_city")
@@ -64,10 +58,8 @@ model Profile {
   sessionParticipants   SessionParticipant[]
 
   // Marketplace relations
-  products              Product[]
   cartItems             CartItem[]
-  ordersAsBuyer         Order[]               @relation("BuyerOrders")
-  ordersAsSeller        Order[]               @relation("SellerOrders")
+  ordersAsBuyer         Order[]
 
   @@map("profiles")
 }
@@ -205,24 +197,59 @@ model PlayedCard {
 }
 
 // ============================================================================
-// MARKETPLACE MODELS
+// MARKETPLACE MODELS - LOJA PIMENTINHAS
 // ============================================================================
 
-model Product {
+model Category {
   id          String   @id @default(cuid())
-  sellerId    String   @map("seller_id")
-  name        String
-  description String   @db.Text
-  price       Decimal  @db.Decimal(10, 2)
-  category    String   // "vibradores" | "lingerie" | "acessorios" | "lubrificantes" | "fantasias" | "outros"
-  stock       Int      @default(0)
-  images      Json     @default("[]") // Array de URLs ou base64
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  order       Int      @default(0)
   active      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  seller      Profile      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  subcategories Subcategory[]
+
+  @@map("categories")
+}
+
+model Subcategory {
+  id          String   @id @default(cuid())
+  categoryId  String   @map("category_id")
+  name        String
+  slug        String
+  description String?  @db.Text
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  category Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([categoryId, slug])
+  @@map("subcategories")
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  subcategoryId   String   @map("subcategory_id")
+  name            String
+  description     String   @db.Text
+  price           Decimal  @db.Decimal(10, 2)
+  stock           Int      @default(0)
+  images          Json     @default("[]") // Array de URLs ou base64
+  active          Boolean  @default(true)
+  featured        Boolean  @default(false) // Produto em destaque
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Restrict)
   cartItems   CartItem[]
   orderItems  OrderItem[]
 
@@ -247,10 +274,8 @@ model CartItem {
 model Order {
   id                      String    @id @default(cuid())
   buyerId                 String    @map("buyer_id")
-  sellerId                String    @map("seller_id")
   totalAmount             Decimal   @db.Decimal(10, 2) @map("total_amount")
   status                  String    @default("pending") // "pending" | "paid_awaiting_confirmation" | "confirmed" | "shipped" | "delivered" | "cancelled"
-  pixKey                  String    @map("pix_key") // Snapshot da chave PIX do vendedor
 
   // Delivery address (snapshot from buyer's profile at order time)
   deliveryAddress         String    @map("delivery_address")
@@ -270,8 +295,7 @@ model Order {
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  buyer      Profile     @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
-  seller     Profile     @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Cascade)
+  buyer      Profile     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 
   @@map("orders")

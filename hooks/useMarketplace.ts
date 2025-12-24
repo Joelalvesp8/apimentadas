@@ -5,26 +5,44 @@ import { apiClient } from '@/lib/api-client';
 // TYPES
 // ============================================================================
 
-export interface Product {
+export interface Category {
   id: string;
-  sellerId: string;
   name: string;
-  description: string;
-  price: number;
-  category: string;
-  stock: number;
-  images: string[] | string | any; // Can be array, string, or Prisma Json type
+  slug: string;
+  description: string | null;
+  order: number;
   active: boolean;
   createdAt: string;
   updatedAt: string;
-  seller: {
-    id: string;
-    nickname: string;
-    storeName: string | null;
-    user: {
-      image: string | null;
-    };
-  };
+  subcategories?: Subcategory[];
+}
+
+export interface Subcategory {
+  id: string;
+  categoryId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  order: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  category?: Category;
+}
+
+export interface Product {
+  id: string;
+  subcategoryId: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  images: string[] | string | any; // Can be array, string, or Prisma Json type
+  active: boolean;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  subcategory?: Subcategory;
 }
 
 export interface CartItem {
@@ -39,10 +57,8 @@ export interface CartItem {
 export interface Order {
   id: string;
   buyerId: string;
-  sellerId: string;
   totalAmount: number;
   status: string;
-  pixKey: string;
   // Delivery address fields
   deliveryAddress: string;
   deliveryCity: string;
@@ -64,14 +80,6 @@ export interface Order {
     user: {
       image: string | null;
       email: string;
-    };
-  };
-  seller: {
-    id: string;
-    nickname: string;
-    storeName: string | null;
-    user: {
-      image: string | null;
     };
   };
   orderItems: OrderItem[];
