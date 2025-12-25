@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import dynamic from "next/dynamic";
@@ -10,7 +10,7 @@ const PWARegister = dynamic(
   { ssr: false }
 );
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "APIMENTADAS 🌶️",
@@ -57,7 +57,7 @@ export default function RootLayout({
         {/* Prevent zooming on iOS inputs */}
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <PWARegister />
         <Providers>{children}</Providers>
       </body>

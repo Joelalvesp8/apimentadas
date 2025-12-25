@@ -163,14 +163,10 @@ export async function PUT(request: NextRequest) {
       return validationErrorResponse(errors);
     }
 
-    const { 
-      nickname, 
-      bio, 
-      orientation, 
-      isVendor, 
-      pixKey, 
-      storeName, 
-      storeDescription,
+    const {
+      nickname,
+      bio,
+      orientation,
       deliveryAddress,
       deliveryCity,
       deliveryState,
@@ -198,11 +194,6 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // If activating vendor mode, require PIX key
-    if (isVendor && !pixKey && !existingProfile.pixKey) {
-      return errorResponse('Chave PIX é obrigatória para vendedores', 400);
-    }
-
     // Update profile
     const profile = await prisma.profile.update({
       where: { userId: user.id },
@@ -210,10 +201,6 @@ export async function PUT(request: NextRequest) {
         ...(nickname && { nickname }),
         ...(bio !== undefined && { bio }),
         ...(orientation && { orientation }),
-        ...(isVendor !== undefined && { isVendor }),
-        ...(pixKey !== undefined && { pixKey }),
-        ...(storeName !== undefined && { storeName }),
-        ...(storeDescription !== undefined && { storeDescription }),
         ...(deliveryAddress !== undefined && { deliveryAddress }),
         ...(deliveryCity !== undefined && { deliveryCity }),
         ...(deliveryState !== undefined && { deliveryState }),
