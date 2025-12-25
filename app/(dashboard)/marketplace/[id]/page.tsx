@@ -9,6 +9,7 @@ import { ShoppingCart, Store, ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { STORE_NAME } from '@/lib/constants/store';
 
 export default function ProductPage() {
   const params = useParams();
@@ -24,7 +25,7 @@ export default function ProductPage() {
     if (product) {
       console.log('=== PRODUCT DEBUG ===');
       console.log('Product data:', product);
-      console.log('Product.seller:', product.seller);
+      console.log('Product.subcategory:', product.subcategory);
       console.log('Product.images:', product.images);
       console.log('Product.images type:', typeof product.images);
       console.log('Product.price:', product.price);
@@ -113,23 +114,6 @@ export default function ProductPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <p className="mb-4">Produto não encontrado</p>
-            <Link href="/marketplace">
-              <Button>Voltar ao Marketplace</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Defensive checks
-  if (!product.seller) {
-    console.error('Product missing seller:', product);
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="mb-4">Erro: Dados do vendedor não encontrados</p>
             <Link href="/marketplace">
               <Button>Voltar ao Marketplace</Button>
             </Link>
@@ -230,7 +214,9 @@ export default function ProductPage() {
               <div className="space-y-4">
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold mb-2">{product.name}</h1>
-                  <Badge>{product.category}</Badge>
+                  {product.subcategory && (
+                    <Badge>{product.subcategory.name}</Badge>
+                  )}
                 </div>
 
                 <div className="text-3xl font-bold text-purple-600">
@@ -245,10 +231,10 @@ export default function ProductPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-2">Vendedor:</h3>
+                  <h3 className="font-semibold mb-2">Loja:</h3>
                   <div className="flex items-center gap-2">
                     <Store className="w-4 h-4" />
-                    <span>{product.seller.storeName || product.seller.nickname}</span>
+                    <span>{STORE_NAME}</span>
                   </div>
                 </div>
 
