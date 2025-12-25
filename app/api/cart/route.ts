@@ -38,12 +38,11 @@ export async function GET(request: NextRequest) {
       include: {
         product: {
           include: {
-            seller: {
+            subcategory: {
               select: {
                 id: true,
-                nickname: true,
-                storeName: true,
-                pixKey: true,
+                name: true,
+                slug: true,
               },
             },
           },
@@ -118,11 +117,6 @@ export async function POST(request: NextRequest) {
       return errorResponse('Produto não está disponível', 400);
     }
 
-    // Check if seller is not the buyer
-    if (product.sellerId === profile.id) {
-      return errorResponse('Você não pode comprar seus próprios produtos', 400);
-    }
-
     // Check stock
     if (product.stock < quantity) {
       return errorResponse(`Estoque insuficiente. Disponível: ${product.stock}`, 400);
@@ -152,11 +146,11 @@ export async function POST(request: NextRequest) {
         include: {
           product: {
             include: {
-              seller: {
+              subcategory: {
                 select: {
                   id: true,
-                  nickname: true,
-                  storeName: true,
+                  name: true,
+                  slug: true,
                 },
               },
             },
@@ -191,11 +185,11 @@ export async function POST(request: NextRequest) {
       include: {
         product: {
           include: {
-            seller: {
+            subcategory: {
               select: {
                 id: true,
-                nickname: true,
-                storeName: true,
+                name: true,
+                slug: true,
               },
             },
           },
