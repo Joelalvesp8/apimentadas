@@ -23,8 +23,8 @@ function unauthorizedResponse() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const sellerId = searchParams.get('sellerId');
+    const category = searchParams.get('category'); // Legacy parameter - not used with new structure
+    const subcategoryId = searchParams.get('subcategoryId');
     const search = searchParams.get('search');
     const activeOnly = searchParams.get('activeOnly') !== 'false'; // Default true
 
@@ -34,12 +34,8 @@ export async function GET(request: NextRequest) {
       where.active = true;
     }
 
-    if (category) {
-      where.category = category;
-    }
-
-    if (sellerId) {
-      where.sellerId = sellerId;
+    if (subcategoryId) {
+      where.subcategoryId = subcategoryId;
     }
 
     if (search) {
@@ -52,14 +48,16 @@ export async function GET(request: NextRequest) {
     const products = await prisma.product.findMany({
       where,
       include: {
-        seller: {
+        subcategory: {
           select: {
             id: true,
-            nickname: true,
-            storeName: true,
-            user: {
+            name: true,
+            slug: true,
+            category: {
               select: {
-                image: true,
+                id: true,
+                name: true,
+                slug: true,
               },
             },
           },
@@ -103,22 +101,15 @@ export async function POST(request: NextRequest) {
       return errorResponse('Perfil não encontrado', 404);
     }
 
-    // Check if user is a seller
-    if (!profile.isVendor) {
-      return errorResponse('Você precisa ser um vendedor para criar produtos', 403);
-    }
-
-    // Check if seller has PIX key
-    if (!profile.pixKey) {
-      return errorResponse('Configure sua chave PIX antes de adicionar produtos', 400);
-    }
+    // TODO: Add admin authorization check here
+    // For now, any authenticated user can create products (should be restricted to admins only)
 
     const body = await request.json();
-    const { name, description, price, category, stock, images } = body;
+    const { name, description, price, subcategoryId, stock, images } = body;
 
     // Validation
-    if (!name || !description || !price || !category) {
-      return errorResponse('Campos obrigatórios: name, description, price, category');
+    if (!name || !description || !price || !subcategoryId) {
+      return errorResponse('Campos obrigatórios: name, description, price, subcategoryId');
     }
 
     if (price <= 0) {
@@ -129,28 +120,31 @@ export async function POST(request: NextRequest) {
       return errorResponse('O estoque não pode ser negativo');
     }
 
-    const validCategories = ['vibradores', 'lingerie', 'acessorios', 'lubrificantes', 'fantasias', 'outros'];
-    if (!validCategories.includes(category)) {
-      return errorResponse(`Categoria inválida. Opções: ${validCategories.join(', ')}`);
+    // Validate subcategory exists
+    const subcategory = await prisma.subcategory.findUnique({
+      where: { id: subcategoryId },
+    });
+
+    if (!subcategory) {
+      return errorResponse('Subcategoria inválida');
     }
 
     // Create product
     const product = await prisma.product.create({
       data: {
-        sellerId: profile.id,
+        subcategoryId,
         name,
         description,
         price,
-        category,
         stock: stock || 0,
         images: images || [],
       },
       include: {
-        seller: {
+        subcategory: {
           select: {
             id: true,
-            nickname: true,
-            storeName: true,
+            name: true,
+            slug: true,
           },
         },
       },
