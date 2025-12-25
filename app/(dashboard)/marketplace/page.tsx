@@ -2,16 +2,15 @@
 
 import { useState } from 'react';
 import { useProducts } from '@/hooks/useMarketplace';
-import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ShoppingCart, Store, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { STORE_NAME } from '@/lib/constants/store';
 
 export default function MarketplacePage() {
-  const { data: profile } = useProfile();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
 
@@ -49,28 +48,9 @@ export default function MarketplacePage() {
             </Link>
           </div>
           <p className="text-sm md:text-base text-muted-foreground">
-            Produtos sensuais vendidos pela comunidade
+            Descubra produtos sensuais com discrição e qualidade
           </p>
         </div>
-
-        {/* Vendor Banner */}
-        {profile && !profile.isVendor && (
-          <Card className="mb-6 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
-            <CardHeader>
-              <CardTitle className="text-purple-700">Quer vender aqui?</CardTitle>
-              <CardDescription>
-                Ative o modo vendedor e comece a vender seus produtos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/profile">
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  Tornar-se Vendedor
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Filters */}
         <Card className="mb-6">
@@ -165,7 +145,7 @@ export default function MarketplacePage() {
                         {product.name}
                       </h3>
                       <p className="text-xs text-muted-foreground mb-2">
-                        {product.seller.storeName || product.seller.nickname}
+                        {STORE_NAME}
                       </p>
                       <div className="flex items-center justify-between">
                         <span className="text-lg font-bold text-purple-600">
