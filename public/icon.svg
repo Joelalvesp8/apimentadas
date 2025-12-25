@@ -1,10 +1,53 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="128" fill="url(#gradient)"/>
-  <text x="256" y="340" font-family="Arial, sans-serif" font-size="240" font-weight="bold" fill="white" text-anchor="middle">JA</text>
-  <defs>
-    <linearGradient id="gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#db2777"/>
-      <stop offset="100%" stop-color="#9333ea"/>
-    </linearGradient>
-  </defs>
+  <!-- Fundo branco com borda arredondada -->
+  <rect width="512" height="512" rx="128" fill="white"/>
+
+  <!-- Sombra suave da pimenta -->
+  <ellipse cx="256" cy="420" rx="100" ry="20" fill="#f0f0f0"/>
+
+  <!-- Corpo da pimenta -->
+  <path d="M 256 150
+           Q 280 150 290 170
+           Q 300 190 295 220
+           Q 290 260 280 300
+           Q 270 340 260 370
+           Q 250 390 256 400
+           Q 262 390 252 370
+           Q 242 340 232 300
+           Q 222 260 217 220
+           Q 212 190 222 170
+           Q 232 150 256 150 Z"
+        fill="#dc2626"
+        stroke="#991b1b"
+        stroke-width="3"/>
+
+  <!-- Brilho na pimenta -->
+  <ellipse cx="245" cy="200" rx="15" ry="30" fill="#ef4444" opacity="0.6"/>
+
+  <!-- Cabo/caule da pimenta -->
+  <path d="M 256 150
+           Q 250 140 248 130
+           Q 246 120 250 115
+           L 255 110
+           Q 258 108 260 110
+           L 265 115
+           Q 268 120 266 130
+           Q 264 140 260 150"
+        fill="#16a34a"
+        stroke="#15803d"
+        stroke-width="2"/>
+
+  <!-- Folha no cabo -->
+  <path d="M 252 120
+           Q 240 118 235 125
+           Q 232 130 238 135
+           Q 244 138 250 135
+           L 252 120 Z"
+        fill="#22c55e"
+        stroke="#15803d"
+        stroke-width="1.5"/>
+
+  <!-- Gotinha de suor/calor (emoji de picante) -->
+  <ellipse cx="290" cy="180" rx="8" ry="12" fill="#fbbf24" opacity="0.8"/>
+  <ellipse cx="288" cy="177" rx="3" ry="5" fill="#fef3c7"/>
 </svg>
