@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateProfile, useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
 export default function OnboardingPage() {
   const router = useRouter();
   const createProfile = useCreateProfile();
-  const { data: existingProfile } = useProfile();
+  const { data: existingProfile, isLoading: profileLoading } = useProfile();
 
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
@@ -27,16 +27,12 @@ export default function OnboardingPage() {
 
   // If user already has a profile with nickname, redirect to dashboard
   // This prevents users from being stuck in onboarding loop
-  console.log('[DEBUG] Onboarding - Profile check:', { 
-    hasProfile: !!existingProfile, 
-    nickname: existingProfile?.nickname 
-  });
-  
-  if (existingProfile && existingProfile.nickname) {
-    console.log('[DEBUG] Onboarding - Profile exists, redirecting to dashboard');
-    router.push('/dashboard');
-    return null;
-  }
+  useEffect(() => {
+    if (existingProfile && existingProfile.nickname) {
+      console.log('[DEBUG] Onboarding - Profile exists, redirecting to dashboard');
+      router.push('/dashboard');
+    }
+  }, [existingProfile, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +63,15 @@ export default function OnboardingPage() {
       setError(errorMessage);
     }
   };
+
+  // Show loading state while checking if profile exists
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-100 to-purple-100">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-100 to-purple-100">

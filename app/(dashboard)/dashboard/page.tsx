@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useProfile } from '@/hooks/useProfile';
 import { useConnections } from '@/hooks/useConnections';
 import { useSessionHistory, useActiveSessions } from '@/hooks/useSessions';
@@ -29,30 +30,29 @@ export default function DashboardPage() {
   const { data: adminData } = useIsAdmin();
 
   // Only redirect to onboarding if profile truly doesn't exist (404 error)
-  // Don't redirect if there's a temporary error or if profile has nickname
-  if (!profileLoading && !profile && profileError) {
-    // Check if it's a 404 error (profile doesn't exist)
-    const errorMessage = String(profileError);
-    console.log('[DEBUG] Dashboard - Profile check failed:', { 
-      profileLoading, 
-      hasProfile: !!profile, 
-      errorMessage 
-    });
-    
-    if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
-      console.log('[DEBUG] Dashboard - Redirecting to onboarding (404 error)');
-      router.push('/onboarding');
-      return null;
+  useEffect(() => {
+    if (!profileLoading && !profile && profileError) {
+      const errorMessage = String(profileError);
+      console.log('[DEBUG] Dashboard - Profile check failed:', {
+        profileLoading,
+        hasProfile: !!profile,
+        errorMessage
+      });
+
+      if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
+        console.log('[DEBUG] Dashboard - Redirecting to onboarding (404 error)');
+        router.push('/onboarding');
+      } else {
+        console.log('[DEBUG] Dashboard - NOT redirecting, error is not 404');
+      }
     } else {
-      console.log('[DEBUG] Dashboard - NOT redirecting, error is not 404');
+      console.log('[DEBUG] Dashboard - Profile status:', {
+        profileLoading,
+        hasProfile: !!profile,
+        nickname: profile?.nickname
+      });
     }
-  } else {
-    console.log('[DEBUG] Dashboard - Profile status:', { 
-      profileLoading, 
-      hasProfile: !!profile,
-      nickname: profile?.nickname 
-    });
-  }
+  }, [profileLoading, profile, profileError, router]);
 
   const totalConnections = connections?.length || 0;
   const totalSessions = sessionHistory?.length || 0;

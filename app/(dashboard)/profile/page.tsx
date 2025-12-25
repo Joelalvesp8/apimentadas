@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useProfile, useUpdateProfile, useUpdateProfileImage } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,7 +28,7 @@ export default function ProfilePage() {
   const [orientation, setOrientation] = useState<'heterosexual' | 'homosexual' | 'bisexual' | 'other' | ''>('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Marketplace - Seller fields
+  // Legacy vendor fields (removed from schema but keeping for UI compatibility)
   const [isVendor, setIsVendor] = useState(false);
   const [pixKey, setPixKey] = useState('');
   const [storeName, setStoreName] = useState('');
@@ -36,18 +36,24 @@ export default function ProfilePage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Redirect to onboarding if profile doesn't exist
+  useEffect(() => {
+    if (!isLoading && !profile && profileError) {
+      const errorMessage = String(profileError);
+      if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
+        router.push('/onboarding');
+      }
+    }
+  }, [isLoading, profile, profileError, router]);
+
   // Initialize form with profile data
-  useState(() => {
+  useEffect(() => {
     if (profile) {
       setNickname(profile.nickname);
       setBio(profile.bio || '');
       setOrientation((profile.orientation || '') as 'heterosexual' | 'homosexual' | 'bisexual' | 'other' | '');
-      setIsVendor(profile.isVendor);
-      setPixKey(profile.pixKey || '');
-      setStoreName(profile.storeName || '');
-      setStoreDescription(profile.storeDescription || '');
     }
-  });
+  }, [profile]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,21 +95,11 @@ export default function ProfilePage() {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate vendor fields if vendor mode is enabled
-    if (isVendor && !pixKey) {
-      alert('Chave PIX é obrigatória para vendedores');
-      return;
-    }
-
     try {
       await updateProfile.mutateAsync({
         nickname,
         bio,
         orientation: orientation || undefined,
-        isVendor,
-        pixKey: pixKey || undefined,
-        storeName: storeName || undefined,
-        storeDescription: storeDescription || undefined,
       });
       alert('Perfil atualizado com sucesso!');
     } catch (error: any) {
@@ -111,7 +107,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !profile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
         <p className="text-muted-foreground">Carregando perfil...</p>
@@ -119,17 +115,8 @@ export default function ProfilePage() {
     );
   }
 
-  // Only redirect to onboarding if profile truly doesn't exist (404 error)
-  if (!profile && profileError) {
-    const errorMessage = String(profileError);
-    if (errorMessage.includes('404') || errorMessage.includes('não encontrado')) {
-      router.push('/onboarding');
-      return null;
-    }
-  }
-
   // Show error if profile couldn't be loaded for other reasons
-  if (!profile && !isLoading) {
+  if (profileError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
         <Card>

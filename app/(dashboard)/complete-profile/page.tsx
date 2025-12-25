@@ -35,6 +35,13 @@ export default function CompleteProfilePage() {
 
   const [error, setError] = useState('');
 
+  // Redirect to onboarding if no profile exists
+  useEffect(() => {
+    if (!isLoading && !profile) {
+      router.push('/onboarding');
+    }
+  }, [profile, isLoading, router]);
+
   // Load existing profile data
   useEffect(() => {
     if (profile) {
@@ -79,7 +86,7 @@ export default function CompleteProfilePage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-100 to-purple-100">
         <p className="text-muted-foreground">Carregando perfil...</p>
@@ -87,14 +94,8 @@ export default function CompleteProfilePage() {
     );
   }
 
-  if (!profile) {
-    // If no profile exists at all, redirect to onboarding
-    router.push('/onboarding');
-    return null;
-  }
-
   // Check if profile already has address
-  const hasAddress = profile.deliveryAddress && profile.deliveryCity && 
+  const hasAddress = profile.deliveryAddress && profile.deliveryCity &&
                      profile.deliveryState && profile.deliveryZipCode;
 
   return (
