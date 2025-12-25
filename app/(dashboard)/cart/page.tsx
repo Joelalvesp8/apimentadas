@@ -53,76 +53,57 @@ export default function CartPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Group items by seller */}
-                {Object.entries(
-                  cart.items.reduce((acc, item) => {
-                    const sellerId = item.product.sellerId;
-                    if (!acc[sellerId]) {
-                      acc[sellerId] = {
-                        seller: item.product.seller,
-                        items: [],
-                      };
+                {/* Lista simples de produtos (loja única) */}
+                <div className="space-y-3">
+                  {cart.items.map((item) => {
+                    // Normalize images to always be an array (defensive programming)
+                    const images = item.product.images as string | string[] | null;
+                    let normalizedImages: string[] = [];
+
+                    if (Array.isArray(images)) {
+                      normalizedImages = images;
+                    } else if (typeof images === 'string') {
+                      try {
+                        normalizedImages = images.startsWith('[')
+                          ? JSON.parse(images)
+                          : [images];
+                      } catch {
+                        normalizedImages = [];
+                      }
                     }
-                    acc[sellerId].items.push(item);
-                    return acc;
-                  }, {} as Record<string, { seller: any; items: typeof cart.items }>)
-                ).map(([sellerId, { seller, items }]) => (
-                  <div key={sellerId} className="border rounded-lg p-4">
-                    <h3 className="font-semibold mb-3">
-                      Vendedor: {seller.storeName || seller.nickname}
-                    </h3>
-                    <div className="space-y-3">
-                      {items.map((item) => {
-                        // Normalize images to always be an array (defensive programming)
-                        const images = item.product.images as string | string[] | null;
-                        let normalizedImages: string[] = [];
 
-                        if (Array.isArray(images)) {
-                          normalizedImages = images;
-                        } else if (typeof images === 'string') {
-                          try {
-                            normalizedImages = images.startsWith('[')
-                              ? JSON.parse(images)
-                              : [images];
-                          } catch {
-                            normalizedImages = [];
-                          }
-                        }
+                    const imageUrl = normalizedImages?.[0] || '/placeholder-product.png';
+                    const subtotal = Number(item.product.price) * item.quantity;
 
-                        const imageUrl = normalizedImages?.[0] || '/placeholder-product.png';
-                        const subtotal = Number(item.product.price) * item.quantity;
-
-                        return (
-                          <div key={item.id} className="flex gap-3 border-b pb-3 last:border-0">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={imageUrl}
-                              alt={item.product.name}
-                              className="w-20 h-20 object-cover rounded"
-                            />
-                            <div className="flex-1">
-                              <h4 className="font-semibold">{item.product.name}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                R$ {Number(item.product.price).toFixed(2)} x {item.quantity}
-                              </p>
-                              <p className="font-semibold text-purple-600">
-                                Subtotal: R$ {subtotal.toFixed(2)}
-                              </p>
-                            </div>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => removeItem.mutate(item.id)}
-                              disabled={removeItem.isPending}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                    return (
+                      <div key={item.id} className="flex gap-3 border rounded-lg p-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imageUrl}
+                          alt={item.product.name}
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{item.product.name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            R$ {Number(item.product.price).toFixed(2)} x {item.quantity}
+                          </p>
+                          <p className="font-semibold text-purple-600">
+                            Subtotal: R$ {subtotal.toFixed(2)}
+                          </p>
+                        </div>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => removeItem.mutate(item.id)}
+                          disabled={removeItem.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
 
                 {/* Total */}
                 <div className="border-t pt-4 space-y-2">

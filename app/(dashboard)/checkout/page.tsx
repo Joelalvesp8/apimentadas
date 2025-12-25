@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { CreditCard, Upload, ArrowLeft, CheckCircle, MapPin, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { STORE_NAME, STORE_PIX_KEY } from '@/lib/constants/store';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -127,20 +128,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // Group items by seller
-  const itemsBySeller = cart.items.reduce((acc, item) => {
-    const sellerId = item.product.sellerId;
-    if (!acc[sellerId]) {
-      acc[sellerId] = {
-        seller: item.product.seller,
-        items: [],
-        total: 0,
-      };
-    }
-    acc[sellerId].items.push(item);
-    acc[sellerId].total += Number(item.product.price) * item.quantity;
-    return acc;
-  }, {} as Record<string, { seller: any; items: typeof cart.items; total: number }>);
+  // Não há mais agrupamento por vendedor - loja única
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-3 md:p-4">
@@ -161,43 +149,36 @@ export default function CheckoutPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Resumo do Pedido por Vendedor */}
+              {/* Resumo do Pedido - Loja Pimentinhas */}
               <div className="space-y-4">
                 <h3 className="font-semibold">Resumo do Pedido:</h3>
-                {Object.entries(itemsBySeller).map(([sellerId, { seller, items, total }]) => (
-                  <Card key={sellerId} className="bg-gray-50">
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div>
-                          <p className="font-semibold">Vendedor: {seller.storeName || seller.nickname}</p>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                            <CreditCard className="w-4 h-4" />
-                            <span>Chave PIX: <span className="font-mono font-semibold text-purple-600">{seller.pixKey}</span></span>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          {items.map((item) => (
-                            <div key={item.id} className="flex justify-between text-sm">
-                              <span>{item.product.name} (x{item.quantity})</span>
-                              <span>R$ {(Number(item.product.price) * item.quantity).toFixed(2)}</span>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="border-t pt-2 flex justify-between font-semibold">
-                          <span>Subtotal para este vendedor:</span>
-                          <span className="text-purple-600">R$ {total.toFixed(2)}</span>
+                <Card className="bg-purple-50 border-purple-200">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-semibold text-purple-900">{STORE_NAME}</p>
+                        <div className="flex items-center gap-2 text-sm text-purple-700 mt-1">
+                          <CreditCard className="w-4 h-4" />
+                          <span>Chave PIX: <span className="font-mono font-semibold text-purple-900">{STORE_PIX_KEY}</span></span>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
 
-                <div className="border-t pt-4 flex justify-between text-xl font-bold">
-                  <span>Total Geral:</span>
-                  <span className="text-purple-600">R$ {cart.total.toFixed(2)}</span>
-                </div>
+                      <div className="space-y-2">
+                        {cart.items.map((item) => (
+                          <div key={item.id} className="flex justify-between text-sm">
+                            <span>{item.product.name} (x{item.quantity})</span>
+                            <span>R$ {(Number(item.product.price) * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="border-t border-purple-300 pt-2 flex justify-between text-xl font-bold">
+                        <span>Total:</span>
+                        <span className="text-purple-900">R$ {cart.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Instruções de Pagamento */}
@@ -205,9 +186,9 @@ export default function CheckoutPage() {
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2">📱 Como Pagar:</h4>
                   <ol className="list-decimal list-inside space-y-1 text-sm">
-                    <li>Copie a(s) chave(s) PIX acima</li>
+                    <li>Copie a chave PIX acima</li>
                     <li>Abra o app do seu banco</li>
-                    <li>Faça o PIX para cada vendedor</li>
+                    <li>Faça o PIX com o valor total</li>
                     <li>Tire um print do comprovante</li>
                     <li>Preencha seu endereço de entrega</li>
                     <li>Envie o comprovante abaixo</li>
