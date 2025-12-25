@@ -7,14 +7,20 @@ const withPWA = require('next-pwa')({
   buildExcludes: [/middleware-manifest\.json$/],
   publicExcludes: ['!robots.txt', '!sitemap.xml'],
   runtimeCaching: [],
+  // Prevent SSR issues with location/window
+  cacheOnFrontEndNav: true,
 });
 
 const nextConfig = {
   reactStrictMode: true,
-  // Disable static optimization for pages that use location
   experimental: {
     workerThreads: false,
     cpus: 1,
+  },
+  // Suppress location warnings during static generation
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
   },
 };
 
