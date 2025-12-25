@@ -4,8 +4,9 @@ import { useOrders } from '@/hooks/useMarketplace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Package, Store, CreditCard, Calendar, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Package, Store, Calendar, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import { STORE_NAME } from '@/lib/constants/store';
 
 const statusConfig = {
   pending: {
@@ -102,12 +103,12 @@ export default function OrdersPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Seller Info */}
+                    {/* Store Info */}
                     <div className="flex items-center gap-2 text-sm">
                       <Store className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Vendedor:</span>
+                      <span className="text-muted-foreground">Loja:</span>
                       <span className="font-semibold">
-                        {order.seller.storeName || order.seller.nickname}
+                        {STORE_NAME}
                       </span>
                     </div>
 
@@ -122,13 +123,6 @@ export default function OrdersPage() {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}</span>
-                    </div>
-
-                    {/* PIX Key */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <CreditCard className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Chave PIX:</span>
-                      <span className="font-mono text-purple-600">{order.pixKey}</span>
                     </div>
 
                     {/* Order Items */}
@@ -163,7 +157,7 @@ export default function OrdersPage() {
                         <div className="text-sm">
                           <p className="font-semibold text-green-800">Comprovante Enviado</p>
                           <p className="text-green-700">
-                            Aguardando confirmação do vendedor
+                            Aguardando confirmação da loja
                           </p>
                         </div>
                       </div>
