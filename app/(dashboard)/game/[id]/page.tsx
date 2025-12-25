@@ -15,7 +15,7 @@ import {
 import { GameCard } from '@/components/game-card';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
-import { ThumbsDown, Meh, ThumbsUp, Users } from 'lucide-react';
+import { ThumbsDown, Meh, ThumbsUp, Users, Heart, HeartOff } from 'lucide-react';
 
 // Map sessionType to card category
 function getCardCategory(sessionType: string): string {
@@ -58,6 +58,8 @@ export default function GamePage() {
 
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [showRatingScreen, setShowRatingScreen] = useState(false);
+  const [cardRatings, setCardRatings] = useState<Record<string, boolean>>({});
 
   // Check if it's my turn
   const isMyTurn = myProfile && session?.currentTurnProfileId === myProfile.id;
@@ -112,10 +114,54 @@ export default function GamePage() {
   const handleFinishSession = async () => {
     try {
       await finishSession.mutateAsync(sessionId);
-      router.push('/dashboard');
+      // Show rating screen instead of redirecting immediately
+      setShowRatingScreen(true);
     } catch (error) {
       console.error('Error finishing session:', error);
     }
+  };
+
+  const handleCardLike = async (cardId: string, liked: boolean) => {
+    try {
+      // If clicking the same rating again, remove it
+      const currentRating = cardRatings[cardId];
+      if (currentRating === liked) {
+        // Remove rating
+        const response = await fetch(`/api/cards/${cardId}/like`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Erro ao remover avaliação');
+        }
+
+        setCardRatings((prev) => {
+          const newRatings = { ...prev };
+          delete newRatings[cardId];
+          return newRatings;
+        });
+      } else {
+        // Add/change rating
+        const response = await fetch(`/api/cards/${cardId}/like`, {
+          method: liked ? 'POST' : 'DELETE',
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Erro ao avaliar carta');
+        }
+
+        setCardRatings((prev) => ({ ...prev, [cardId]: liked }));
+      }
+    } catch (error: any) {
+      console.error('Error rating card:', error);
+      alert(error.message || 'Erro ao avaliar carta');
+    }
+  };
+
+  const handleFinishRating = () => {
+    router.push('/dashboard');
   };
 
   if (isLoading) {
@@ -130,6 +176,117 @@ export default function GamePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Sessão não encontrada</p>
+      </div>
+    );
+  }
+
+  // Rating Screen - shown after finishing session
+  if (showRatingScreen) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 overflow-y-auto">
+        <div className="max-w-4xl mx-auto pb-20">
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-center text-2xl">
+                🎉 Sessão Finalizada!
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground mb-6">
+                Avalie as cartas que apareceram durante o jogo. Sua opinião ajuda a melhorar a experiência!
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <p className="text-3xl font-bold text-purple-600">{session.cardsPlayed}</p>
+                  <p className="text-sm text-muted-foreground">Cartas jogadas</p>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <p className="text-3xl font-bold text-green-600">
+                    {session.averageRating?.toFixed(1) || '0.0'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Rating médio</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Cards Rating */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Avalie as Cartas</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Toque no coração para curtir uma carta ou no X para descurtir
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {session.playedCards && session.playedCards.length > 0 ? (
+                  session.playedCards.map((playedCard: any) => {
+                    const isLiked = cardRatings[playedCard.card.id];
+                    return (
+                      <Card key={playedCard.id} className="border-2">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant={playedCard.card.type === 'pergunta' ? 'default' : 'secondary'}>
+                                  {playedCard.card.type === 'pergunta' ? '❓ Pergunta' : '🎯 Tarefa'}
+                                </Badge>
+                                <Badge variant="outline">
+                                  {playedCard.card.difficulty === 'facil' && '🟢 Fácil'}
+                                  {playedCard.card.difficulty === 'medio' && '🟡 Médio'}
+                                  {playedCard.card.difficulty === 'dificil' && '🟠 Difícil'}
+                                  {playedCard.card.difficulty === 'extremo' && '🔴 Extremo'}
+                                </Badge>
+                              </div>
+                              <p className="text-sm mb-2">{playedCard.card.content}</p>
+                              {playedCard.qualitativeRating && (
+                                <Badge variant="outline" className="text-xs">
+                                  Execução: {playedCard.qualitativeRating === 'ruim' && '👎 Ruim'}
+                                  {playedCard.qualitativeRating === 'satisfatoria' && '😐 Satisfatória'}
+                                  {playedCard.qualitativeRating === 'excelente' && '👍 Excelente'}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant={isLiked === true ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => handleCardLike(playedCard.card.id, true)}
+                                className="h-10 w-10 p-0"
+                              >
+                                <Heart className={`w-5 h-5 ${isLiked === true ? 'fill-current' : ''}`} />
+                              </Button>
+                              <Button
+                                variant={isLiked === false ? 'destructive' : 'outline'}
+                                size="sm"
+                                onClick={() => handleCardLike(playedCard.card.id, false)}
+                                className="h-10 w-10 p-0"
+                              >
+                                <HeartOff className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">
+                    Nenhuma carta foi jogada nesta sessão
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-center">
+            <Button onClick={handleFinishRating} size="lg" className="min-w-[200px]">
+              Finalizar e Voltar
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
