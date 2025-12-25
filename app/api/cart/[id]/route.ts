@@ -70,11 +70,11 @@ export async function PATCH(
       include: {
         product: {
           include: {
-            seller: {
+            subcategory: {
               select: {
                 id: true,
-                nickname: true,
-                storeName: true,
+                name: true,
+                slug: true,
               },
             },
           },
