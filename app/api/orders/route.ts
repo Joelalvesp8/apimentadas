@@ -34,11 +34,12 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') || 'buyer'; // 'buyer' | 'seller'
+    const type = searchParams.get('type') || 'buyer'; // 'buyer' | 'seller' (kept for backwards compatibility, but seller mode shows all orders)
     const status = searchParams.get('status'); // optional filter
 
+    // For seller type (admin view), show all orders; for buyer, show only user's orders
     const where: any = type === 'seller'
-      ? { sellerId: profile.id }
+      ? {} // Show all orders for admin
       : { buyerId: profile.id };
 
     if (status) {
@@ -56,18 +57,6 @@ export async function GET(request: NextRequest) {
               select: {
                 image: true,
                 email: true,
-              },
-            },
-          },
-        },
-        seller: {
-          select: {
-            id: true,
-            nickname: true,
-            storeName: true,
-            user: {
-              select: {
-                image: true,
               },
             },
           },
@@ -145,11 +134,7 @@ export async function POST(request: NextRequest) {
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: profile.id },
       include: {
-        product: {
-          include: {
-            seller: true,
-          },
-        },
+        product: true,
       },
     });
 
@@ -157,93 +142,66 @@ export async function POST(request: NextRequest) {
       return errorResponse('Carrinho vazio', 400);
     }
 
-    // Group items by seller
-    const itemsBySeller = cartItems.reduce((acc, item) => {
-      const sellerId = item.product.sellerId;
-      if (!acc[sellerId]) {
-        acc[sellerId] = [];
+    // Calculate total
+    const totalAmount = cartItems.reduce((sum, item) => {
+      return sum + Number(item.product.price) * item.quantity;
+    }, 0);
+
+    // Check stock for all items
+    for (const item of cartItems) {
+      if (item.product.stock < item.quantity) {
+        return errorResponse(
+          `Estoque insuficiente para ${item.product.name}. Disponível: ${item.product.stock}`,
+          400
+        );
       }
-      acc[sellerId].push(item);
-      return acc;
-    }, {} as Record<string, typeof cartItems>);
+    }
 
-    // Create one order per seller
-    const orders = [];
-
-    for (const [sellerId, items] of Object.entries(itemsBySeller)) {
-      const seller = items[0].product.seller;
-
-      // Check if seller has PIX key
-      if (!seller.pixKey) {
-        return errorResponse(`Vendedor ${seller.nickname} não configurou chave PIX`, 400);
-      }
-
-      // Calculate total
-      const totalAmount = items.reduce((sum, item) => {
-        return sum + Number(item.product.price) * item.quantity;
-      }, 0);
-
-      // Check stock for all items
-      for (const item of items) {
-        if (item.product.stock < item.quantity) {
-          return errorResponse(
-            `Estoque insuficiente para ${item.product.name}. Disponível: ${item.product.stock}`,
-            400
-          );
-        }
-      }
-
-      // Create order
-      const order = await prisma.order.create({
-        data: {
-          buyerId: profile.id,
-          sellerId,
-          totalAmount,
-          pixKey: seller.pixKey,
-          // Delivery address (snapshot from buyer's profile)
-          deliveryAddress: profile.deliveryAddress,
-          deliveryCity: profile.deliveryCity,
-          deliveryState: profile.deliveryState,
-          deliveryZipCode: profile.deliveryZipCode,
-          deliveryComplement: profile.deliveryComplement || undefined,
-          paymentProof,
-          paymentProofUploadedAt: new Date(),
-          status: 'paid_awaiting_confirmation',
-          orderItems: {
-            create: items.map((item) => ({
-              productId: item.productId,
-              productName: item.product.name,
-              productPrice: item.product.price,
-              quantity: item.quantity,
-              subtotal: Number(item.product.price) * item.quantity,
-            })),
+    // Create single order
+    const order = await prisma.order.create({
+      data: {
+        buyerId: profile.id,
+        totalAmount,
+        // Delivery address (snapshot from buyer's profile)
+        deliveryAddress: profile.deliveryAddress,
+        deliveryCity: profile.deliveryCity,
+        deliveryState: profile.deliveryState,
+        deliveryZipCode: profile.deliveryZipCode,
+        deliveryComplement: profile.deliveryComplement || undefined,
+        paymentProof,
+        paymentProofUploadedAt: new Date(),
+        status: 'paid_awaiting_confirmation',
+        orderItems: {
+          create: cartItems.map((item) => ({
+            productId: item.productId,
+            productName: item.product.name,
+            productPrice: item.product.price,
+            quantity: item.quantity,
+            subtotal: Number(item.product.price) * item.quantity,
+          })),
+        },
+      },
+      include: {
+        buyer: {
+          select: {
+            id: true,
+            nickname: true,
           },
         },
-        include: {
-          seller: {
-            select: {
-              id: true,
-              nickname: true,
-              storeName: true,
-            },
+        orderItems: true,
+      },
+    });
+
+    // Update stock
+    for (const item of cartItems) {
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: {
+          stock: {
+            decrement: item.quantity,
           },
-          orderItems: true,
         },
       });
-
-      // Update stock
-      for (const item of items) {
-        await prisma.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: {
-              decrement: item.quantity,
-            },
-          },
-        });
-      }
-
-      orders.push(order);
     }
 
     // Clear cart
@@ -251,7 +209,7 @@ export async function POST(request: NextRequest) {
       where: { userId: profile.id },
     });
 
-    return successResponse({ orders, message: 'Pedido(s) criado(s) com sucesso!' }, 201);
+    return successResponse({ order, message: 'Pedido criado com sucesso!' }, 201);
   } catch (error: any) {
     console.error('Error creating order:', error);
     return errorResponse('Erro ao criar pedido', 500);
