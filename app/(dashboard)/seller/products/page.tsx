@@ -132,7 +132,7 @@ export default function SellerProductsPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Categoria:</span>
-                      <span className="text-sm capitalize">{product.category}</span>
+                      <span className="text-sm">{product.subcategory?.name || 'N/A'}</span>
                     </div>
                   </div>
 
