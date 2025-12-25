@@ -51,19 +51,6 @@ export async function GET(
             },
           },
         },
-        seller: {
-          select: {
-            id: true,
-            nickname: true,
-            storeName: true,
-            storeDescription: true,
-            user: {
-              select: {
-                image: true,
-              },
-            },
-          },
-        },
         orderItems: {
           include: {
             product: {
@@ -82,8 +69,8 @@ export async function GET(
       return errorResponse('Pedido não encontrado', 404);
     }
 
-    // Check if user is buyer or seller
-    if (order.buyerId !== profile.id && order.sellerId !== profile.id) {
+    // Check if user is the buyer
+    if (order.buyerId !== profile.id) {
       return errorResponse('Você não tem permissão para ver este pedido', 403);
     }
 
