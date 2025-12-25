@@ -7,18 +7,17 @@ import { Badge } from '@/components/ui/badge';
 import {
   Package,
   User,
-  CreditCard,
   Calendar,
   CheckCircle,
   Clock,
   XCircle,
   Eye,
-  AlertCircle,
   MapPin,
   Truck
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { STORE_PIX_KEY } from '@/lib/constants/store';
 
 const statusConfig = {
   pending: {
@@ -159,13 +158,6 @@ export default function SellerOrdersPage() {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}</span>
-                      </div>
-
-                      {/* PIX Key */}
-                      <div className="flex items-center gap-2 text-sm">
-                        <CreditCard className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">Sua Chave PIX:</span>
-                        <span className="font-mono text-purple-600">{order.pixKey}</span>
                       </div>
 
                       {/* Delivery Address */}
