@@ -50,8 +50,8 @@ export async function POST(
       return errorResponse('Pedido não encontrado', 404);
     }
 
-    // Check if user is buyer or seller
-    if (order.buyerId !== profile.id && order.sellerId !== profile.id) {
+    // Check if user is the buyer
+    if (order.buyerId !== profile.id) {
       return errorResponse('Você não tem permissão para cancelar este pedido', 403);
     }
 
@@ -84,12 +84,6 @@ export async function POST(
       },
       include: {
         buyer: {
-          select: {
-            id: true,
-            nickname: true,
-          },
-        },
-        seller: {
           select: {
             id: true,
             nickname: true,
