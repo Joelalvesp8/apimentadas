@@ -100,7 +100,7 @@ export default function ProductPage() {
             <p className="mb-4 text-red-600">Erro ao carregar produto</p>
             <p className="mb-4 text-sm text-gray-600">{String(error)}</p>
             <Link href="/marketplace">
-              <Button>Voltar ao Marketplace</Button>
+              <Button>Voltar à Pimentinhas</Button>
             </Link>
           </CardContent>
         </Card>
@@ -115,7 +115,7 @@ export default function ProductPage() {
           <CardContent className="p-8 text-center">
             <p className="mb-4">Produto não encontrado</p>
             <Link href="/marketplace">
-              <Button>Voltar ao Marketplace</Button>
+              <Button>Voltar à Pimentinhas</Button>
             </Link>
           </CardContent>
         </Card>

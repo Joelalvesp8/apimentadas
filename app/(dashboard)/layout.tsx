@@ -43,7 +43,7 @@ export default function DashboardLayout({
             <Link href="/marketplace">
               <Button variant="ghost" size="sm" className="px-2 sm:px-3">
                 <Store className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Marketplace</span>
+                <span className="hidden sm:inline">Pimentinhas</span>
               </Button>
             </Link>
             <Link href="/orders">

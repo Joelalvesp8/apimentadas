@@ -216,12 +216,12 @@ export default function OrdersPage() {
           })}
         </div>
 
-        {/* Back to Marketplace */}
+        {/* Back to Pimentinhas */}
         <div className="mt-6 text-center">
           <Link href="/marketplace">
             <Button variant="outline">
               <Store className="w-4 h-4 mr-2" />
-              Voltar ao Marketplace
+              Voltar à Pimentinhas
             </Button>
           </Link>
         </div>

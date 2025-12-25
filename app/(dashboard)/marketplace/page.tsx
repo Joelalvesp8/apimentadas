@@ -38,7 +38,7 @@ export default function MarketplacePage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Store className="w-6 h-6 text-purple-600" />
-              <h1 className="text-2xl md:text-3xl font-bold">Marketplace 🛍️</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Pimentinhas 🌶️</h1>
             </div>
             <Link href="/cart">
               <Button variant="outline" size="sm">
