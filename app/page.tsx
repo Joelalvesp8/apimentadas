@@ -12,58 +12,75 @@ import {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#1a0a14] via-[#2d0d24] to-[#4a1024] relative overflow-hidden">
-      {/* Grain texture overlay */}
+    <main className="min-h-screen bg-black relative overflow-hidden">
+      {/* Film grain texture overlay */}
       <div
-        className="absolute inset-0 opacity-[0.15] pointer-events-none"
+        className="absolute inset-0 opacity-[0.08] pointer-events-none mix-blend-overlay"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Subtle glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-red-900/20 rounded-full blur-3xl" />
+      {/* Red halo glow - inspired by logo background */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-900/30 rounded-full blur-[120px] animate-pulse-slow" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-red-800/20 rounded-full blur-[100px]" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20 lg:py-28">
-        {/* Hero Section */}
-        <div className="text-center mb-16 md:mb-24 lg:mb-32 space-y-8">
-          {/* Pepper icon with glow animation */}
-          <div className="flex items-center justify-center mb-8">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32">
+        {/* Hero Section - Logo-inspired */}
+        <div className="text-center mb-20 md:mb-32 lg:mb-40 space-y-10">
+          {/* Pepper icon with intense glow - matching logo style */}
+          <div className="flex items-center justify-center mb-12">
             <div className="relative">
-              <div className="absolute inset-0 animate-pulse">
-                <span className="text-6xl md:text-7xl lg:text-8xl opacity-40 blur-xl">🌶️</span>
+              {/* Outer glow halo */}
+              <div className="absolute inset-0 -m-12">
+                <div className="w-full h-full rounded-full bg-red-600/40 blur-3xl animate-breathe-glow" />
               </div>
-              <span className="relative text-6xl md:text-7xl lg:text-8xl animate-glow">🌶️</span>
+
+              {/* Inner pulse */}
+              <div className="absolute inset-0 animate-pulse">
+                <span className="text-7xl md:text-8xl lg:text-9xl opacity-30 blur-2xl">🌶️</span>
+              </div>
+
+              {/* Main pepper */}
+              <span className="relative text-7xl md:text-8xl lg:text-9xl drop-shadow-[0_0_25px_rgba(220,38,38,0.8)] animate-heat-shimmer">
+                🌶️
+              </span>
             </div>
           </div>
 
-          {/* Main headline - emotional hook */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-tight text-white/95 leading-tight px-4 max-w-4xl mx-auto">
-            Nem todo jogo termina quando as cartas acabam.
+          {/* Main headline - Direct, provocative */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1] px-4 max-w-5xl mx-auto">
+            Nem todo limite
+            <br />
+            <span className="text-red-500">precisa ser explicado.</span>
           </h1>
 
-          {/* Subtitle - building tension */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-purple-200/80 font-light leading-relaxed px-4 max-w-3xl mx-auto tracking-wide">
-            Um jogo adulto que transforma curiosidade em tensão… e tensão em momentos inesquecíveis.
+          {/* Subtitle - Building heat and tension */}
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-400 font-normal leading-relaxed px-4 max-w-2xl mx-auto tracking-wide">
+            Cartas que aquecem.
+            <br className="hidden sm:block" />
+            Decisões que mudam o clima.
+            <br className="hidden sm:block" />
+            Momentos que não se repetem.
           </p>
 
-          {/* Primary CTA with breathing animation */}
-          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center px-4 pt-8">
-            <Link href="/register" className="w-full sm:w-auto">
+          {/* Primary CTA with heat effect */}
+          <div className="flex flex-col sm:flex-row gap-5 justify-center px-4 pt-6">
+            <Link href="/register" className="w-full sm:w-auto group">
               <Button
                 size="lg"
-                className="px-8 md:px-12 py-6 md:py-7 text-base md:text-lg w-full sm:w-auto bg-gradient-to-r from-red-700 to-rose-700 hover:from-red-600 hover:to-rose-600 text-white border-none shadow-lg shadow-red-900/50 transition-all duration-500 animate-breathe font-normal tracking-wide"
+                className="px-10 md:px-14 py-7 md:py-8 text-lg md:text-xl w-full sm:w-auto bg-gradient-to-br from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 text-white border-none shadow-[0_0_40px_rgba(220,38,38,0.5)] hover:shadow-[0_0_60px_rgba(220,38,38,0.8)] transition-all duration-700 font-semibold tracking-wider uppercase animate-breathe-slow relative overflow-hidden"
               >
-                Virar a Primeira Carta
+                <span className="relative z-10">Virar a Primeira Carta</span>
+                {/* Heat shimmer overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent translate-y-full group-hover:translate-y-[-100%] transition-transform duration-1000" />
               </Button>
             </Link>
             <Link href="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 md:px-12 py-6 md:py-7 text-base md:text-lg w-full sm:w-auto bg-transparent border-purple-300/30 text-purple-100 hover:bg-purple-900/20 hover:border-purple-300/50 transition-all duration-500 font-normal tracking-wide"
+                className="px-10 md:px-14 py-7 md:py-8 text-lg md:text-xl w-full sm:w-auto bg-transparent border-2 border-red-900/50 text-gray-300 hover:bg-red-950/30 hover:border-red-700/70 hover:text-white transition-all duration-500 font-semibold tracking-wider uppercase"
               >
                 Entrar
               </Button>
@@ -71,95 +88,118 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features Section - Reframed as sensations */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10 mb-16 md:mb-24 px-4">
-          {/* Card 1: Cards as tension creators */}
-          <Card className="bg-gradient-to-br from-purple-950/40 to-red-950/40 border-purple-800/30 backdrop-blur-sm hover:border-purple-700/50 transition-all duration-700 group">
+        {/* Features Section - Sensations, not specs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-32 px-4">
+          {/* Card 1: Heat */}
+          <Card className="bg-gradient-to-br from-black/80 via-red-950/20 to-black/80 border-red-900/30 backdrop-blur-sm hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden">
+            {/* Side glow on hover */}
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
             <CardHeader className="space-y-4 pb-4">
-              <CardTitle className="text-xl md:text-2xl text-purple-100 font-light tracking-wide">
-                Cartas que provocam
+              <CardTitle className="text-2xl md:text-3xl text-white font-bold tracking-wide">
+                Cartas que aquecem
               </CardTitle>
-              <CardDescription className="text-purple-300/70 text-sm md:text-base font-light leading-relaxed">
-                Testam limites, criam tensão e quebram a rotina.
+              <CardDescription className="text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+                De sugestões sutis a desafios intensos.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm md:text-base text-purple-200/60 font-light leading-relaxed">
-                De sugestões sutis a desafios intensos. Cada carta é uma porta que você escolhe abrir… ou não.
+              <p className="text-sm md:text-base text-gray-500 font-light leading-relaxed">
+                Cada carta é uma porta. Você escolhe até onde vai.
               </p>
             </CardContent>
           </Card>
 
-          {/* Card 2: Rating as memory keeper */}
-          <Card className="bg-gradient-to-br from-red-950/40 to-purple-950/40 border-red-800/30 backdrop-blur-sm hover:border-red-700/50 transition-all duration-700 group">
+          {/* Card 2: Memory as heat */}
+          <Card className="bg-gradient-to-br from-black/80 via-red-950/20 to-black/80 border-red-900/30 backdrop-blur-sm hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
             <CardHeader className="space-y-4 pb-4">
-              <CardTitle className="text-xl md:text-2xl text-purple-100 font-light tracking-wide">
-                Memórias que voltam
+              <CardTitle className="text-2xl md:text-3xl text-white font-bold tracking-wide">
+                Sessões que marcam
               </CardTitle>
-              <CardDescription className="text-purple-300/70 text-sm md:text-base font-light leading-relaxed">
-                Guarde aquilo que funcionou… e repita quando quiser.
+              <CardDescription className="text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+                O que funcionou, você guarda. E repete.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm md:text-base text-purple-200/60 font-light leading-relaxed">
-                Avalie cada experiência. Descubra padrões. Crie um histórico do que vale a pena repetir.
+              <p className="text-sm md:text-base text-gray-500 font-light leading-relaxed">
+                Avalie. Descubra padrões. Crie um histórico pessoal.
               </p>
             </CardContent>
           </Card>
 
-          {/* Card 3: Social as private moments */}
-          <Card className="bg-gradient-to-br from-purple-950/40 to-pink-950/40 border-purple-800/30 backdrop-blur-sm hover:border-purple-700/50 transition-all duration-700 group">
+          {/* Card 3: Private intensity */}
+          <Card className="bg-gradient-to-br from-black/80 via-red-950/20 to-black/80 border-red-900/30 backdrop-blur-sm hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
             <CardHeader className="space-y-4 pb-4">
-              <CardTitle className="text-xl md:text-2xl text-purple-100 font-light tracking-wide">
-                Momentos privados
+              <CardTitle className="text-2xl md:text-3xl text-white font-bold tracking-wide">
+                Convites fechados
               </CardTitle>
-              <CardDescription className="text-purple-300/70 text-sm md:text-base font-light leading-relaxed">
-                Convites fechados e sessões que não precisam ser explicadas.
+              <CardDescription className="text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+                Só você e quem você confia.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm md:text-base text-purple-200/60 font-light leading-relaxed">
-                Adicione quem você confia. Crie sessões sob medida. O que acontece aqui, fica aqui.
+              <p className="text-sm md:text-base text-gray-500 font-light leading-relaxed">
+                Sessões privadas. Sem explicações necessárias.
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Social Proof Section - Subtle and suggestive */}
-        <div className="text-center mb-16 md:mb-20 px-4">
-          <div className="max-w-2xl mx-auto space-y-6">
-            <p className="text-sm md:text-base text-purple-300/60 font-light tracking-wider uppercase">
-              Mais de 1.000 jogadores já viraram a primeira carta
+        {/* Social Proof - Indirect and suggestive */}
+        <div className="text-center mb-20 md:mb-28 px-4">
+          <div className="max-w-3xl mx-auto space-y-8">
+            <p className="text-sm md:text-base text-gray-600 font-medium tracking-[0.2em] uppercase">
+              Mais de 1.000 jogadores
             </p>
-            <div className="flex justify-center gap-1">
+
+            {/* Dripping stars effect - inspired by logo drops */}
+            <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-2xl md:text-3xl text-red-400/80">★</span>
+                <span
+                  key={star}
+                  className="text-3xl md:text-4xl text-red-600 drop-shadow-[0_0_10px_rgba(220,38,38,0.6)]"
+                  style={{
+                    animation: `drip 3s ease-in-out infinite ${star * 0.2}s`
+                  }}
+                >
+                  ★
+                </span>
               ))}
             </div>
-            <p className="text-purple-200/50 italic text-sm md:text-base font-light leading-relaxed">
-              &ldquo;Alguns jogos você termina. Outros, você não esquece.&rdquo;
+
+            <p className="text-gray-500 italic text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto">
+              &ldquo;Nem todo jogo termina quando a partida acaba.&rdquo;
             </p>
           </div>
         </div>
 
-        {/* Final CTA Section - Invitation to discover */}
-        <div className="text-center pb-12 px-4">
-          <Card className="max-w-3xl mx-auto bg-gradient-to-br from-purple-950/60 to-red-950/60 border-purple-700/40 backdrop-blur-md shadow-2xl shadow-purple-900/40">
-            <CardHeader className="space-y-6 pt-10 pb-6">
-              <CardTitle className="text-2xl md:text-3xl lg:text-4xl text-purple-100 font-light tracking-wide leading-tight">
-                A curiosidade já começou.
+        {/* Final CTA - Maximum heat */}
+        <div className="text-center pb-16 px-4">
+          <Card className="max-w-4xl mx-auto bg-gradient-to-br from-black/90 via-red-950/40 to-black/90 border-red-800/50 backdrop-blur-md shadow-[0_0_80px_rgba(220,38,38,0.3)] relative overflow-hidden">
+            {/* Ambient glow inside card */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-red-900/20 to-transparent" />
+
+            <CardHeader className="space-y-8 pt-12 pb-8 relative z-10">
+              <CardTitle className="text-3xl md:text-4xl lg:text-5xl text-white font-bold tracking-tight leading-tight">
+                Você decide até onde vai.
               </CardTitle>
-              <CardDescription className="text-base md:text-lg lg:text-xl text-purple-300/70 font-light leading-relaxed">
-                Crie sua conta e descubra o que está esperando por você.
+              <CardDescription className="text-lg md:text-xl lg:text-2xl text-gray-400 font-light leading-relaxed">
+                A primeira carta já está na mesa.
               </CardDescription>
             </CardHeader>
-            <CardContent className="pb-10">
-              <Link href="/register" className="w-full sm:w-auto inline-block">
+
+            <CardContent className="pb-12 relative z-10">
+              <Link href="/register" className="inline-block group">
                 <Button
                   size="lg"
-                  className="px-10 md:px-16 py-6 md:py-7 text-base md:text-lg w-full sm:w-auto bg-gradient-to-r from-red-700 to-rose-700 hover:from-red-600 hover:to-rose-600 text-white border-none shadow-xl shadow-red-900/50 transition-all duration-500 animate-breathe font-normal tracking-wide"
+                  className="px-12 md:px-20 py-7 md:py-9 text-lg md:text-xl w-full sm:w-auto bg-gradient-to-br from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 text-white border-none shadow-[0_0_50px_rgba(220,38,38,0.6)] hover:shadow-[0_0_80px_rgba(220,38,38,0.9)] transition-all duration-700 font-bold tracking-widest uppercase animate-breathe-slow relative overflow-hidden"
                 >
-                  Aceitar o Desafio
+                  <span className="relative z-10">Aceitar o Desafio</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent translate-y-full group-hover:translate-y-[-100%] transition-transform duration-1000" />
                 </Button>
               </Link>
             </CardContent>
@@ -168,7 +208,7 @@ export default function Home() {
       </div>
 
       <style jsx>{`
-        @keyframes breathe {
+        @keyframes breathe-slow {
           0%, 100% {
             transform: scale(1);
           }
@@ -177,21 +217,58 @@ export default function Home() {
           }
         }
 
-        @keyframes glow {
+        @keyframes breathe-glow {
           0%, 100% {
-            filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.5));
+            opacity: 0.4;
+            transform: scale(1);
           }
           50% {
-            filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.8));
+            opacity: 0.6;
+            transform: scale(1.1);
           }
         }
 
-        .animate-breathe {
-          animation: breathe 3s ease-in-out infinite;
+        @keyframes heat-shimmer {
+          0%, 100% {
+            filter: drop-shadow(0 0 25px rgba(220, 38, 38, 0.8));
+          }
+          50% {
+            filter: drop-shadow(0 0 40px rgba(239, 68, 68, 1));
+          }
         }
 
-        .animate-glow {
-          animation: glow 2s ease-in-out infinite;
+        @keyframes pulse-slow {
+          0%, 100% {
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+
+        @keyframes drip {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(4px);
+          }
+        }
+
+        .animate-breathe-slow {
+          animation: breathe-slow 4s ease-in-out infinite;
+        }
+
+        .animate-breathe-glow {
+          animation: breathe-glow 3s ease-in-out infinite;
+        }
+
+        .animate-heat-shimmer {
+          animation: heat-shimmer 2s ease-in-out infinite;
+        }
+
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
         }
       `}</style>
     </main>
