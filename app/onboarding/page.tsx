@@ -86,28 +86,28 @@ export default function OnboardingPage() {
       {/* Red halo glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-900/20 rounded-full blur-[100px] animate-pulse-slow" />
 
-      <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-black/90 via-red-950/30 to-black/90 border-red-900/40 backdrop-blur-sm shadow-[0_0_50px_rgba(220,38,38,0.2)]">
+      <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(220,38,38,0.3)] hover:shadow-[0_0_80px_rgba(220,38,38,0.4)] transition-all duration-500">
         <CardHeader>
           <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]">🌶️</span>
+            <span className="text-5xl drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer">🌶️</span>
           </div>
-          <CardTitle className="text-2xl text-center text-white font-bold">
+          <CardTitle className="text-2xl text-center text-white font-bold drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
             Última etapa
           </CardTitle>
-          <CardDescription className="text-center text-gray-400">
+          <CardDescription className="text-center text-gray-300">
             Escolha seu nickname e complete seu perfil
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-200 bg-red-950/50 border border-red-800/50 rounded-md">
+              <div className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
                 {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="nickname" className="text-gray-300">
+              <Label htmlFor="nickname" className="text-gray-200 font-medium">
                 Nickname *
               </Label>
               <Input
@@ -120,7 +120,7 @@ export default function OnboardingPage() {
                 disabled={createProfile.isPending}
                 minLength={3}
                 maxLength={20}
-                className="bg-black/50 border-red-900/30 text-white placeholder:text-gray-600 focus:border-red-700/50 focus:ring-red-900/30"
+                className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner"
               />
               <p className="text-xs text-gray-500">
                 Apenas letras, números e underscores (3-20 caracteres)
@@ -128,7 +128,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio" className="text-gray-300">
+              <Label htmlFor="bio" className="text-gray-200 font-medium">
                 Bio (opcional)
               </Label>
               <Textarea
@@ -138,32 +138,32 @@ export default function OnboardingPage() {
                 onChange={(e) => setBio(e.target.value)}
                 disabled={createProfile.isPending}
                 maxLength={500}
-                className="bg-black/50 border-red-900/30 text-white placeholder:text-gray-600 focus:border-red-700/50 focus:ring-red-900/30 min-h-[100px]"
+                className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner min-h-[100px]"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="orientation" className="text-gray-300">
+              <Label htmlFor="orientation" className="text-gray-200 font-medium">
                 Orientação (opcional)
               </Label>
               <select
                 id="orientation"
-                className="flex h-10 w-full rounded-md border border-red-900/30 bg-black/50 px-3 py-2 text-sm text-white ring-offset-background focus-visible:outline-none focus-visible:border-red-700/50 focus-visible:ring-2 focus-visible:ring-red-900/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-full rounded-md border-2 border-zinc-700/50 bg-zinc-900/90 px-3 py-2 text-sm text-white ring-offset-background focus-visible:outline-none focus-visible:border-red-600/80 focus-visible:ring-2 focus-visible:ring-red-600/30 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                 value={orientation}
                 onChange={(e) => setOrientation(e.target.value)}
                 disabled={createProfile.isPending}
               >
-                <option value="" className="bg-black text-white">Selecione...</option>
-                <option value="heterosexual" className="bg-black text-white">Heterosexual</option>
-                <option value="homosexual" className="bg-black text-white">Homosexual</option>
-                <option value="bisexual" className="bg-black text-white">Bisexual</option>
-                <option value="other" className="bg-black text-white">Outro</option>
+                <option value="" className="bg-zinc-900 text-white">Selecione...</option>
+                <option value="heterosexual" className="bg-zinc-900 text-white">Heterosexual</option>
+                <option value="homosexual" className="bg-zinc-900 text-white">Homosexual</option>
+                <option value="bisexual" className="bg-zinc-900 text-white">Bisexual</option>
+                <option value="other" className="bg-zinc-900 text-white">Outro</option>
               </select>
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all duration-500 mt-6"
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50 hover:border-red-500/80 mt-6"
               disabled={createProfile.isPending}
             >
               {createProfile.isPending ? 'Criando perfil...' : 'Começar a Jogar'}
@@ -182,8 +182,21 @@ export default function OnboardingPage() {
           }
         }
 
+        @keyframes heat-shimmer {
+          0%, 100% {
+            filter: drop-shadow(0 0 25px rgba(220, 38, 38, 0.9));
+          }
+          50% {
+            filter: drop-shadow(0 0 35px rgba(239, 68, 68, 1));
+          }
+        }
+
         .animate-pulse-slow {
           animation: pulse-slow 4s ease-in-out infinite;
+        }
+
+        .animate-heat-shimmer {
+          animation: heat-shimmer 2s ease-in-out infinite;
         }
       `}</style>
     </div>

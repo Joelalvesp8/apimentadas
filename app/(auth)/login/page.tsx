@@ -60,29 +60,31 @@ export default function LoginPage() {
       {/* Red halo glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-900/20 rounded-full blur-[100px] animate-pulse-slow" />
 
-      <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-black/90 via-red-950/30 to-black/90 border-red-900/40 backdrop-blur-sm shadow-[0_0_50px_rgba(220,38,38,0.2)]">
+      <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(220,38,38,0.3)] hover:shadow-[0_0_80px_rgba(220,38,38,0.4)] transition-all duration-500">
         <CardHeader>
           <div className="flex items-center justify-center gap-3 mb-6">
-            <span className="text-5xl drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]">🌶️</span>
-            <h1 className="text-3xl font-bold text-white tracking-wide">
+            <span className="text-5xl drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer">🌶️</span>
+            <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">
               APIMENTADAS
             </h1>
           </div>
-          <CardTitle className="text-2xl text-center text-white font-bold">Entrar</CardTitle>
-          <CardDescription className="text-center text-gray-400">
+          <CardTitle className="text-2xl text-center text-white font-bold drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
+            Entrar
+          </CardTitle>
+          <CardDescription className="text-center text-gray-300">
             Entre para acessar suas sessões
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-200 bg-red-950/50 border border-red-800/50 rounded-md">
+              <div className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
                 {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300">Email</Label>
+              <Label htmlFor="email" className="text-gray-200 font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -91,12 +93,12 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="bg-black/50 border-red-900/30 text-white placeholder:text-gray-600 focus:border-red-700/50 focus:ring-red-900/30"
+                className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-300">Senha</Label>
+              <Label htmlFor="password" className="text-gray-200 font-medium">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -105,25 +107,25 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                className="bg-black/50 border-red-900/30 text-white placeholder:text-gray-600 focus:border-red-700/50 focus:ring-red-900/30"
+                className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all duration-500"
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50 hover:border-red-500/80"
               disabled={isLoading}
             >
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
 
             <div className="text-center text-sm pt-2">
-              <span className="text-gray-500">
+              <span className="text-gray-400">
                 Não tem uma conta?{' '}
               </span>
               <Link
                 href="/register"
-                className="text-red-400 hover:text-red-300 hover:underline font-medium transition-colors"
+                className="text-red-400 hover:text-red-300 hover:underline font-semibold transition-colors drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]"
               >
                 Criar conta
               </Link>
@@ -142,8 +144,21 @@ export default function LoginPage() {
           }
         }
 
+        @keyframes heat-shimmer {
+          0%, 100% {
+            filter: drop-shadow(0 0 25px rgba(220, 38, 38, 0.9));
+          }
+          50% {
+            filter: drop-shadow(0 0 35px rgba(239, 68, 68, 1));
+          }
+        }
+
         .animate-pulse-slow {
           animation: pulse-slow 4s ease-in-out infinite;
+        }
+
+        .animate-heat-shimmer {
+          animation: heat-shimmer 2s ease-in-out infinite;
         }
       `}</style>
     </div>
