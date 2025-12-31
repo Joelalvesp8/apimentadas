@@ -167,7 +167,7 @@ export default function GamePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Carregando sessão...</p>
+        <p className="text-gray-400">Carregando sessão...</p>
       </div>
     );
   }
@@ -175,7 +175,7 @@ export default function GamePage() {
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Sessão não encontrada</p>
+        <p className="text-gray-400">Sessão não encontrada</p>
       </div>
     );
   }
@@ -183,39 +183,39 @@ export default function GamePage() {
   // Rating Screen - shown after finishing session
   if (showRatingScreen) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 overflow-y-auto">
+      <div className="min-h-screen p-4 overflow-y-auto">
         <div className="max-w-4xl mx-auto pb-20">
-          <Card className="mb-6">
+          <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
             <CardHeader>
-              <CardTitle className="text-center text-2xl">
+              <CardTitle className="text-center text-2xl text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
                 🎉 Sessão Finalizada!
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-muted-foreground mb-6">
+              <p className="text-center text-gray-300 mb-6">
                 Avalie as cartas que apareceram durante o jogo. Sua opinião ajuda a melhorar a experiência!
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <p className="text-3xl font-bold text-purple-600">{session.cardsPlayed}</p>
-                  <p className="text-sm text-muted-foreground">Cartas jogadas</p>
+                <div className="text-center p-4 bg-zinc-900/80 border-2 border-zinc-700/40 rounded-lg shadow-inner">
+                  <p className="text-3xl font-bold text-red-500">{session.cardsPlayed}</p>
+                  <p className="text-sm text-gray-400">Cartas jogadas</p>
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <p className="text-3xl font-bold text-green-600">
+                <div className="text-center p-4 bg-zinc-900/80 border-2 border-zinc-700/40 rounded-lg shadow-inner">
+                  <p className="text-3xl font-bold text-red-500">
                     {session.averageRating?.toFixed(1) || '0.0'}
                   </p>
-                  <p className="text-sm text-muted-foreground">Rating médio</p>
+                  <p className="text-sm text-gray-400">Rating médio</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Cards Rating */}
-          <Card className="mb-6">
+          <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
             <CardHeader>
-              <CardTitle>Avalie as Cartas</CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <CardTitle className="text-white">Avalie as Cartas</CardTitle>
+              <p className="text-sm text-gray-400">
                 Toque no coração para curtir uma carta ou no X para descurtir
               </p>
             </CardHeader>
@@ -225,24 +225,24 @@ export default function GamePage() {
                   session.playedCards.map((playedCard: any) => {
                     const isLiked = cardRatings[playedCard.card.id];
                     return (
-                      <Card key={playedCard.id} className="border-2">
+                      <Card key={playedCard.id} className="bg-zinc-900/60 border-2 border-zinc-700/40 hover:border-red-700/50 transition-all duration-300">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
-                                <Badge variant={playedCard.card.type === 'pergunta' ? 'default' : 'secondary'}>
+                                <Badge variant={playedCard.card.type === 'pergunta' ? 'default' : 'secondary'} className="bg-red-900/40 border-red-700/50 text-red-200">
                                   {playedCard.card.type === 'pergunta' ? '❓ Pergunta' : '🎯 Tarefa'}
                                 </Badge>
-                                <Badge variant="outline">
+                                <Badge variant="outline" className="border-zinc-600 text-gray-300">
                                   {playedCard.card.difficulty === 'facil' && '🟢 Fácil'}
                                   {playedCard.card.difficulty === 'medio' && '🟡 Médio'}
                                   {playedCard.card.difficulty === 'dificil' && '🟠 Difícil'}
                                   {playedCard.card.difficulty === 'extremo' && '🔴 Extremo'}
                                 </Badge>
                               </div>
-                              <p className="text-sm mb-2">{playedCard.card.content}</p>
+                              <p className="text-sm mb-2 text-gray-200">{playedCard.card.content}</p>
                               {playedCard.qualitativeRating && (
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-xs border-zinc-600 text-gray-400">
                                   Execução: {playedCard.qualitativeRating === 'ruim' && '👎 Ruim'}
                                   {playedCard.qualitativeRating === 'satisfatoria' && '😐 Satisfatória'}
                                   {playedCard.qualitativeRating === 'excelente' && '👍 Excelente'}
@@ -254,17 +254,17 @@ export default function GamePage() {
                                 variant={isLiked === true ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleCardLike(playedCard.card.id, true)}
-                                className="h-10 w-10 p-0"
+                                className={`h-10 w-10 p-0 ${isLiked === true ? 'bg-red-600 hover:bg-red-500 border-red-600' : 'border-zinc-600 hover:bg-zinc-800'}`}
                               >
-                                <Heart className={`w-5 h-5 ${isLiked === true ? 'fill-current' : ''}`} />
+                                <Heart className={`w-5 h-5 ${isLiked === true ? 'fill-current text-white' : 'text-gray-400'}`} />
                               </Button>
                               <Button
                                 variant={isLiked === false ? 'destructive' : 'outline'}
                                 size="sm"
                                 onClick={() => handleCardLike(playedCard.card.id, false)}
-                                className="h-10 w-10 p-0"
+                                className={`h-10 w-10 p-0 ${isLiked === false ? 'bg-zinc-700 hover:bg-zinc-600 border-zinc-600' : 'border-zinc-600 hover:bg-zinc-800'}`}
                               >
-                                <HeartOff className="w-5 h-5" />
+                                <HeartOff className={`w-5 h-5 ${isLiked === false ? 'text-white' : 'text-gray-400'}`} />
                               </Button>
                             </div>
                           </div>
@@ -273,7 +273,7 @@ export default function GamePage() {
                     );
                   })
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-gray-400 py-8">
                     Nenhuma carta foi jogada nesta sessão
                   </p>
                 )}
@@ -282,7 +282,11 @@ export default function GamePage() {
           </Card>
 
           <div className="flex justify-center">
-            <Button onClick={handleFinishRating} size="lg" className="min-w-[200px]">
+            <Button
+              onClick={handleFinishRating}
+              size="lg"
+              className="min-w-[200px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50"
+            >
               Finalizar e Voltar
             </Button>
           </div>
@@ -292,27 +296,27 @@ export default function GamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 overflow-y-auto">
+    <div className="min-h-screen p-4 overflow-y-auto">
       <div className="max-w-4xl mx-auto pb-20">
         {/* Turn Banner */}
-        <Card className={`mb-6 ${isMyTurn ? 'border-4 border-green-500 bg-green-50' : 'border-2 border-orange-300 bg-orange-50'}`}>
+        <Card className={`mb-6 ${isMyTurn ? 'bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/60 shadow-[0_0_40px_rgba(220,38,38,0.4)]' : 'bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-zinc-700/50 shadow-[0_0_20px_rgba(120,120,120,0.2)]'}`}>
           <CardContent className="py-6">
             <div className="text-center">
               {isMyTurn ? (
                 <>
-                  <h2 className="text-3xl font-bold text-green-700 mb-2">
+                  <h2 className="text-3xl font-bold text-red-500 mb-2 drop-shadow-[0_0_10px_rgba(220,38,38,0.6)]">
                     🎯 SUA VEZ!
                   </h2>
-                  <p className="text-lg text-green-600">
+                  <p className="text-lg text-gray-300">
                     Pegue uma carta para {getAnswererName()} responder/executar
                   </p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold text-orange-700 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-300 mb-2">
                     ⏳ Aguarde...
                   </h2>
-                  <p className="text-lg text-orange-600">
+                  <p className="text-lg text-gray-400">
                     {currentTurnParticipant?.profile.user.name} está pegando uma carta
                   </p>
                 </>
@@ -322,11 +326,11 @@ export default function GamePage() {
         </Card>
 
         {/* Session Info */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.3)]">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between text-white">
               <span>Sessão de Jogo</span>
-              <Badge className="text-lg">
+              <Badge className="text-lg bg-red-900/50 border-red-700/50 text-red-200">
                 {session.sessionType === 'casal'
                   ? 'Casal'
                   : session.sessionType === 'trisal'
@@ -337,30 +341,32 @@ export default function GamePage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">{session.cardsPlayed}</p>
-                <p className="text-sm text-muted-foreground">Cartas jogadas</p>
+              <div className="text-center p-3 bg-zinc-900/60 border border-zinc-700/40 rounded-lg">
+                <p className="text-2xl font-bold text-red-500">{session.cardsPlayed}</p>
+                <p className="text-sm text-gray-400">Cartas jogadas</p>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold">
+              <div className="text-center p-3 bg-zinc-900/60 border border-zinc-700/40 rounded-lg">
+                <p className="text-2xl font-bold text-red-500">
                   {session.averageRating?.toFixed(1) || '0.0'}
                 </p>
-                <p className="text-sm text-muted-foreground">Rating médio</p>
+                <p className="text-sm text-gray-400">Rating médio</p>
               </div>
             </div>
 
             {/* Participants */}
-            <div className="border-t pt-4">
+            <div className="border-t border-zinc-700/40 pt-4">
               <div className="flex items-center gap-2 mb-3">
-                <Users className="w-5 h-5" />
-                <h3 className="font-semibold">Participantes</h3>
+                <Users className="w-5 h-5 text-red-500" />
+                <h3 className="font-semibold text-white">Participantes</h3>
               </div>
               <div className="flex flex-wrap gap-2">
                 {session.sessionParticipants.map((participant) => (
                   <Badge
                     key={participant.id}
                     variant={participant.profileId === session.currentTurnProfileId ? 'default' : 'outline'}
-                    className="px-3 py-1"
+                    className={participant.profileId === session.currentTurnProfileId
+                      ? 'px-3 py-1 bg-red-900/50 border-red-700/50 text-red-200'
+                      : 'px-3 py-1 border-zinc-600 text-gray-300'}
                   >
                     {participant.profile.nickname}
                     {participant.profileId === session.currentTurnProfileId && ' 🎯'}
@@ -382,14 +388,14 @@ export default function GamePage() {
               />
 
               {isCardFlipped && isMyTurn && (
-                <Card className="w-full max-w-md">
+                <Card className="w-full max-w-md bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.3)]">
                   <CardHeader>
-                    <CardTitle className="text-center">
+                    <CardTitle className="text-center text-white">
                       Como {getAnswererName()} se saiu?
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-center text-sm text-muted-foreground mb-4">
+                    <p className="text-center text-sm text-gray-400 mb-4">
                       Avalie a resposta ou execução da tarefa:
                     </p>
                     <div className="grid grid-cols-3 gap-3">
@@ -397,7 +403,7 @@ export default function GamePage() {
                         onClick={() => handleRateCard('ruim')}
                         disabled={playCard.isPending}
                         variant="outline"
-                        className="flex-col h-24 gap-2 border-red-300 hover:bg-red-50"
+                        className="flex-col h-24 gap-2 bg-zinc-900/60 border-2 border-red-800/50 hover:bg-red-950/50 hover:border-red-700/70 text-gray-300 hover:text-white transition-all duration-300"
                       >
                         <ThumbsDown className="w-8 h-8 text-red-500" />
                         <span className="text-sm">Ruim</span>
@@ -406,23 +412,23 @@ export default function GamePage() {
                         onClick={() => handleRateCard('satisfatoria')}
                         disabled={playCard.isPending}
                         variant="outline"
-                        className="flex-col h-24 gap-2 border-yellow-300 hover:bg-yellow-50"
+                        className="flex-col h-24 gap-2 bg-zinc-900/60 border-2 border-zinc-700/50 hover:bg-zinc-800/70 hover:border-zinc-600/70 text-gray-300 hover:text-white transition-all duration-300"
                       >
-                        <Meh className="w-8 h-8 text-yellow-500" />
+                        <Meh className="w-8 h-8 text-gray-400" />
                         <span className="text-sm">Satisfatória</span>
                       </Button>
                       <Button
                         onClick={() => handleRateCard('excelente')}
                         disabled={playCard.isPending}
                         variant="outline"
-                        className="flex-col h-24 gap-2 border-green-300 hover:bg-green-50"
+                        className="flex-col h-24 gap-2 bg-zinc-900/60 border-2 border-red-700/50 hover:bg-red-950/50 hover:border-red-600/70 text-gray-300 hover:text-white transition-all duration-300"
                       >
-                        <ThumbsUp className="w-8 h-8 text-green-500" />
+                        <ThumbsUp className="w-8 h-8 text-red-500" />
                         <span className="text-sm">Excelente</span>
                       </Button>
                     </div>
                     {playCard.isPending && (
-                      <p className="text-center text-sm text-muted-foreground mt-4">
+                      <p className="text-center text-sm text-gray-400 mt-4">
                         Salvando avaliação...
                       </p>
                     )}
@@ -431,9 +437,9 @@ export default function GamePage() {
               )}
 
               {isCardFlipped && !isMyTurn && (
-                <Card className="w-full max-w-md">
+                <Card className="w-full max-w-md bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-zinc-700/50">
                   <CardContent className="py-6 text-center">
-                    <p className="text-muted-foreground">
+                    <p className="text-gray-400">
                       Aguarde {currentTurnParticipant?.profile.user.name} avaliar sua resposta...
                     </p>
                   </CardContent>
@@ -441,23 +447,33 @@ export default function GamePage() {
               )}
             </>
           ) : (
-            <Card className="w-full max-w-md">
+            <Card className="w-full max-w-md bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.3)]">
               <CardContent className="py-12 text-center">
                 {isMyTurn ? (
                   <>
-                    <p className="mb-4 text-muted-foreground">
+                    <p className="mb-4 text-gray-300">
                       É sua vez! Clique no botão abaixo para pegar uma carta
                     </p>
-                    <Button onClick={handleFetchCard} size="lg" disabled={cardLoading}>
+                    <Button
+                      onClick={handleFetchCard}
+                      size="lg"
+                      disabled={cardLoading}
+                      className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50"
+                    >
                       {cardLoading ? 'Buscando...' : '🎴 Buscar Carta'}
                     </Button>
                   </>
                 ) : (
                   <>
-                    <p className="mb-4 text-muted-foreground">
+                    <p className="mb-4 text-gray-300">
                       Aguarde {currentTurnParticipant?.profile.user.name} pegar uma carta
                     </p>
-                    <Button size="lg" disabled variant="outline">
+                    <Button
+                      size="lg"
+                      disabled
+                      variant="outline"
+                      className="border-zinc-700 text-gray-500 cursor-not-allowed"
+                    >
                       ⏳ Não é sua vez
                     </Button>
                   </>
@@ -470,7 +486,7 @@ export default function GamePage() {
             variant="destructive"
             onClick={handleFinishSession}
             disabled={finishSession.isPending}
-            className="mb-8"
+            className="mb-8 bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-gray-300 hover:text-white border-2 border-zinc-700/50 hover:border-red-700/50 shadow-[0_0_15px_rgba(120,120,120,0.3)] hover:shadow-[0_0_25px_rgba(220,38,38,0.4)] transition-all duration-500"
             size="lg"
           >
             {finishSession.isPending ? 'Finalizando...' : 'Finalizar Sessão'}

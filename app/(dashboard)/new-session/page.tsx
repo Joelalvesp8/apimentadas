@@ -49,30 +49,33 @@ export default function NewSessionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
-        <Card>
+        <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
           <CardHeader>
-            <CardTitle className="text-2xl">Nova Sessão de Jogo</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">Nova Sessão de Jogo</CardTitle>
+            <CardDescription className="text-gray-400">
               Selecione os participantes para esta sessão
             </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
-              <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+              <div className="p-3 mb-4 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
                 {error}
               </div>
             )}
 
-            {isLoading && <p>Carregando conexões...</p>}
+            {isLoading && <p className="text-gray-400">Carregando conexões...</p>}
 
             {connections && connections.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">
+                <p className="text-gray-400 mb-4">
                   Você ainda não tem conexões aceitas.
                 </p>
-                <Button onClick={() => router.push('/connections')}>
+                <Button
+                  onClick={() => router.push('/connections')}
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all duration-500 border-2 border-red-600/50"
+                >
                   Adicionar Conexões
                 </Button>
               </div>
@@ -92,29 +95,29 @@ export default function NewSessionPage() {
                     return (
                       <div
                         key={connection.id}
-                        className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition ${
+                        className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
                           isSelected
-                            ? 'bg-purple-50 border-purple-500'
-                            : 'hover:bg-gray-50'
+                            ? 'bg-zinc-900/70 border-red-700/60 shadow-[0_0_25px_rgba(220,38,38,0.3)]'
+                            : 'bg-zinc-900/40 border-zinc-700/40 hover:bg-zinc-900/60 hover:border-zinc-600/60'
                         }`}
                         onClick={() => toggleParticipant(profile.id)}
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar>
+                          <Avatar className="border-2 border-zinc-700">
                             <AvatarImage src={profile.user.image || undefined} />
-                            <AvatarFallback>
+                            <AvatarFallback className="bg-zinc-800 text-gray-300">
                               {profile.nickname[0].toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{profile.nickname}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="font-medium text-white">{profile.nickname}</p>
+                            <p className="text-sm text-gray-400">
                               {profile.user.name}
                             </p>
                           </div>
                         </div>
                         {isSelected && (
-                          <Badge className="bg-purple-500">Selecionado</Badge>
+                          <Badge className="bg-red-900/50 border-red-700/50 text-red-200 shadow-[0_0_15px_rgba(220,38,38,0.4)]">Selecionado</Badge>
                         )}
                       </div>
                     );
@@ -122,7 +125,7 @@ export default function NewSessionPage() {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-400">
                     {selectedParticipants.length} participante(s) selecionado(s)
                   </p>
                   <Button
@@ -130,6 +133,7 @@ export default function NewSessionPage() {
                     disabled={
                       selectedParticipants.length === 0 || createSession.isPending
                     }
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {createSession.isPending
                       ? 'Criando...'

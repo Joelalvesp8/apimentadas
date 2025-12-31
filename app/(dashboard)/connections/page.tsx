@@ -59,26 +59,37 @@ export default function ConnectionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Conexões</h1>
+        <h1 className="text-4xl font-bold mb-8 text-white drop-shadow-[0_0_10px_rgba(220,38,38,0.4)]">Conexões</h1>
 
         <Tabs defaultValue="accepted" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="accepted">
+          <TabsList className="bg-zinc-900/90 border-2 border-zinc-700/50">
+            <TabsTrigger
+              value="accepted"
+              className="data-[state=active]:bg-red-900/50 data-[state=active]:text-red-200 data-[state=active]:border-red-700/50 text-gray-400 hover:text-gray-200"
+            >
               Aceitas ({acceptedConnections?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="pending">
+            <TabsTrigger
+              value="pending"
+              className="data-[state=active]:bg-red-900/50 data-[state=active]:text-red-200 data-[state=active]:border-red-700/50 text-gray-400 hover:text-gray-200"
+            >
               Pendentes ({pendingConnections?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="search">Buscar</TabsTrigger>
+            <TabsTrigger
+              value="search"
+              className="data-[state=active]:bg-red-900/50 data-[state=active]:text-red-200 data-[state=active]:border-red-700/50 text-gray-400 hover:text-gray-200"
+            >
+              Buscar
+            </TabsTrigger>
           </TabsList>
 
           {/* Accepted Connections */}
           <TabsContent value="accepted">
-            <Card>
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
               <CardHeader>
-                <CardTitle>Conexões Aceitas</CardTitle>
+                <CardTitle className="text-white">Conexões Aceitas</CardTitle>
               </CardHeader>
               <CardContent>
                 {acceptedConnections && acceptedConnections.length > 0 ? (
@@ -92,18 +103,18 @@ export default function ConnectionsPage() {
                       return (
                         <div
                           key={connection.id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
+                          className="flex items-center justify-between p-4 bg-zinc-900/60 border-2 border-zinc-700/40 rounded-lg hover:border-red-700/50 transition-all duration-300"
                         >
                           <div className="flex items-center gap-3">
-                            <Avatar>
+                            <Avatar className="border-2 border-zinc-700">
                               <AvatarImage src={profile.user.image || undefined} />
-                              <AvatarFallback>
+                              <AvatarFallback className="bg-zinc-800 text-gray-300">
                                 {profile.nickname[0].toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium">{profile.nickname}</p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="font-medium text-white">{profile.nickname}</p>
+                              <p className="text-sm text-gray-400">
                                 {profile.user.name}
                               </p>
                             </div>
@@ -112,6 +123,7 @@ export default function ConnectionsPage() {
                             variant="destructive"
                             size="sm"
                             onClick={() => handleRemove(connection.id)}
+                            className="bg-zinc-700 hover:bg-zinc-600 border-2 border-zinc-600 text-gray-300 hover:text-white transition-all duration-300"
                           >
                             Remover
                           </Button>
@@ -120,7 +132,7 @@ export default function ConnectionsPage() {
                     })}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-gray-400 py-8">
                     Você ainda não tem conexões aceitas
                   </p>
                 )}
@@ -130,9 +142,9 @@ export default function ConnectionsPage() {
 
           {/* Pending Connections */}
           <TabsContent value="pending">
-            <Card>
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
               <CardHeader>
-                <CardTitle>Solicitações Pendentes</CardTitle>
+                <CardTitle className="text-white">Solicitações Pendentes</CardTitle>
               </CardHeader>
               <CardContent>
                 {pendingConnections && pendingConnections.length > 0 ? (
@@ -146,22 +158,22 @@ export default function ConnectionsPage() {
                       return (
                         <div
                           key={connection.id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
+                          className="flex items-center justify-between p-4 bg-zinc-900/60 border-2 border-zinc-700/40 rounded-lg hover:border-red-700/50 transition-all duration-300"
                         >
                           <div className="flex items-center gap-3">
-                            <Avatar>
+                            <Avatar className="border-2 border-zinc-700">
                               <AvatarImage src={profile.user.image || undefined} />
-                              <AvatarFallback>
+                              <AvatarFallback className="bg-zinc-800 text-gray-300">
                                 {profile.nickname[0].toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium">{profile.nickname}</p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="font-medium text-white">{profile.nickname}</p>
+                              <p className="text-sm text-gray-400">
                                 {profile.user.name}
                               </p>
                               {isReceiver && (
-                                <Badge variant="secondary" className="mt-1">
+                                <Badge variant="secondary" className="mt-1 bg-red-900/40 border-red-700/50 text-red-200">
                                   Quer se conectar com você
                                 </Badge>
                               )}
@@ -172,6 +184,7 @@ export default function ConnectionsPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleAccept(connection.id)}
+                                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white border-2 border-red-600/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300"
                               >
                                 Aceitar
                               </Button>
@@ -179,19 +192,20 @@ export default function ConnectionsPage() {
                                 variant="destructive"
                                 size="sm"
                                 onClick={() => handleReject(connection.id)}
+                                className="bg-zinc-700 hover:bg-zinc-600 border-2 border-zinc-600 text-gray-300 hover:text-white transition-all duration-300"
                               >
                                 Rejeitar
                               </Button>
                             </div>
                           ) : (
-                            <Badge variant="secondary">Aguardando resposta</Badge>
+                            <Badge variant="secondary" className="bg-zinc-800 border-zinc-700 text-gray-400">Aguardando resposta</Badge>
                           )}
                         </div>
                       );
                     })}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-gray-400 py-8">
                     Nenhuma solicitação pendente
                   </p>
                 )}
@@ -201,16 +215,16 @@ export default function ConnectionsPage() {
 
           {/* Search */}
           <TabsContent value="search">
-            <Card>
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
               <CardHeader>
-                <CardTitle>Buscar Usuários</CardTitle>
+                <CardTitle className="text-white">Buscar Usuários</CardTitle>
               </CardHeader>
               <CardContent>
                 <Input
                   placeholder="Digite um nickname..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="mb-4"
+                  className="mb-4 bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300"
                 />
 
                 {searchResults && searchResults.length > 0 ? (
@@ -218,18 +232,18 @@ export default function ConnectionsPage() {
                     {searchResults.map((profile) => (
                       <div
                         key={profile.id}
-                        className="flex items-center justify-between p-4 border rounded-lg"
+                        className="flex items-center justify-between p-4 bg-zinc-900/60 border-2 border-zinc-700/40 rounded-lg hover:border-red-700/50 transition-all duration-300"
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar>
+                          <Avatar className="border-2 border-zinc-700">
                             <AvatarImage src={profile.user.image || undefined} />
-                            <AvatarFallback>
+                            <AvatarFallback className="bg-zinc-800 text-gray-300">
                               {profile.nickname[0].toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{profile.nickname}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="font-medium text-white">{profile.nickname}</p>
+                            <p className="text-sm text-gray-400">
                               {profile.user.name}
                             </p>
                           </div>
@@ -238,6 +252,7 @@ export default function ConnectionsPage() {
                           size="sm"
                           onClick={() => handleSendRequest(profile.id)}
                           disabled={createConnection.isPending}
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white border-2 border-red-600/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300"
                         >
                           Conectar
                         </Button>
@@ -245,11 +260,11 @@ export default function ConnectionsPage() {
                     ))}
                   </div>
                 ) : searchQuery.length >= 2 ? (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-gray-400 py-8">
                     Nenhum resultado encontrado
                   </p>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-gray-400 py-8">
                     Digite pelo menos 2 caracteres para buscar
                   </p>
                 )}
