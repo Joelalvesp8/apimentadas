@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import { join } from 'path';
-import { existsSync } from 'fs';
+import { mkdirSync, existsSync } from 'fs';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
 import { isAdmin } from '@/lib/utils/admin-helper';
 
@@ -70,19 +70,39 @@ export async function POST(request: NextRequest) {
     console.log('Generated filename:', filename);
 
     // Ensure upload directory exists
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'products');
-    console.log('Upload directory:', uploadDir);
+    const publicDir = join(process.cwd(), 'public');
+    const uploadsDir = join(publicDir, 'uploads');
+    const productsDir = join(uploadsDir, 'products');
 
-    if (!existsSync(uploadDir)) {
-      console.log('Creating upload directory...');
-      await mkdir(uploadDir, { recursive: true });
+    console.log('Working directory:', process.cwd());
+    console.log('Public directory:', publicDir);
+    console.log('Uploads directory:', uploadsDir);
+    console.log('Products directory:', productsDir);
+
+    // Create directories synchronously to ensure they exist
+    try {
+      if (!existsSync(publicDir)) {
+        console.log('Creating public directory...');
+        mkdirSync(publicDir, { recursive: true });
+      }
+      if (!existsSync(uploadsDir)) {
+        console.log('Creating uploads directory...');
+        mkdirSync(uploadsDir, { recursive: true });
+      }
+      if (!existsSync(productsDir)) {
+        console.log('Creating products directory...');
+        mkdirSync(productsDir, { recursive: true });
+      }
+    } catch (dirError: any) {
+      console.error('Error creating directories:', dirError);
+      return errorResponse(`Erro ao criar diretório de upload: ${dirError.message}`, 500);
     }
 
     // Save file
     console.log('Converting file to buffer...');
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const filepath = join(uploadDir, filename);
+    const filepath = join(productsDir, filename);
 
     console.log('Writing file to:', filepath);
     await writeFile(filepath, buffer);
