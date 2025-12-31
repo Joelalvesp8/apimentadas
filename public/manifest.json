@@ -1,10 +1,10 @@
 {
   "name": "APIMENTADAS 🌶️",
   "short_name": "APIMENTADAS",
-  "description": "Jogo adulto picante e divertido para casais, trios e grupos. Esquente sua relação!",
+  "description": "Cartas que aquecem. Decisões que mudam o clima. Momentos que não se repetem.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#dc2626",
   "orientation": "portrait-primary",
   "scope": "/",

@@ -15,7 +15,7 @@ const PWARegister = dynamic(
 
 export const metadata: Metadata = {
   title: "APIMENTADAS 🌶️",
-  description: "Jogo adulto picante e divertido para casais, trios e grupos. Esquente sua relação!",
+  description: "Cartas que aquecem. Decisões que mudam o clima. Momentos que não se repetem.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
