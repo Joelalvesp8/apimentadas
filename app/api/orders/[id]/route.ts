@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 
 // Force dynamic rendering for authenticated routes
 export const dynamic = 'force-dynamic';
@@ -118,8 +119,7 @@ export async function DELETE(
     }
 
     // Check if user is admin
-    const isAdmin = user.email && user.email.endsWith('@admin.com');
-    if (!isAdmin) {
+    if (!isAdmin(user)) {
       return errorResponse('Apenas administradores podem excluir pedidos', 403);
     }
 
@@ -153,8 +153,7 @@ export async function PATCH(
     }
 
     // Check if user is admin
-    const isAdmin = user.email && user.email.endsWith('@admin.com');
-    if (!isAdmin) {
+    if (!isAdmin(user)) {
       return errorResponse('Apenas administradores podem atualizar pedidos', 403);
     }
 
