@@ -35,7 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, X, Trash2, Shield, List, Package, ShoppingCart, Plus, Edit, Eye } from 'lucide-react';
+import { Check, X, Trash2, Shield, List, Package, ShoppingCart, Plus, Edit, Eye, Upload } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -100,6 +100,7 @@ export default function AdminPage() {
     images: [] as string[],
     active: true,
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // ========== CARDS HANDLERS ==========
   const handleApprove = async (id: string) => {
@@ -189,6 +190,53 @@ export default function AdminPage() {
       setDeleteProductDialog(null);
     } catch (error: any) {
       alert(error.message || 'Erro ao excluir produto');
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      alert('Tipo de arquivo inválido. Apenas imagens são permitidas (JPEG, PNG, WebP, GIF)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert('Arquivo muito grande. Tamanho máximo: 5MB');
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao fazer upload');
+      }
+
+      // Add uploaded image URL to the list
+      setProductForm({ ...productForm, images: [...productForm.images, result.data.url] });
+
+      // Clear the input
+      event.target.value = '';
+    } catch (error: any) {
+      alert(error.message || 'Erro ao fazer upload da imagem');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -943,6 +991,46 @@ export default function AdminPage() {
               <div>
                 <Label className="text-gray-300">Imagens do Produto *</Label>
                 <div className="space-y-3">
+                  {/* Upload de arquivo */}
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      id="file-upload"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      disabled={productDialog.mode === 'view' || uploadingImage}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => document.getElementById('file-upload')?.click()}
+                      disabled={productDialog.mode === 'view' || uploadingImage}
+                      className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 border-2 border-red-600/50 shadow-[0_0_20px_rgba(220,38,38,0.4)]"
+                    >
+                      {uploadingImage ? (
+                        <>
+                          <span className="animate-spin mr-2">⏳</span>
+                          Fazendo upload...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Fazer Upload de Imagem
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-zinc-700/50"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-zinc-900 px-2 text-gray-500">ou</span>
+                    </div>
+                  </div>
+
                   {/* Input para adicionar nova URL */}
                   <div className="flex gap-2">
                     <Input
