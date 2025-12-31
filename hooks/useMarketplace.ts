@@ -100,6 +100,22 @@ export interface OrderItem {
 }
 
 // ============================================================================
+// CATEGORIES HOOKS
+// ============================================================================
+
+export function useCategories(includeSubcategories = true) {
+  const params = new URLSearchParams();
+  if (includeSubcategories !== undefined) {
+    params.append('includeSubcategories', String(includeSubcategories));
+  }
+
+  return useQuery({
+    queryKey: ['categories', includeSubcategories],
+    queryFn: () => apiClient.get<Category[]>(`/api/categories?${params.toString()}`),
+  });
+}
+
+// ============================================================================
 // PRODUCTS HOOKS
 // ============================================================================
 
