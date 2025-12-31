@@ -17,6 +17,9 @@ import {
   useDeleteProduct,
   useOrders,
   useConfirmOrderMutation,
+  useUpdateOrderStatus,
+  useDeleteOrder,
+  useCancelOrderMutation,
   Product,
   Order,
 } from '@/hooks/useMarketplace';
@@ -78,6 +81,14 @@ export default function AdminPage() {
   // Orders hooks
   const { data: orders, isLoading: ordersLoading } = useOrders('seller');
   const confirmOrder = useConfirmOrderMutation();
+  const updateOrderStatus = useUpdateOrderStatus();
+  const deleteOrder = useDeleteOrder();
+  const cancelOrder = useCancelOrderMutation();
+
+  // Order dialogs
+  const [cancelOrderDialog, setCancelOrderDialog] = useState<{ open: boolean; order?: Order }>({ open: false });
+  const [cancelReason, setCancelReason] = useState('');
+  const [deleteOrderDialog, setDeleteOrderDialog] = useState<Order | null>(null);
 
   // Product form state
   const [productForm, setProductForm] = useState({
@@ -187,6 +198,46 @@ export default function AdminPage() {
       await confirmOrder.mutateAsync(orderId);
     } catch (error: any) {
       alert(error.message || 'Erro ao confirmar pedido');
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId: string, status: string) => {
+    try {
+      await updateOrderStatus.mutateAsync({ orderId, status });
+    } catch (error: any) {
+      alert(error.message || 'Erro ao atualizar status do pedido');
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelOrderDialog.order) return;
+    if (!cancelReason.trim()) {
+      alert('Informe o motivo do cancelamento');
+      return;
+    }
+
+    try {
+      await cancelOrder.mutateAsync({
+        orderId: cancelOrderDialog.order.id,
+        reason: cancelReason,
+      });
+      setCancelOrderDialog({ open: false });
+      setCancelReason('');
+      setOrderDetailsDialog(null);
+    } catch (error: any) {
+      alert(error.message || 'Erro ao cancelar pedido');
+    }
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!deleteOrderDialog) return;
+
+    try {
+      await deleteOrder.mutateAsync(deleteOrderDialog.id);
+      setDeleteOrderDialog(null);
+      setOrderDetailsDialog(null);
+    } catch (error: any) {
+      alert(error.message || 'Erro ao excluir pedido');
     }
   };
 
@@ -738,25 +789,43 @@ export default function AdminPage() {
                               })}
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex gap-1 justify-end flex-wrap">
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setOrderDetailsDialog(order)}
-                                  className="border-zinc-600 text-gray-300 hover:bg-zinc-800"
+                                  className="border-zinc-600 text-gray-300 hover:bg-zinc-800 h-8 px-2"
                                 >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  Ver
+                                  <Eye className="w-3 h-3" />
                                 </Button>
                                 {order.status === 'paid_awaiting_confirmation' && (
                                   <Button
                                     size="sm"
                                     onClick={() => handleConfirmOrder(order.id)}
                                     disabled={confirmOrder.isPending}
-                                    className="bg-green-700 hover:bg-green-600 border-2 border-green-600 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                                    className="bg-green-700 hover:bg-green-600 border-2 border-green-600 shadow-[0_0_15px_rgba(34,197,94,0.3)] h-8 px-2 text-xs"
                                   >
-                                    <Check className="w-4 h-4 mr-1" />
-                                    Confirmar
+                                    ✓ Conf
+                                  </Button>
+                                )}
+                                {order.status === 'confirmed' && (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleUpdateOrderStatus(order.id, 'shipped')}
+                                    disabled={updateOrderStatus.isPending}
+                                    className="bg-blue-700 hover:bg-blue-600 border-2 border-blue-600 h-8 px-2 text-xs"
+                                  >
+                                    📦 Env
+                                  </Button>
+                                )}
+                                {order.status === 'shipped' && (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleUpdateOrderStatus(order.id, 'delivered')}
+                                    disabled={updateOrderStatus.isPending}
+                                    className="bg-green-700 hover:bg-green-600 border-2 border-green-600 h-8 px-2 text-xs"
+                                  >
+                                    ✅ Ent
                                   </Button>
                                 )}
                               </div>
@@ -995,23 +1064,139 @@ export default function AdminPage() {
                 )}
               </div>
             )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setOrderDetailsDialog(null)} className="border-zinc-600 text-gray-300 hover:bg-zinc-800">
-                Fechar
-              </Button>
-              {orderDetailsDialog?.status === 'paid_awaiting_confirmation' && (
-                <Button
-                  onClick={() => {
-                    handleConfirmOrder(orderDetailsDialog.id);
-                    setOrderDetailsDialog(null);
-                  }}
-                  disabled={confirmOrder.isPending}
-                  className="bg-green-700 hover:bg-green-600 border-2 border-green-600 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
-                >
-                  <Check className="w-4 h-4 mr-2" />
-                  Confirmar Pedido
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <div className="flex gap-2 flex-wrap">
+                <Button variant="outline" onClick={() => setOrderDetailsDialog(null)} className="border-zinc-600 text-gray-300 hover:bg-zinc-800">
+                  Fechar
                 </Button>
-              )}
+                {orderDetailsDialog?.status === 'paid_awaiting_confirmation' && (
+                  <Button
+                    onClick={() => {
+                      handleConfirmOrder(orderDetailsDialog.id);
+                    }}
+                    disabled={confirmOrder.isPending}
+                    className="bg-green-700 hover:bg-green-600 border-2 border-green-600 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Confirmar
+                  </Button>
+                )}
+                {orderDetailsDialog?.status === 'confirmed' && (
+                  <Button
+                    onClick={() => {
+                      handleUpdateOrderStatus(orderDetailsDialog.id, 'shipped');
+                    }}
+                    disabled={updateOrderStatus.isPending}
+                    className="bg-blue-700 hover:bg-blue-600 border-2 border-blue-600"
+                  >
+                    📦 Marcar como Enviado
+                  </Button>
+                )}
+                {orderDetailsDialog?.status === 'shipped' && (
+                  <Button
+                    onClick={() => {
+                      handleUpdateOrderStatus(orderDetailsDialog.id, 'delivered');
+                    }}
+                    disabled={updateOrderStatus.isPending}
+                    className="bg-green-700 hover:bg-green-600 border-2 border-green-600"
+                  >
+                    ✅ Marcar como Entregue
+                  </Button>
+                )}
+                {orderDetailsDialog && !['cancelled', 'delivered'].includes(orderDetailsDialog.status) && (
+                  <Button
+                    onClick={() => {
+                      setCancelOrderDialog({ open: true, order: orderDetailsDialog });
+                    }}
+                    variant="outline"
+                    className="border-orange-600 text-orange-400 hover:bg-orange-950/30"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Cancelar Pedido
+                  </Button>
+                )}
+                <Button
+                  onClick={() => setDeleteOrderDialog(orderDetailsDialog)}
+                  variant="destructive"
+                  className="bg-red-700 hover:bg-red-600 border-2 border-red-600"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Excluir
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ========== CANCEL ORDER DIALOG ========== */}
+        <Dialog open={cancelOrderDialog.open} onOpenChange={(open) => !open && setCancelOrderDialog({ open: false })}>
+          <DialogContent className="bg-gradient-to-br from-zinc-900 to-zinc-950 border-2 border-red-700/50 text-white">
+            <DialogHeader>
+              <DialogTitle className="text-white">Cancelar Pedido</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Informe o motivo do cancelamento. O cliente será notificado.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-gray-300">Motivo do Cancelamento *</Label>
+                <Textarea
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Ex: Produto em falta no estoque..."
+                  rows={4}
+                  className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCancelOrderDialog({ open: false });
+                  setCancelReason('');
+                }}
+                className="border-zinc-600 text-gray-300 hover:bg-zinc-800"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleCancelOrder}
+                disabled={cancelOrder.isPending || !cancelReason.trim()}
+                className="bg-orange-600 hover:bg-orange-500 border-2 border-orange-600"
+              >
+                {cancelOrder.isPending ? 'Cancelando...' : 'Confirmar Cancelamento'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ========== DELETE ORDER DIALOG ========== */}
+        <Dialog open={!!deleteOrderDialog} onOpenChange={(open) => !open && setDeleteOrderDialog(null)}>
+          <DialogContent className="bg-gradient-to-br from-zinc-900 to-zinc-950 border-2 border-red-700/50 text-white">
+            <DialogHeader>
+              <DialogTitle className="text-white">Confirmar Exclusão</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Tem certeza que deseja excluir o pedido <span className="font-semibold text-white">#{deleteOrderDialog?.id.substring(0, 8)}</span>?
+                <br />
+                Esta ação não pode ser desfeita e removerá todos os dados do pedido permanentemente.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteOrderDialog(null)}
+                className="border-zinc-600 text-gray-300 hover:bg-zinc-800"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleDeleteOrder}
+                disabled={deleteOrder.isPending}
+                className="bg-red-600 hover:bg-red-500 border-2 border-red-600"
+              >
+                {deleteOrder.isPending ? 'Excluindo...' : 'Excluir Pedido'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
