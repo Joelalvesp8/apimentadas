@@ -91,15 +91,15 @@ export default function Home() {
         {/* Features Section - Sensations, not specs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-32 px-4">
           {/* Card 1: Heat */}
-          <Card className="bg-gradient-to-br from-black/80 via-red-950/20 to-black/80 border-red-900/30 backdrop-blur-sm hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden">
+          <Card className="bg-gradient-to-br from-zinc-900 to-zinc-950 border-zinc-800/60 hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden shadow-xl">
             {/* Side glow on hover */}
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-            <CardHeader className="space-y-4 pb-4">
-              <CardTitle className="text-2xl md:text-3xl text-white font-bold tracking-wide">
+            <CardHeader className="space-y-3 pb-4">
+              <CardTitle className="text-xl md:text-2xl text-white font-semibold tracking-wide">
                 Cartas que aquecem
               </CardTitle>
-              <CardDescription className="text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+              <CardDescription className="text-gray-400 text-sm md:text-base font-normal leading-relaxed">
                 De sugestões sutis a desafios intensos.
               </CardDescription>
             </CardHeader>
@@ -111,14 +111,14 @@ export default function Home() {
           </Card>
 
           {/* Card 2: Memory as heat */}
-          <Card className="bg-gradient-to-br from-black/80 via-red-950/20 to-black/80 border-red-900/30 backdrop-blur-sm hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden">
+          <Card className="bg-gradient-to-br from-zinc-900 to-zinc-950 border-zinc-800/60 hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden shadow-xl">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-            <CardHeader className="space-y-4 pb-4">
-              <CardTitle className="text-2xl md:text-3xl text-white font-bold tracking-wide">
+            <CardHeader className="space-y-3 pb-4">
+              <CardTitle className="text-xl md:text-2xl text-white font-semibold tracking-wide">
                 Sessões que marcam
               </CardTitle>
-              <CardDescription className="text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+              <CardDescription className="text-gray-400 text-sm md:text-base font-normal leading-relaxed">
                 O que funcionou, você guarda. E repete.
               </CardDescription>
             </CardHeader>
@@ -130,14 +130,14 @@ export default function Home() {
           </Card>
 
           {/* Card 3: Private intensity */}
-          <Card className="bg-gradient-to-br from-black/80 via-red-950/20 to-black/80 border-red-900/30 backdrop-blur-sm hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden">
+          <Card className="bg-gradient-to-br from-zinc-900 to-zinc-950 border-zinc-800/60 hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 group relative overflow-hidden shadow-xl">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-            <CardHeader className="space-y-4 pb-4">
-              <CardTitle className="text-2xl md:text-3xl text-white font-bold tracking-wide">
+            <CardHeader className="space-y-3 pb-4">
+              <CardTitle className="text-xl md:text-2xl text-white font-semibold tracking-wide">
                 Convites fechados
               </CardTitle>
-              <CardDescription className="text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+              <CardDescription className="text-gray-400 text-sm md:text-base font-normal leading-relaxed">
                 Só você e quem você confia.
               </CardDescription>
             </CardHeader>
