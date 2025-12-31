@@ -186,6 +186,31 @@ npm run db:studio
 
 Todas as 6 fases implementadas com sucesso!
 
+## 🎨 Design System & Branding
+
+A identidade visual do Apimentadas segue uma filosofia **dark premium** com foco em **sensualidade implícita** e **provocação controlada**.
+
+### Princípios de Design
+
+- **Paleta:** Preto absoluto + vermelho intenso (sem pink/purple)
+- **Atmosfera:** Calor, tensão, mistério
+- **Copy:** Provocativo e sugestivo (não explícito)
+- **Animações:** Lentas e fluidas (≥500ms)
+
+### Documentação Completa
+
+📖 **[BRANDING.md](./BRANDING.md)** — Guia completo de identidade visual
+
+Inclui:
+- Paleta de cores e gradações
+- Componentes reutilizáveis (Dark Card, Red Button, Dark Input)
+- Animações (breathe, shimmer, drip, glow)
+- Tipografia e hierarquia
+- Spacing e responsividade
+- Anti-patterns e checklist de qualidade
+
+**Para desenvolvedores:** Consulte BRANDING.md antes de criar novas páginas ou componentes visuais.
+
 ## 📂 Estrutura do Projeto
 
 ```
