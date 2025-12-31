@@ -940,6 +940,82 @@ export default function AdminPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <Label className="text-gray-300">Imagens do Produto *</Label>
+                <div className="space-y-3">
+                  {/* Input para adicionar nova URL */}
+                  <div className="flex gap-2">
+                    <Input
+                      type="url"
+                      placeholder="Cole a URL da imagem aqui..."
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const input = e.target as HTMLInputElement;
+                          const url = input.value.trim();
+                          if (url && !productForm.images.includes(url)) {
+                            setProductForm({ ...productForm, images: [...productForm.images, url] });
+                            input.value = '';
+                          }
+                        }
+                      }}
+                      disabled={productDialog.mode === 'view'}
+                      className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white focus:border-red-600/80"
+                    />
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                        const url = input.value.trim();
+                        if (url && !productForm.images.includes(url)) {
+                          setProductForm({ ...productForm, images: [...productForm.images, url] });
+                          input.value = '';
+                        }
+                      }}
+                      disabled={productDialog.mode === 'view'}
+                      className="bg-red-700 hover:bg-red-600 border-2 border-red-600"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Lista de imagens adicionadas */}
+                  {productForm.images.length > 0 && (
+                    <div className="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto p-2 bg-zinc-950/50 rounded-md border border-zinc-700/30">
+                      {productForm.images.map((imageUrl, index) => (
+                        <div key={index} className="relative group">
+                          <div className="aspect-square bg-zinc-900 rounded-md border-2 border-zinc-700/50 overflow-hidden">
+                            <img
+                              src={imageUrl}
+                              alt={`Produto ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23333" width="100" height="100"/%3E%3Ctext fill="%23666" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3E❌%3C/text%3E%3C/svg%3E';
+                              }}
+                            />
+                          </div>
+                          {productDialog.mode !== 'view' && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => {
+                                const newImages = productForm.images.filter((_, i) => i !== index);
+                                setProductForm({ ...productForm, images: newImages });
+                              }}
+                              className="absolute -top-2 -right-2 w-7 h-7 p-0 bg-red-600 hover:bg-red-500 border-2 border-red-500 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {productForm.images.length === 0 && (
+                    <p className="text-sm text-gray-500 italic">Nenhuma imagem adicionada ainda</p>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
