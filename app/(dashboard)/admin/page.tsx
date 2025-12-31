@@ -225,7 +225,12 @@ export default function AdminPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erro ao fazer upload');
+        console.error('Upload error:', result);
+        throw new Error(result.error || `Erro ao fazer upload (${response.status})`);
+      }
+
+      if (!result.data || !result.data.url) {
+        throw new Error('Resposta inválida do servidor');
       }
 
       // Add uploaded image URL to the list
@@ -233,8 +238,11 @@ export default function AdminPage() {
 
       // Clear the input
       event.target.value = '';
+
+      alert('Imagem enviada com sucesso!');
     } catch (error: any) {
-      alert(error.message || 'Erro ao fazer upload da imagem');
+      console.error('Upload error:', error);
+      alert(`Erro ao fazer upload: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setUploadingImage(false);
     }
