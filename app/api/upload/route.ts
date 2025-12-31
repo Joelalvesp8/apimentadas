@@ -69,34 +69,59 @@ export async function POST(request: NextRequest) {
 
     console.log('Generated filename:', filename);
 
-    // Ensure upload directory exists
-    const publicDir = join(process.cwd(), 'public');
-    const uploadsDir = join(publicDir, 'uploads');
-    const productsDir = join(uploadsDir, 'products');
+    // Find the correct upload directory
+    // Try multiple possible paths
+    const possibleRoots = [
+      process.cwd(),
+      '/home/user/apimentadas',
+      join(process.cwd(), '../'),
+      join(process.cwd(), '../../'),
+    ];
 
-    console.log('Working directory:', process.cwd());
-    console.log('Public directory:', publicDir);
-    console.log('Uploads directory:', uploadsDir);
-    console.log('Products directory:', productsDir);
+    let productsDir: string | null = null;
+    let publicDir: string | null = null;
 
-    // Create directories synchronously to ensure they exist
-    try {
-      if (!existsSync(publicDir)) {
-        console.log('Creating public directory...');
-        mkdirSync(publicDir, { recursive: true });
+    console.log('Searching for public directory...');
+    for (const root of possibleRoots) {
+      const testPublicDir = join(root, 'public');
+      const testProductsDir = join(testPublicDir, 'uploads', 'products');
+
+      console.log('Testing:', testPublicDir);
+
+      if (existsSync(testPublicDir)) {
+        console.log('Found public directory at:', testPublicDir);
+        publicDir = testPublicDir;
+
+        // Try to ensure uploads/products exists
+        try {
+          const uploadsDir = join(testPublicDir, 'uploads');
+          if (!existsSync(uploadsDir)) {
+            mkdirSync(uploadsDir, { recursive: true, mode: 0o777 });
+          }
+          if (!existsSync(testProductsDir)) {
+            mkdirSync(testProductsDir, { recursive: true, mode: 0o777 });
+          }
+          productsDir = testProductsDir;
+          break;
+        } catch (err) {
+          console.log('Could not create subdirectories in:', testPublicDir, err);
+          continue;
+        }
       }
-      if (!existsSync(uploadsDir)) {
-        console.log('Creating uploads directory...');
-        mkdirSync(uploadsDir, { recursive: true });
-      }
-      if (!existsSync(productsDir)) {
-        console.log('Creating products directory...');
-        mkdirSync(productsDir, { recursive: true });
-      }
-    } catch (dirError: any) {
-      console.error('Error creating directories:', dirError);
-      return errorResponse(`Erro ao criar diretório de upload: ${dirError.message}`, 500);
     }
+
+    if (!productsDir) {
+      console.error('Could not find or create upload directory');
+      console.error('Tried roots:', possibleRoots);
+      return errorResponse(
+        `Não foi possível encontrar o diretório de uploads. ` +
+        `Por favor, certifique-se de que a pasta 'public/uploads/products' existe ` +
+        `com permissões de escrita no diretório do projeto.`,
+        500
+      );
+    }
+
+    console.log('Using products directory:', productsDir);
 
     // Save file
     console.log('Converting file to buffer...');
