@@ -70,10 +70,10 @@ export async function POST(request: NextRequest) {
     console.log('Generated filename:', filename);
 
     // Find the correct upload directory
-    // Try multiple possible paths
+    // Try multiple possible paths (prioritize known working path)
     const possibleRoots = [
+      '/home/user/apimentadas',  // Known working path - try first
       process.cwd(),
-      '/home/user/apimentadas',
       join(process.cwd(), '../'),
       join(process.cwd(), '../../'),
     ];
@@ -81,32 +81,44 @@ export async function POST(request: NextRequest) {
     let productsDir: string | null = null;
     let publicDir: string | null = null;
 
-    console.log('Searching for public directory...');
+    console.log('Current working directory:', process.cwd());
+    console.log('Searching for public directory in these roots:', possibleRoots);
+
     for (const root of possibleRoots) {
       const testPublicDir = join(root, 'public');
       const testProductsDir = join(testPublicDir, 'uploads', 'products');
 
-      console.log('Testing:', testPublicDir);
+      console.log('Testing root:', root);
+      console.log('  -> Public dir:', testPublicDir, '- exists:', existsSync(testPublicDir));
 
       if (existsSync(testPublicDir)) {
-        console.log('Found public directory at:', testPublicDir);
+        console.log('  -> Found public directory!');
         publicDir = testPublicDir;
+
+        // Check if products dir exists
+        console.log('  -> Products dir:', testProductsDir, '- exists:', existsSync(testProductsDir));
 
         // Try to ensure uploads/products exists
         try {
           const uploadsDir = join(testPublicDir, 'uploads');
           if (!existsSync(uploadsDir)) {
+            console.log('  -> Creating uploads directory...');
             mkdirSync(uploadsDir, { recursive: true, mode: 0o777 });
           }
           if (!existsSync(testProductsDir)) {
+            console.log('  -> Creating products directory...');
             mkdirSync(testProductsDir, { recursive: true, mode: 0o777 });
           }
           productsDir = testProductsDir;
+          console.log('  -> SUCCESS! Using products directory:', productsDir);
           break;
-        } catch (err) {
-          console.log('Could not create subdirectories in:', testPublicDir, err);
+        } catch (err: any) {
+          console.log('  -> FAILED to create subdirectories:', err.message);
+          console.log('  -> Error:', err);
           continue;
         }
+      } else {
+        console.log('  -> Public directory not found at this root');
       }
     }
 
