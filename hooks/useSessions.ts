@@ -6,8 +6,10 @@ export interface GameSession {
   id: string;
   creatorId: string;
   sessionType: string;
+  mode: string; // 'local' | 'online'
   status: string;
   currentTurnProfileId: string | null;
+  currentRoundId: string | null; // For online mode
   averageRating: number | null;
   cardsPlayed: number;
   createdAt: string;
