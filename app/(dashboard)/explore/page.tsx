@@ -144,7 +144,6 @@ export default function ExplorePage() {
                       <h3 className="text-lg font-bold text-white truncate group-hover:text-red-400 transition-colors">
                         @{user.nickname}
                       </h3>
-                      <p className="text-sm text-gray-400 truncate">{user.name}</p>
                     </div>
                   </div>
 

@@ -8,7 +8,6 @@ import { apiClient } from '@/lib/api-client';
 export interface ExploreUser {
   id: string;
   nickname: string;
-  name: string;
   image: string | null;
   bio: string | null;
   orientation: string | null;
@@ -21,7 +20,6 @@ export interface ExploreUser {
 export interface PublicProfile {
   id: string;
   nickname: string;
-  name: string;
   image: string | null;
   bio: string | null;
   orientation: string | null;

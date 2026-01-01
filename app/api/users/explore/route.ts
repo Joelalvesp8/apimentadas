@@ -81,18 +81,16 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         user: {
           select: {
-            name: true,
             image: true,
           },
         },
       },
     });
 
-    // Transform data for response
+    // Transform data for response (name is private - only nickname is public)
     const transformedUsers = users.map((profile) => ({
       id: profile.id,
       nickname: profile.nickname,
-      name: profile.user.name,
       image: profile.user.image,
       bio: profile.bio,
       orientation: profile.orientation,

@@ -40,9 +40,8 @@ export async function GET(
         createdAt: true,
         user: {
           select: {
-            name: true,
             image: true,
-            // DO NOT expose email or other sensitive data
+            // DO NOT expose email, name or other sensitive data
           },
         },
       },
@@ -118,11 +117,10 @@ export async function GET(
       isConnected = !!connection;
     }
 
-    // Build response
+    // Build response (name is private - only nickname is public)
     const publicProfile = {
       id: profile.id,
       nickname: profile.nickname,
-      name: profile.user.name,
       image: profile.user.image,
       bio: profile.bio,
       orientation: profile.orientation,

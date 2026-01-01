@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home, Users, LogOut, Store, Package, ShoppingBag, Compass } from 'lucide-react';
+import { Home, Users, LogOut, Store, Package, ShoppingBag, Compass, User } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 
 export default function DashboardLayout({
@@ -88,6 +88,12 @@ export default function DashboardLayout({
                 </Button>
               </Link>
             )}
+            <Link href="/profile">
+              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
+                <User className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Perfil</span>
+              </Button>
+            </Link>
             <Link href="/connections">
               <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
                 <Users className="h-4 w-4 sm:mr-2" />

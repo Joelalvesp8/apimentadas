@@ -91,7 +91,6 @@ export default function PublicProfilePage() {
                     <h1 className="text-3xl font-bold text-white mb-1">
                       @{profile.nickname}
                     </h1>
-                    <p className="text-xl text-gray-400">{profile.name}</p>
                   </div>
 
                   {profile.isConnected && (
