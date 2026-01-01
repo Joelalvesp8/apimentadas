@@ -18,7 +18,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   name          String
-  password      String?   // Null for OAuth users
+  password      String? // Null for OAuth users
   provider      String    @default("credentials") // "credentials" | "google"
   emailVerified DateTime? @map("email_verified")
   image         String?
@@ -26,20 +26,20 @@ model User {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  profile       Profile?
-  gameSessions  GameSession[]
-  userCards     UserCard[]
-  cardLikes     CardLike[]
+  profile      Profile?
+  gameSessions GameSession[]
+  userCards    UserCard[]
+  cardLikes    CardLike[]
 
   @@map("users")
 }
 
 model Profile {
-  id          String   @id @default(cuid())
-  userId      String   @unique @map("user_id")
-  nickname    String   @unique
+  id          String  @id @default(cuid())
+  userId      String  @unique @map("user_id")
+  nickname    String  @unique
   bio         String?
-  orientation String?  // "heterosexual" | "homosexual" | "bisexual" | "other"
+  orientation String? // "heterosexual" | "homosexual" | "bisexual" | "other"
 
   // Delivery address fields
   deliveryAddress    String? @map("delivery_address")
@@ -48,18 +48,24 @@ model Profile {
   deliveryZipCode    String? @map("delivery_zip_code")
   deliveryComplement String? @map("delivery_complement")
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  // Social/stats fields
+  sessionsPlayed Int      @default(0) @map("sessions_played")
+  averageRating  Float?   @map("average_rating")
+  lastActiveAt   DateTime @default(now()) @map("last_active_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  connectionsFrom       Connection[]          @relation("ConnectionFrom")
-  connectionsTo         Connection[]          @relation("ConnectionTo")
-  sessionParticipants   SessionParticipant[]
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connectionsFrom     Connection[]         @relation("ConnectionFrom")
+  connectionsTo       Connection[]         @relation("ConnectionTo")
+  sessionParticipants SessionParticipant[]
+  onlineAnswers       OnlineAnswer[]
 
   // Marketplace relations
-  cartItems             CartItem[]
-  ordersAsBuyer         Order[]
+  cartItems     CartItem[]
+  ordersAsBuyer Order[]
 
   @@map("profiles")
 }
@@ -89,33 +95,34 @@ model Connection {
 // ============================================================================
 
 model Card {
-  id          String   @id @default(cuid())
-  type        String   // "pergunta" | "tarefa"
-  category    String   // "casais" | "trios" | "grupos"
-  difficulty  String   // "facil" | "medio" | "dificil" | "extremo"
-  content     String   @db.Text
-  isOfficial  Boolean  @default(true) @map("is_official")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  type       String // "pergunta" | "tarefa"
+  category   String // "casais" | "trios" | "grupos"
+  difficulty String // "facil" | "medio" | "dificil" | "extremo"
+  content    String   @db.Text
+  isOfficial Boolean  @default(true) @map("is_official")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   // Relations
-  playedCards PlayedCard[]
-  cardLikes   CardLike[]
+  playedCards  PlayedCard[]
+  cardLikes    CardLike[]
+  onlineRounds OnlineRound[]
 
   @@map("cards")
 }
 
 model UserCard {
-  id          String   @id @default(cuid())
-  userId      String   @map("user_id")
-  type        String   // "pergunta" | "tarefa"
-  category    String   // "casais" | "trios" | "grupos"
-  difficulty  String   // "facil" | "medio" | "dificil" | "extremo"
-  content     String   @db.Text
-  approved    Boolean  @default(false)
-  likesCount  Int      @default(0) @map("likes_count")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  type       String // "pergunta" | "tarefa"
+  category   String // "casais" | "trios" | "grupos"
+  difficulty String // "facil" | "medio" | "dificil" | "extremo"
+  content    String   @db.Text
+  approved   Boolean  @default(false)
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   // Relations
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -146,21 +153,24 @@ model CardLike {
 // ============================================================================
 
 model GameSession {
-  id                  String    @id @default(cuid())
-  creatorId           String    @map("creator_id")
-  sessionType         String    @map("session_type") // "casal" | "trisal" | "grupo" (determined by participant count)
-  status              String    @default("active") // "active" | "finished"
-  currentTurnProfileId String?  @map("current_turn_profile_id") // Profile ID of who is picking the card
-  averageRating       Float?    @map("average_rating")
-  cardsPlayed         Int       @default(0) @map("cards_played")
-  createdAt           DateTime  @default(now()) @map("created_at")
-  finishedAt          DateTime? @map("finished_at")
-  updatedAt           DateTime  @updatedAt @map("updated_at")
+  id                   String    @id @default(cuid())
+  creatorId            String    @map("creator_id")
+  sessionType          String    @map("session_type") // "casal" | "trisal" | "grupo" (determined by participant count)
+  mode                 String    @default("local") // "local" | "online"
+  status               String    @default("active") // "active" | "finished"
+  currentTurnProfileId String?   @map("current_turn_profile_id") // Profile ID of who is picking the card (local mode only)
+  currentRoundId       String?   @map("current_round_id") // Current round ID (online mode only)
+  averageRating        Float?    @map("average_rating")
+  cardsPlayed          Int       @default(0) @map("cards_played")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  finishedAt           DateTime? @map("finished_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  creator             User                  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creator             User                 @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   sessionParticipants SessionParticipant[]
   playedCards         PlayedCard[]
+  onlineRounds        OnlineRound[]
 
   @@map("game_sessions")
 }
@@ -186,7 +196,7 @@ model PlayedCard {
   pickedByProfileId   String   @map("picked_by_profile_id") // Who picked/drew the card
   answeredByProfileId String?  @map("answered_by_profile_id") // Who answered/executed
   qualitativeRating   String?  @map("qualitative_rating") // "ruim" | "satisfatoria" | "excelente"
-  rating              Int?     // Legacy numeric rating (0-5 stars) - kept for compatibility
+  rating              Int? // Legacy numeric rating (0-5 stars) - kept for compatibility
   playedAt            DateTime @default(now()) @map("played_at")
 
   // Relations
@@ -194,6 +204,40 @@ model PlayedCard {
   card    Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@map("played_cards")
+}
+
+// Online Mode - Each card in online mode is a "round" where all players must answer
+model OnlineRound {
+  id          String    @id @default(cuid())
+  sessionId   String    @map("session_id")
+  cardId      String    @map("card_id")
+  roundNumber Int       @map("round_number")
+  status      String    @default("waiting") // "waiting" | "completed"
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Relations
+  session GameSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  card    Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  answers OnlineAnswer[]
+
+  @@map("online_rounds")
+}
+
+// Each player's answer in an online round
+model OnlineAnswer {
+  id         String   @id @default(cuid())
+  roundId    String   @map("round_id")
+  profileId  String   @map("profile_id")
+  answer     String   @db.Text
+  answeredAt DateTime @default(now()) @map("answered_at")
+
+  // Relations
+  round   OnlineRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  profile Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([roundId, profileId]) // One answer per player per round
+  @@map("online_answers")
 }
 
 // ============================================================================
@@ -236,17 +280,17 @@ model Subcategory {
 }
 
 model Product {
-  id              String   @id @default(cuid())
-  subcategoryId   String   @map("subcategory_id")
-  name            String
-  description     String   @db.Text
-  price           Decimal  @db.Decimal(10, 2)
-  stock           Int      @default(0)
-  images          Json     @default("[]") // Array de URLs ou base64
-  active          Boolean  @default(true)
-  featured        Boolean  @default(false) // Produto em destaque
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id            String   @id @default(cuid())
+  subcategoryId String   @map("subcategory_id")
+  name          String
+  description   String   @db.Text
+  price         Decimal  @db.Decimal(10, 2)
+  stock         Int      @default(0)
+  images        Json     @default("[]") // Array de URLs ou base64
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false) // Produto em destaque
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Relations
   subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Restrict)
@@ -272,27 +316,27 @@ model CartItem {
 }
 
 model Order {
-  id                      String    @id @default(cuid())
-  buyerId                 String    @map("buyer_id")
-  totalAmount             Decimal   @db.Decimal(10, 2) @map("total_amount")
-  status                  String    @default("pending") // "pending" | "paid_awaiting_confirmation" | "confirmed" | "shipped" | "delivered" | "cancelled"
+  id          String  @id @default(cuid())
+  buyerId     String  @map("buyer_id")
+  totalAmount Decimal @map("total_amount") @db.Decimal(10, 2)
+  status      String  @default("pending") // "pending" | "paid_awaiting_confirmation" | "confirmed" | "shipped" | "delivered" | "cancelled"
 
   // Delivery address (snapshot from buyer's profile at order time)
-  deliveryAddress         String    @map("delivery_address")
-  deliveryCity            String    @map("delivery_city")
-  deliveryState           String    @map("delivery_state")
-  deliveryZipCode         String    @map("delivery_zip_code")
-  deliveryComplement      String?   @map("delivery_complement")
+  deliveryAddress    String  @map("delivery_address")
+  deliveryCity       String  @map("delivery_city")
+  deliveryState      String  @map("delivery_state")
+  deliveryZipCode    String  @map("delivery_zip_code")
+  deliveryComplement String? @map("delivery_complement")
 
-  paymentProof            String?   @map("payment_proof") @db.Text // Imagem base64 do comprovante
-  paymentProofUploadedAt  DateTime? @map("payment_proof_uploaded_at")
-  confirmedAt             DateTime? @map("confirmed_at")
-  shippedAt               DateTime? @map("shipped_at")
-  deliveredAt             DateTime? @map("delivered_at")
-  cancelledAt             DateTime? @map("cancelled_at")
-  cancellationReason      String?   @map("cancellation_reason") @db.Text
-  createdAt               DateTime  @default(now()) @map("created_at")
-  updatedAt               DateTime  @updatedAt @map("updated_at")
+  paymentProof           String?   @map("payment_proof") @db.Text // Imagem base64 do comprovante
+  paymentProofUploadedAt DateTime? @map("payment_proof_uploaded_at")
+  confirmedAt            DateTime? @map("confirmed_at")
+  shippedAt              DateTime? @map("shipped_at")
+  deliveredAt            DateTime? @map("delivered_at")
+  cancelledAt            DateTime? @map("cancelled_at")
+  cancellationReason     String?   @map("cancellation_reason") @db.Text
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
 
   // Relations
   buyer      Profile     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
@@ -306,7 +350,7 @@ model OrderItem {
   orderId      String  @map("order_id")
   productId    String  @map("product_id")
   productName  String  @map("product_name") // Snapshot do nome
-  productPrice Decimal @db.Decimal(10, 2) @map("product_price") // Snapshot do preço
+  productPrice Decimal @map("product_price") @db.Decimal(10, 2) // Snapshot do preço
   quantity     Int
   subtotal     Decimal @db.Decimal(10, 2)
 

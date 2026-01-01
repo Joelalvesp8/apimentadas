@@ -1,0 +1,154 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+function successResponse(data: any, status = 200) {
+  return NextResponse.json({ data }, { status });
+}
+
+function errorResponse(error: string, status = 400) {
+  return NextResponse.json({ error }, { status });
+}
+
+function unauthorizedResponse() {
+  return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+}
+
+// POST /api/sessions/:id/rounds/start - Start new round in online session
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return unauthorizedResponse();
+
+    // Get user's profile
+    const profile = await prisma.profile.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!profile) {
+      return errorResponse('Perfil não encontrado', 404);
+    }
+
+    // Get session and verify it's online mode
+    const session = await prisma.gameSession.findUnique({
+      where: { id: params.id },
+      include: {
+        sessionParticipants: true,
+        onlineRounds: {
+          orderBy: { roundNumber: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    if (!session) {
+      return errorResponse('Sessão não encontrada', 404);
+    }
+
+    if (session.mode !== 'online') {
+      return errorResponse('Esta funcionalidade é apenas para sessões online', 400);
+    }
+
+    // Verify user is participant
+    const isParticipant = session.sessionParticipants.some(
+      (p) => p.profileId === profile.id
+    );
+
+    if (!isParticipant) {
+      return errorResponse('Você não é participante desta sessão', 403);
+    }
+
+    // Check if there's a current round that isn't completed
+    if (session.currentRoundId) {
+      const currentRound = await prisma.onlineRound.findUnique({
+        where: { id: session.currentRoundId },
+        include: {
+          answers: true,
+        },
+      });
+
+      if (currentRound && currentRound.status === 'waiting') {
+        const participantCount = session.sessionParticipants.length;
+        const answersCount = currentRound.answers.length;
+
+        return errorResponse(
+          `Ainda há participantes que não responderam (${answersCount}/${participantCount})`,
+          400
+        );
+      }
+    }
+
+    // Get next round number
+    const lastRound = session.onlineRounds[0];
+    const nextRoundNumber = lastRound ? lastRound.roundNumber + 1 : 1;
+
+    // Find random question card
+    // Online mode uses ONLY "pergunta" type cards
+    const card = await prisma.card.findFirst({
+      where: {
+        type: 'pergunta', // CRITICAL: Only questions in online mode
+        category: session.sessionType,
+        isOfficial: true,
+      },
+      orderBy: {
+        // Random order using updatedAt (simple random)
+        updatedAt: 'desc',
+      },
+      skip: Math.floor(Math.random() * 100), // Simple randomization
+    });
+
+    if (!card) {
+      return errorResponse(
+        'Nenhuma carta disponível para esta sessão',
+        404
+      );
+    }
+
+    // Create new round
+    const newRound = await prisma.onlineRound.create({
+      data: {
+        sessionId: session.id,
+        cardId: card.id,
+        roundNumber: nextRoundNumber,
+        status: 'waiting',
+      },
+      include: {
+        card: true,
+        answers: {
+          include: {
+            profile: {
+              select: {
+                id: true,
+                nickname: true,
+                user: {
+                  select: {
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Update session currentRoundId
+    await prisma.gameSession.update({
+      where: { id: session.id },
+      data: {
+        currentRoundId: newRound.id,
+      },
+    });
+
+    return successResponse(newRound, 201);
+  } catch (error: any) {
+    console.error('Error starting round:', error);
+    return errorResponse('Erro ao iniciar rodada', 500);
+  }
+}
