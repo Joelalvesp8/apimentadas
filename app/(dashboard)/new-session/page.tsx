@@ -37,10 +37,10 @@ export default function NewSessionPage() {
   };
 
   const handleCreateSession = async () => {
-    // Validate participants
-    const minParticipants = sessionMode === 'online' ? 2 : 1;
+    // Validate participants (creator is already counted as 1 participant)
+    const minParticipants = 1; // Need at least 1 more person (creator + 1 = 2 total)
     if (selectedParticipants.length < minParticipants) {
-      setError(`Selecione pelo menos ${minParticipants} participante(s) para o modo ${sessionMode === 'online' ? 'online' : 'presencial'}`);
+      setError('Selecione pelo menos 1 participante adicional para jogar com você');
       return;
     }
 
@@ -181,7 +181,7 @@ export default function NewSessionPage() {
                 <p className="text-sm text-blue-300 flex items-start gap-2">
                   <span className="text-lg">ℹ️</span>
                   <span>
-                    <strong>Modo Online:</strong> Requer no mínimo 2 participantes. Todos precisam estar conectados simultaneamente.
+                    <strong>Modo Online:</strong> Adicione pelo menos 1 pessoa para jogar com você (total mínimo: 2 jogadores). Todos precisam estar conectados simultaneamente.
                     A rodada só avança quando todos responderem.
                   </span>
                 </p>
@@ -198,9 +198,7 @@ export default function NewSessionPage() {
               Selecione os Participantes
             </CardTitle>
             <CardDescription className="text-gray-400">
-              {sessionMode === 'online'
-                ? 'Escolha quem vai participar do jogo online (mínimo 2)'
-                : 'Escolha quem vai jogar com você'}
+              Escolha quem vai jogar com você (você já está incluído)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -271,7 +269,7 @@ export default function NewSessionPage() {
 
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-400">
-                    {selectedParticipants.length} participante(s) selecionado(s)
+                    {selectedParticipants.length} participante(s) selecionado(s) + você = {selectedParticipants.length + 1} total
                   </p>
                   <Button
                     onClick={handleCreateSession}

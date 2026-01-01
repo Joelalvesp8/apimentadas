@@ -22,7 +22,7 @@ export const playCardSchema = z.object({
 export const createOnlineSessionSchema = z.object({
   participantIds: z
     .array(z.string())
-    .min(2, 'Modo online requer no mínimo 2 participantes')
+    .min(1, 'Modo online requer no mínimo 1 participante adicional (você + 1 = 2 jogadores)')
     .max(10, 'Máximo de 10 participantes'),
   difficulty: z.enum(['facil', 'medio', 'dificil', 'extremo']).optional(),
 });
