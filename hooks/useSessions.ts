@@ -118,3 +118,130 @@ export function useSessionHistory() {
     queryFn: () => apiClient.get<GameSession[]>('/api/sessions/history'),
   });
 }
+
+// ============================================================================
+// ONLINE MODE HOOKS
+// ============================================================================
+
+export interface OnlineRound {
+  id: string;
+  sessionId: string;
+  cardId: string;
+  roundNumber: number;
+  status: 'waiting' | 'completed';
+  startedAt: string;
+  completedAt: string | null;
+  card: {
+    id: string;
+    type: string;
+    category: string;
+    difficulty: string;
+    content: string;
+  };
+  answers: Array<{
+    id: string;
+    roundId: string;
+    profileId: string;
+    answer: string;
+    answeredAt: string;
+    profile: {
+      id: string;
+      nickname: string;
+      user: {
+        image: string | null;
+      };
+    };
+  }>;
+  metadata?: {
+    totalParticipants: number;
+    totalAnswers: number;
+    waitingCount: number;
+    waitingProfiles: Array<{
+      id: string;
+      nickname: string;
+      image: string | null;
+    }>;
+    currentUserAnswered: boolean;
+  };
+}
+
+export interface SessionStatus {
+  sessionId: string;
+  mode: string;
+  sessionType: string;
+  status: string;
+  totalRounds: number;
+  completedRounds: number;
+  cardsPlayed: number;
+  canStartNext: boolean;
+  answersNeeded: number;
+  currentRound: {
+    roundNumber: number;
+    status: string;
+    answersReceived: number;
+    answersNeeded: number;
+    awaitingAnswers: number;
+  } | null;
+  participantCount: number;
+}
+
+// Create online session
+export function useCreateOnlineSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { participantIds: string[]; difficulty?: string }) =>
+      apiClient.post<GameSession>('/api/sessions/online', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    },
+  });
+}
+
+// Start new round in online session
+export function useStartRound(sessionId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => apiClient.post<OnlineRound>(`/api/sessions/${sessionId}/rounds/start`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions', sessionId] });
+      queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'rounds', 'current'] });
+      queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'status'] });
+    },
+  });
+}
+
+// Submit answer to current round
+export function useSubmitAnswer(sessionId: string, roundId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { answer: string }) =>
+      apiClient.post(`/api/sessions/${sessionId}/rounds/${roundId}/answer`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'rounds', 'current'] });
+      queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'status'] });
+    },
+  });
+}
+
+// Get current round (with polling)
+export function useCurrentRound(sessionId: string) {
+  return useQuery({
+    queryKey: ['sessions', sessionId, 'rounds', 'current'],
+    queryFn: () => apiClient.get<OnlineRound | null>(`/api/sessions/${sessionId}/rounds/current`),
+    enabled: !!sessionId,
+    refetchInterval: 3000, // Poll every 3 seconds for real-time updates
+  });
+}
+
+// Get session status (with polling)
+export function useSessionStatus(sessionId: string) {
+  return useQuery({
+    queryKey: ['sessions', sessionId, 'status'],
+    queryFn: () => apiClient.get<SessionStatus>(`/api/sessions/${sessionId}/status`),
+    enabled: !!sessionId,
+    refetchInterval: 3000, // Poll every 3 seconds
+  });
+}
