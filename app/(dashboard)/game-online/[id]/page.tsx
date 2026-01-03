@@ -226,16 +226,16 @@ export default function GameOnlinePage() {
               <CardContent>
                 <div className="bg-black/40 border-2 border-red-700/30 rounded-lg p-6 mb-6">
                   <p className="text-xl text-white leading-relaxed">
-                    {currentRound.card.content}
+                    {currentRound.card?.content || 'Carregando pergunta...'}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Badge variant="outline" className="border-zinc-600">
-                    {currentRound.card.difficulty}
+                    {currentRound.card?.difficulty || 'N/A'}
                   </Badge>
                   <Badge variant="outline" className="border-zinc-600">
-                    {currentRound.card.category}
+                    {currentRound.card?.category || 'N/A'}
                   </Badge>
                 </div>
               </CardContent>
