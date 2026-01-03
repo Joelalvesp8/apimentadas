@@ -4,6 +4,11 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+// GET /api/admin/seed-cards - Seed cards (can be called from browser)
+export async function GET() {
+  return POST();
+}
+
 // POST /api/admin/seed-cards - Seed cards in production database
 export async function POST() {
   try {
