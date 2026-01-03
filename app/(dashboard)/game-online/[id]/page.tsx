@@ -48,6 +48,20 @@ export default function GameOnlinePage() {
     status: currentRound?.status,
   });
 
+  // Check if current round is corrupted (exists but has no card)
+  const isCurrentRoundCorrupted = currentRound && !currentRound.card;
+
+  // Treat corrupted rounds as no round
+  const effectiveCurrentRound = isCurrentRoundCorrupted ? null : currentRound;
+
+  if (isCurrentRoundCorrupted) {
+    console.error('[GAME-ONLINE] CORRUPTED ROUND DETECTED!', {
+      roundId: currentRound.id,
+      roundNumber: currentRound.roundNumber,
+      hasCard: !!currentRound.card,
+    });
+  }
+
   // Handle start round
   const handleStartRound = async () => {
     try {
@@ -134,10 +148,10 @@ export default function GameOnlinePage() {
     );
   }
 
-  const isRoundActive = currentRound && currentRound.status === 'waiting';
-  const isRoundCompleted = currentRound && currentRound.status === 'completed';
+  const isRoundActive = effectiveCurrentRound && effectiveCurrentRound.status === 'waiting';
+  const isRoundCompleted = effectiveCurrentRound && effectiveCurrentRound.status === 'completed';
   const canStartNext = status?.canStartNext || false;
-  const hasAnswered = currentRound?.metadata?.currentUserAnswered || false;
+  const hasAnswered = effectiveCurrentRound?.metadata?.currentUserAnswered || false;
 
   // Prepare participants data for counter
   const answeredParticipants = currentRound?.answers?.map((a) => ({
@@ -207,7 +221,7 @@ export default function GameOnlinePage() {
         </Card>
 
         {/* No active round - show start button */}
-        {!currentRound && canStartNext && (
+        {!effectiveCurrentRound && canStartNext && (
           <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
             <CardContent className="p-12 text-center">
               <Play className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -227,7 +241,7 @@ export default function GameOnlinePage() {
         )}
 
         {/* Current round card */}
-        {currentRound && (
+        {effectiveCurrentRound && (
           <>
             <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
               <CardHeader>
