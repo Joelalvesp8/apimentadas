@@ -121,7 +121,7 @@ export async function GET(
           .map((p) => ({
             id: p.profile.id,
             nickname: p.profile.nickname,
-            image: p.profile.user.image,
+            image: p.profile.user?.image || null,
           })),
         currentUserAnswered: answeredIds.includes(profile.id),
       },
