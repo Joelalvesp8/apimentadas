@@ -94,11 +94,23 @@ export async function POST(
       select: { cardId: true },
     }).then((rounds) => rounds.map((r) => r.cardId));
 
+    // Map sessionType (singular) to card category (plural)
+    // sessionType: "casal" | "trisal" | "grupo"
+    // card category: "casais" | "trios" | "grupos"
+    const categoryMap: Record<string, string> = {
+      casal: 'casais',
+      trisal: 'trios',
+      grupo: 'grupos',
+    };
+
+    const cardCategory = categoryMap[session.sessionType] || session.sessionType;
+
     // Find random question card (excluding already played cards)
     // Online mode uses ONLY "pergunta" type cards
     console.log('[START ROUND] Looking for cards with:', {
       type: 'pergunta',
-      category: session.sessionType,
+      sessionType: session.sessionType,
+      cardCategory,
       playedCardIds,
       playedCount: playedCardIds.length,
     });
@@ -106,7 +118,7 @@ export async function POST(
     const card = await prisma.card.findFirst({
       where: {
         type: 'pergunta', // CRITICAL: Only questions in online mode
-        category: session.sessionType,
+        category: cardCategory, // FIXED: Use mapped category (plural)
         isOfficial: true,
         id: {
           notIn: playedCardIds, // CRITICAL: Exclude already played cards
@@ -126,7 +138,7 @@ export async function POST(
       const totalCards = await prisma.card.count({
         where: {
           type: 'pergunta',
-          category: session.sessionType,
+          category: cardCategory,
           isOfficial: true,
         },
       });
@@ -134,7 +146,8 @@ export async function POST(
       console.error('[START ROUND] No card found!', {
         totalCardsInCategory: totalCards,
         playedCards: playedCardIds.length,
-        category: session.sessionType,
+        sessionType: session.sessionType,
+        cardCategory,
       });
 
       return errorResponse(
