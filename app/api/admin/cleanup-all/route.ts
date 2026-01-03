@@ -19,12 +19,6 @@ export async function POST() {
       include: {
         card: true,
       },
-      select: {
-        id: true,
-        sessionId: true,
-        cardId: true,
-        card: true,
-      },
     });
 
     // Filter corrupted rounds (without cards)
