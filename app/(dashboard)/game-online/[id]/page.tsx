@@ -38,11 +38,24 @@ export default function GameOnlinePage() {
   const [answerText, setAnswerText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Debug logs
+  console.log('[GAME-ONLINE] Current round data:', {
+    currentRound,
+    hasCard: !!currentRound?.card,
+    cardId: currentRound?.card?.id,
+    cardContent: currentRound?.card?.content?.substring(0, 40),
+    roundNumber: currentRound?.roundNumber,
+    status: currentRound?.status,
+  });
+
   // Handle start round
   const handleStartRound = async () => {
     try {
-      await startRound.mutateAsync();
+      console.log('[GAME-ONLINE] Starting round...');
+      const result = await startRound.mutateAsync();
+      console.log('[GAME-ONLINE] Round started successfully:', result);
     } catch (error: any) {
+      console.error('[GAME-ONLINE] Error starting round:', error);
       alert(error.message || 'Erro ao iniciar rodada');
     }
   };
