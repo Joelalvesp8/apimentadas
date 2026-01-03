@@ -88,13 +88,22 @@ export async function POST(
     const lastRound = session.onlineRounds[0];
     const nextRoundNumber = lastRound ? lastRound.roundNumber + 1 : 1;
 
-    // Find random question card
+    // Get all cards already played in this session to avoid repetition
+    const playedCardIds = await prisma.onlineRound.findMany({
+      where: { sessionId: session.id },
+      select: { cardId: true },
+    }).then((rounds) => rounds.map((r) => r.cardId));
+
+    // Find random question card (excluding already played cards)
     // Online mode uses ONLY "pergunta" type cards
     const card = await prisma.card.findFirst({
       where: {
         type: 'pergunta', // CRITICAL: Only questions in online mode
         category: session.sessionType,
         isOfficial: true,
+        id: {
+          notIn: playedCardIds, // CRITICAL: Exclude already played cards
+        },
       },
       orderBy: {
         // Random order using updatedAt (simple random)

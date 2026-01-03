@@ -145,8 +145,9 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 {activeSessions.map((gameSession) => {
                   const isMyTurn = gameSession.currentTurnProfileId === profile?.id;
+                  const gameUrl = gameSession.mode === 'online' ? `/game-online/${gameSession.id}` : `/game/${gameSession.id}`;
                   return (
-                    <Link key={gameSession.id} href={`/game/${gameSession.id}`}>
+                    <Link key={gameSession.id} href={gameUrl}>
                       <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         isMyTurn
                           ? 'border-red-700/60 bg-zinc-900/60 shadow-[0_0_25px_rgba(220,38,38,0.3)] hover:shadow-[0_0_35px_rgba(220,38,38,0.4)]'
@@ -157,6 +158,9 @@ export default function DashboardPage() {
                             <div className="flex items-center gap-2 mb-2">
                               <Badge variant={isMyTurn ? 'default' : 'secondary'} className={isMyTurn ? 'bg-red-900/50 border-red-700/50 text-red-200' : 'bg-zinc-800 border-zinc-700 text-gray-300'}>
                                 {gameSession.sessionType === 'casal' ? 'Casal' : gameSession.sessionType === 'trisal' ? 'Trisal' : 'Grupo'}
+                              </Badge>
+                              <Badge variant="outline" className={gameSession.mode === 'online' ? 'border-blue-700/50 text-blue-300 bg-blue-950/20' : 'border-zinc-600 text-gray-400 bg-zinc-900/20'}>
+                                {gameSession.mode === 'online' ? '🌐 Online' : '📍 Local'}
                               </Badge>
                               {isMyTurn && (
                                 <Badge className="bg-red-600 border-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]">🎯 Sua vez!</Badge>

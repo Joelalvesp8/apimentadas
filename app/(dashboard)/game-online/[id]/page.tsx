@@ -9,7 +9,7 @@ import {
   useSessionStatus,
   useStartRound,
   useSubmitAnswer,
-  useFinishSession,
+  useLeaveSession,
 } from '@/hooks/useSessions';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ export default function GameOnlinePage() {
 
   const startRound = useStartRound(sessionId);
   const submitAnswer = useSubmitAnswer(sessionId, currentRound?.id || '');
-  const finishSession = useFinishSession();
+  const leaveSession = useLeaveSession();
 
   const [answerText, setAnswerText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,16 +71,18 @@ export default function GameOnlinePage() {
     }
   };
 
-  // Handle finish session
-  const handleFinishSession = async () => {
-    const confirm = window.confirm('Tem certeza que deseja finalizar a sessão?');
+  // Handle leave session
+  const handleLeaveSession = async () => {
+    const confirm = window.confirm(
+      'Tem certeza que deseja sair da sessão? Os outros participantes serão notificados.'
+    );
     if (!confirm) return;
 
     try {
-      await finishSession.mutateAsync(sessionId);
+      await leaveSession.mutateAsync(sessionId);
       router.push('/dashboard');
     } catch (error: any) {
-      alert(error.message || 'Erro ao finalizar sessão');
+      alert(error.message || 'Erro ao sair da sessão');
     }
   };
 
@@ -165,10 +167,11 @@ export default function GameOnlinePage() {
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={handleFinishSession}
+                onClick={handleLeaveSession}
+                disabled={leaveSession.isPending}
                 className="bg-red-700 hover:bg-red-600"
               >
-                Finalizar Sessão
+                {leaveSession.isPending ? 'Saindo...' : 'Sair da Sessão'}
               </Button>
             </CardTitle>
           </CardHeader>

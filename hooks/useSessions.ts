@@ -247,3 +247,16 @@ export function useSessionStatus(sessionId: string) {
     refetchInterval: 3000, // Poll every 3 seconds
   });
 }
+
+// Leave session (individual participant)
+export function useLeaveSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) =>
+      apiClient.post(`/api/sessions/${sessionId}/leave`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    },
+  });
+}
