@@ -82,6 +82,13 @@ export async function POST(request: NextRequest) {
         },
       },
       include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
         sessionParticipants: {
           include: {
             profile: {
@@ -90,6 +97,8 @@ export async function POST(request: NextRequest) {
                 nickname: true,
                 user: {
                   select: {
+                    id: true,
+                    name: true,
                     image: true,
                   },
                 },
