@@ -96,6 +96,13 @@ export async function POST(
 
     // Find random question card (excluding already played cards)
     // Online mode uses ONLY "pergunta" type cards
+    console.log('[START ROUND] Looking for cards with:', {
+      type: 'pergunta',
+      category: session.sessionType,
+      playedCardIds,
+      playedCount: playedCardIds.length,
+    });
+
     const card = await prisma.card.findFirst({
       where: {
         type: 'pergunta', // CRITICAL: Only questions in online mode
@@ -112,9 +119,26 @@ export async function POST(
       skip: Math.floor(Math.random() * 100), // Simple randomization
     });
 
+    console.log('[START ROUND] Card found:', card ? { id: card.id, content: card.content.substring(0, 50) } : null);
+
     if (!card) {
+      // Try to get total available cards for debugging
+      const totalCards = await prisma.card.count({
+        where: {
+          type: 'pergunta',
+          category: session.sessionType,
+          isOfficial: true,
+        },
+      });
+
+      console.error('[START ROUND] No card found!', {
+        totalCardsInCategory: totalCards,
+        playedCards: playedCardIds.length,
+        category: session.sessionType,
+      });
+
       return errorResponse(
-        'Nenhuma carta disponível para esta sessão',
+        `Nenhuma carta disponível para esta sessão. Total de cartas: ${totalCards}, Já jogadas: ${playedCardIds.length}`,
         404
       );
     }

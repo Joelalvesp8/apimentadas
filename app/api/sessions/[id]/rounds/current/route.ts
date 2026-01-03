@@ -76,6 +76,12 @@ export async function GET(
     }
 
     // Get current round with all data
+    console.log('[GET CURRENT ROUND] Fetching round:', {
+      sessionId: session.id,
+      currentRoundId: session.currentRoundId,
+      participantCount: session.sessionParticipants.length,
+    });
+
     const currentRound = await prisma.onlineRound.findUnique({
       where: { id: session.currentRoundId },
       include: {
@@ -101,7 +107,17 @@ export async function GET(
       },
     });
 
+    console.log('[GET CURRENT ROUND] Round fetched:', {
+      roundId: currentRound?.id,
+      roundNumber: currentRound?.roundNumber,
+      hasCard: !!currentRound?.card,
+      cardId: currentRound?.cardId,
+      cardContent: currentRound?.card?.content?.substring(0, 50),
+      answersCount: currentRound?.answers?.length,
+    });
+
     if (!currentRound) {
+      console.warn('[GET CURRENT ROUND] Round not found for ID:', session.currentRoundId);
       return successResponse(null);
     }
 
