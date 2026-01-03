@@ -301,10 +301,10 @@ export default function GameOnlinePage() {
             )}
 
             {/* Show all answers when round is completed */}
-            {isRoundCompleted && (
+            {isRoundCompleted && currentRound?.answers && (
               <>
                 <OnlineAnswersDisplay
-                  answers={currentRound.answers}
+                  answers={currentRound.answers || []}
                   currentUserId={profile?.id}
                 />
 
