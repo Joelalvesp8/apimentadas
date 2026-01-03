@@ -127,10 +127,10 @@ export default function GameOnlinePage() {
   const hasAnswered = currentRound?.metadata?.currentUserAnswered || false;
 
   // Prepare participants data for counter
-  const answeredParticipants = currentRound?.answers.map((a) => ({
+  const answeredParticipants = currentRound?.answers?.map((a) => ({
     id: a.profile.id,
     nickname: a.profile.nickname,
-    image: a.profile.user.image,
+    image: a.profile.user?.image || null,
   })) || [];
 
   const waitingParticipants = currentRound?.metadata?.waitingProfiles || [];

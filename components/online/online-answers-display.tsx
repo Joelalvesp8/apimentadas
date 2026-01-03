@@ -61,7 +61,7 @@ export function OnlineAnswersDisplay({
                 <div className="flex items-start gap-3 mb-3">
                   <div className="relative">
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src={answer.profile.user.image || undefined} />
+                      <AvatarImage src={answer.profile.user?.image || undefined} />
                       <AvatarFallback className="bg-red-900 text-red-200">
                         {answer.profile.nickname.charAt(0).toUpperCase()}
                       </AvatarFallback>

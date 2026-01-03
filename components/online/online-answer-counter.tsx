@@ -13,17 +13,20 @@ interface Participant {
 interface OnlineAnswerCounterProps {
   totalParticipants: number;
   answeredCount: number;
-  waitingParticipants: Participant[];
+  waitingParticipants?: Participant[];
   answeredParticipants?: Participant[];
 }
 
 export function OnlineAnswerCounter({
   totalParticipants,
   answeredCount,
-  waitingParticipants,
+  waitingParticipants = [],
   answeredParticipants = [],
 }: OnlineAnswerCounterProps) {
   const allAnswered = answeredCount === totalParticipants;
+  const progress = totalParticipants > 0
+    ? Math.round((answeredCount / totalParticipants) * 100)
+    : 0;
 
   return (
     <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
@@ -54,11 +57,11 @@ export function OnlineAnswerCounter({
                 className={`h-full transition-all duration-500 ${
                   allAnswered ? 'bg-green-500' : 'bg-red-500'
                 }`}
-                style={{ width: `${(answeredCount / totalParticipants) * 100}%` }}
+                style={{ width: `${progress}%` }}
               />
             </div>
             <span className="text-sm font-semibold text-white">
-              {Math.round((answeredCount / totalParticipants) * 100)}%
+              {progress}%
             </span>
           </div>
         </div>
