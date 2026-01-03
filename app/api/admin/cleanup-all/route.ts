@@ -14,29 +14,37 @@ export async function POST() {
   try {
     console.log('[CLEANUP-ALL] Starting global cleanup...');
 
-    // 1. Find all corrupted rounds (rounds without cards)
-    const corruptedRounds = await prisma.onlineRound.findMany({
-      where: {
-        card: null,
+    // 1. Find all online rounds with their cards
+    const allRounds = await prisma.onlineRound.findMany({
+      include: {
+        card: true,
       },
       select: {
         id: true,
         sessionId: true,
         cardId: true,
+        card: true,
       },
     });
+
+    // Filter corrupted rounds (without cards)
+    const corruptedRounds = allRounds.filter((r) => !r.card);
 
     console.log('[CLEANUP-ALL] Found corrupted rounds:', {
       count: corruptedRounds.length,
       roundIds: corruptedRounds.map((r) => r.id),
     });
 
-    // 2. Delete all corrupted rounds
-    const deletedRounds = await prisma.onlineRound.deleteMany({
-      where: {
-        card: null,
-      },
-    });
+    // 2. Delete all corrupted rounds individually
+    let deletedCount = 0;
+    for (const round of corruptedRounds) {
+      await prisma.onlineRound.delete({
+        where: { id: round.id },
+      });
+      deletedCount++;
+    }
+
+    const deletedRounds = { count: deletedCount };
 
     console.log('[CLEANUP-ALL] Deleted corrupted rounds:', deletedRounds.count);
 
