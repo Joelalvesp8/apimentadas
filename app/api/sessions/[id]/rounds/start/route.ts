@@ -115,6 +115,30 @@ export async function POST(
       playedCount: playedCardIds.length,
     });
 
+    // First, count available cards
+    const availableCardsCount = await prisma.card.count({
+      where: {
+        type: 'pergunta',
+        category: cardCategory,
+        isOfficial: true,
+        id: {
+          notIn: playedCardIds,
+        },
+      },
+    });
+
+    console.log('[START ROUND] Available cards count:', availableCardsCount);
+
+    if (availableCardsCount === 0) {
+      return errorResponse(
+        'Todas as cartas desta categoria já foram jogadas!',
+        404
+      );
+    }
+
+    // Random skip based on actual available cards
+    const randomSkip = Math.floor(Math.random() * availableCardsCount);
+
     const card = await prisma.card.findFirst({
       where: {
         type: 'pergunta', // CRITICAL: Only questions in online mode
@@ -124,35 +148,23 @@ export async function POST(
           notIn: playedCardIds, // CRITICAL: Exclude already played cards
         },
       },
-      orderBy: {
-        // Random order using updatedAt (simple random)
-        updatedAt: 'desc',
-      },
-      skip: Math.floor(Math.random() * 100), // Simple randomization
+      skip: randomSkip, // FIXED: Skip based on actual count, not hardcoded 100
     });
 
     console.log('[START ROUND] Card found:', card ? { id: card.id, content: card.content.substring(0, 50) } : null);
 
     if (!card) {
-      // Try to get total available cards for debugging
-      const totalCards = await prisma.card.count({
-        where: {
-          type: 'pergunta',
-          category: cardCategory,
-          isOfficial: true,
-        },
-      });
-
-      console.error('[START ROUND] No card found!', {
-        totalCardsInCategory: totalCards,
+      console.error('[START ROUND] No card found despite count check!', {
+        availableCardsCount,
         playedCards: playedCardIds.length,
         sessionType: session.sessionType,
         cardCategory,
+        randomSkip,
       });
 
       return errorResponse(
-        `Nenhuma carta disponível para esta sessão. Total de cartas: ${totalCards}, Já jogadas: ${playedCardIds.length}`,
-        404
+        `Erro ao buscar carta. Disponíveis: ${availableCardsCount}, Já jogadas: ${playedCardIds.length}`,
+        500
       );
     }
 
