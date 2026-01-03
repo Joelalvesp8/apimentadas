@@ -121,6 +121,30 @@ export async function GET(
       return successResponse(null);
     }
 
+    // CRITICAL FIX: Ignore corrupted rounds without card
+    // These were created before the category mapping fix
+    if (!currentRound.card) {
+      console.error('[GET CURRENT ROUND] Corrupted round found (no card)!', {
+        roundId: currentRound.id,
+        cardId: currentRound.cardId,
+        sessionId: session.id,
+      });
+
+      // Delete the corrupted round
+      await prisma.onlineRound.delete({
+        where: { id: currentRound.id },
+      });
+
+      // Clear currentRoundId from session
+      await prisma.gameSession.update({
+        where: { id: session.id },
+        data: { currentRoundId: null },
+      });
+
+      console.log('[GET CURRENT ROUND] Corrupted round deleted, returning null');
+      return successResponse(null);
+    }
+
     // Add metadata about who answered
     const participantIds = session.sessionParticipants.map((p) => p.profileId);
     const answeredIds = currentRound.answers.map((a) => a.profileId);
