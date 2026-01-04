@@ -154,13 +154,13 @@ export default function GameOnlinePage() {
   const hasAnswered = effectiveCurrentRound?.metadata?.currentUserAnswered || false;
 
   // Prepare participants data for counter
-  const answeredParticipants = currentRound?.answers?.map((a) => ({
+  const answeredParticipants = effectiveCurrentRound?.answers?.map((a) => ({
     id: a.profile.id,
     nickname: a.profile.nickname,
     image: a.profile.user?.image || null,
   })) || [];
 
-  const waitingParticipants = currentRound?.metadata?.waitingProfiles || [];
+  const waitingParticipants = effectiveCurrentRound?.metadata?.waitingProfiles || [];
 
   return (
     <div className="min-h-screen bg-black py-6 px-4">
@@ -247,22 +247,22 @@ export default function GameOnlinePage() {
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <span className="text-3xl">❓</span>
-                  Pergunta da Rodada #{currentRound.roundNumber}
+                  Pergunta da Rodada #{effectiveCurrentRound.roundNumber}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="bg-black/40 border-2 border-red-700/30 rounded-lg p-6 mb-6">
                   <p className="text-xl text-white leading-relaxed">
-                    {currentRound.card?.content || 'Carregando pergunta...'}
+                    {effectiveCurrentRound.card?.content || 'Carregando pergunta...'}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Badge variant="outline" className="border-zinc-600">
-                    {currentRound.card?.difficulty || 'N/A'}
+                    {effectiveCurrentRound.card?.difficulty || 'N/A'}
                   </Badge>
                   <Badge variant="outline" className="border-zinc-600">
-                    {currentRound.card?.category || 'N/A'}
+                    {effectiveCurrentRound.card?.category || 'N/A'}
                   </Badge>
                 </div>
               </CardContent>
@@ -270,8 +270,8 @@ export default function GameOnlinePage() {
 
             {/* Answer counter */}
             <OnlineAnswerCounter
-              totalParticipants={currentRound.metadata?.totalParticipants || 0}
-              answeredCount={currentRound.metadata?.totalAnswers || 0}
+              totalParticipants={effectiveCurrentRound.metadata?.totalParticipants || 0}
+              answeredCount={effectiveCurrentRound.metadata?.totalAnswers || 0}
               waitingParticipants={waitingParticipants}
               answeredParticipants={answeredParticipants}
             />
@@ -328,10 +328,10 @@ export default function GameOnlinePage() {
             )}
 
             {/* Show all answers when round is completed */}
-            {isRoundCompleted && currentRound?.answers && (
+            {isRoundCompleted && effectiveCurrentRound?.answers && (
               <>
                 <OnlineAnswersDisplay
-                  answers={currentRound.answers || []}
+                  answers={effectiveCurrentRound.answers || []}
                   currentUserId={profile?.id}
                 />
 
