@@ -96,11 +96,20 @@ export default function GameOnlinePage() {
       console.log('[GAME-ONLINE] Answer submitted successfully');
 
       // Force immediate refetch to show updated state
-      // This avoids waiting 3 seconds for the next poll
+      // Use longer delay to ensure transaction completes
+      console.log('[GAME-ONLINE] Scheduling refetch after answer submission');
       setTimeout(() => {
+        console.log('[GAME-ONLINE] First refetch - checking round status');
         queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'rounds', 'current'] });
         queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'status'] });
-      }, 500); // Wait 500ms for backend to process
+      }, 1500); // Wait 1.5s for backend to process
+
+      // Double-check after 3 seconds to ensure we catch the update
+      setTimeout(() => {
+        console.log('[GAME-ONLINE] Second refetch - ensuring status is updated');
+        queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'rounds', 'current'] });
+        queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'status'] });
+      }, 3000);
     } catch (error: any) {
       console.error('[GAME-ONLINE] Error submitting answer:', error);
       alert(error.message || 'Erro ao enviar resposta');
@@ -163,6 +172,19 @@ export default function GameOnlinePage() {
   const isRoundCompleted = effectiveCurrentRound && effectiveCurrentRound.status === 'completed';
   const canStartNext = status?.canStartNext || false;
   const hasAnswered = effectiveCurrentRound?.metadata?.currentUserAnswered || false;
+
+  // Debug: Log round status
+  console.log('[GAME-ONLINE] Render state:', {
+    hasCurrentRound: !!effectiveCurrentRound,
+    roundStatus: effectiveCurrentRound?.status,
+    roundNumber: effectiveCurrentRound?.roundNumber,
+    isRoundActive,
+    isRoundCompleted,
+    canStartNext,
+    hasAnswered,
+    answersCount: effectiveCurrentRound?.answers?.length,
+    totalParticipants: effectiveCurrentRound?.metadata?.totalParticipants,
+  });
 
   // Prepare participants data for counter
   const answeredParticipants = effectiveCurrentRound?.answers?.map((a) => ({
