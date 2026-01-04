@@ -61,8 +61,8 @@ async function generateIcons() {
       const outputPath = path.join(ICONS_DIR, name);
       await sharp(SOURCE_IMAGE)
         .resize(size, size, {
-          fit: 'contain',
-          background: { r: 0, g: 0, b: 0, alpha: 0 },
+          fit: 'cover', // Use 'cover' to fill entire area
+          position: 'center',
         })
         .png()
         .toFile(outputPath);
@@ -74,8 +74,8 @@ async function generateIcons() {
       const outputPath = path.join(__dirname, dir, name);
       await sharp(SOURCE_IMAGE)
         .resize(size, size, {
-          fit: 'contain',
-          background: { r: 0, g: 0, b: 0, alpha: 0 },
+          fit: 'cover', // Use 'cover' to fill entire area
+          position: 'center',
         })
         .png()
         .toFile(outputPath);
