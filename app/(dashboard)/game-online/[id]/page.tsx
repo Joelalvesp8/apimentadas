@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession as useAuthSession } from 'next-auth/react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useSession,
   useCurrentRound,
@@ -24,6 +25,7 @@ export default function GameOnlinePage() {
   const params = useParams();
   const router = useRouter();
   const sessionId = params.id as string;
+  const queryClient = useQueryClient();
 
   const { data: authSession } = useAuthSession();
   const { data: profile } = useProfile();
@@ -88,10 +90,19 @@ export default function GameOnlinePage() {
 
     setIsSubmitting(true);
     try {
+      console.log('[GAME-ONLINE] Submitting answer...');
       await submitAnswer.mutateAsync({ answer: answerText });
       setAnswerText('');
-      alert('Resposta enviada com sucesso!');
+      console.log('[GAME-ONLINE] Answer submitted successfully');
+
+      // Force immediate refetch to show updated state
+      // This avoids waiting 3 seconds for the next poll
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'rounds', 'current'] });
+        queryClient.invalidateQueries({ queryKey: ['sessions', sessionId, 'status'] });
+      }, 500); // Wait 500ms for backend to process
     } catch (error: any) {
+      console.error('[GAME-ONLINE] Error submitting answer:', error);
       alert(error.message || 'Erro ao enviar resposta');
     } finally {
       setIsSubmitting(false);

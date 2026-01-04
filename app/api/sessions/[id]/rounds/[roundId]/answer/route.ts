@@ -88,6 +88,12 @@ export async function POST(
       return errorResponse('Você já respondeu esta rodada', 400);
     }
 
+    console.log('[SUBMIT ANSWER] Creating answer:', {
+      roundId: round.id,
+      profileId: profile.id,
+      answerLength: answer.length,
+    });
+
     // Create answer
     const newAnswer = await prisma.onlineAnswer.create({
       data: {
@@ -110,27 +116,41 @@ export async function POST(
       },
     });
 
+    console.log('[SUBMIT ANSWER] Answer created:', newAnswer.id);
+
     // Check if all participants have answered
     const totalParticipants = round.session.sessionParticipants.length;
     const totalAnswers = round.answers.length + 1; // +1 for the new answer
 
-    if (totalAnswers >= totalParticipants) {
-      // Mark round as completed
-      await prisma.onlineRound.update({
-        where: { id: round.id },
-        data: {
-          status: 'completed',
-          completedAt: new Date(),
-        },
-      });
+    console.log('[SUBMIT ANSWER] Checking completion:', {
+      totalParticipants,
+      totalAnswers,
+      isComplete: totalAnswers >= totalParticipants,
+    });
 
-      // Increment cards played in session
-      await prisma.gameSession.update({
-        where: { id: round.sessionId },
-        data: {
-          cardsPlayed: { increment: 1 },
-        },
-      });
+    if (totalAnswers >= totalParticipants) {
+      console.log('[SUBMIT ANSWER] Marking round as completed');
+
+      // Use transaction to update both at once (faster)
+      await prisma.$transaction([
+        // Mark round as completed
+        prisma.onlineRound.update({
+          where: { id: round.id },
+          data: {
+            status: 'completed',
+            completedAt: new Date(),
+          },
+        }),
+        // Increment cards played in session
+        prisma.gameSession.update({
+          where: { id: round.sessionId },
+          data: {
+            cardsPlayed: { increment: 1 },
+          },
+        }),
+      ]);
+
+      console.log('[SUBMIT ANSWER] Round marked as completed');
     }
 
     return successResponse(newAnswer, 201);
