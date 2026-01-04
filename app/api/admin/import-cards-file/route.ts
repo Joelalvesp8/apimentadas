@@ -60,7 +60,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const validCards = [];
+    const validCards: Array<{
+      type: string;
+      category: string;
+      difficulty: string;
+      content: string;
+      isOfficial: boolean;
+    }> = [];
     const errors: any[] = [];
 
     rows.forEach((row, index) => {
