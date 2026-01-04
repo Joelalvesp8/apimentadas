@@ -232,9 +232,31 @@ export function useSubmitAnswer(sessionId: string, roundId: string) {
 export function useCurrentRound(sessionId: string) {
   return useQuery({
     queryKey: ['sessions', sessionId, 'rounds', 'current'],
-    queryFn: () => apiClient.get<OnlineRound | null>(`/api/sessions/${sessionId}/rounds/current`),
+    queryFn: async () => {
+      const data = await apiClient.get<OnlineRound | null>(`/api/sessions/${sessionId}/rounds/current`);
+      console.log('[useCurrentRound] Fetched:', {
+        hasRound: !!data,
+        status: data?.status,
+        totalAnswers: data?.metadata?.totalAnswers,
+        totalParticipants: data?.metadata?.totalParticipants,
+      });
+      return data;
+    },
     enabled: !!sessionId,
-    refetchInterval: 3000, // Poll every 3 seconds for real-time updates
+    refetchInterval: (query) => {
+      // If round exists and all answered but status is still 'waiting', poll faster
+      const round = query.state.data;
+      if (round && round.metadata) {
+        const allAnswered = round.metadata.totalAnswers >= round.metadata.totalParticipants;
+        const isWaiting = round.status === 'waiting';
+
+        if (allAnswered && isWaiting) {
+          console.log('[useCurrentRound] All answered but status=waiting, polling every 500ms');
+          return 500; // Poll every 500ms when waiting for completion
+        }
+      }
+      return 3000; // Normal polling every 3 seconds
+    },
   });
 }
 

@@ -132,6 +132,7 @@ export async function POST(
       console.log('[SUBMIT ANSWER] Marking round as completed');
 
       // Use transaction to update both at once (faster)
+      console.log('[SUBMIT ANSWER] Starting transaction to mark as completed...');
       await prisma.$transaction([
         // Mark round as completed
         prisma.onlineRound.update({
@@ -150,7 +151,19 @@ export async function POST(
         }),
       ]);
 
-      console.log('[SUBMIT ANSWER] Round marked as completed');
+      console.log('[SUBMIT ANSWER] ✅ Transaction completed! Round marked as completed');
+
+      // Verify it was updated
+      const updatedRound = await prisma.onlineRound.findUnique({
+        where: { id: round.id },
+        select: { id: true, status: true, completedAt: true },
+      });
+
+      console.log('[SUBMIT ANSWER] Verification:', {
+        roundId: updatedRound?.id,
+        status: updatedRound?.status,
+        completedAt: updatedRound?.completedAt,
+      });
     }
 
     return successResponse(newAnswer, 201);
