@@ -2,8 +2,21 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-const SOURCE_IMAGE = path.join(__dirname, '../public/app-icon-source.png');
+const SOURCE_SVG = path.join(__dirname, '../public/app-icon-source.svg');
+const SOURCE_PNG = path.join(__dirname, '../public/app-icon-source.png');
 const ICONS_DIR = path.join(__dirname, '../public/icons');
+
+// Determine which source to use
+let SOURCE_IMAGE;
+if (fs.existsSync(SOURCE_SVG)) {
+  SOURCE_IMAGE = SOURCE_SVG;
+  console.log('📌 Usando SVG como fonte');
+} else if (fs.existsSync(SOURCE_PNG)) {
+  SOURCE_IMAGE = SOURCE_PNG;
+  console.log('📌 Usando PNG como fonte');
+} else {
+  SOURCE_IMAGE = null;
+}
 
 // Icon sizes needed for PWA
 const SIZES = [
@@ -27,10 +40,12 @@ const ADDITIONAL_ICONS = [
 async function generateIcons() {
   try {
     // Check if source image exists
-    if (!fs.existsSync(SOURCE_IMAGE)) {
+    if (!SOURCE_IMAGE) {
       console.error('❌ Imagem fonte não encontrada!');
       console.log('📋 Por favor, salve a imagem da pimenta como:');
-      console.log('   public/app-icon-source.png');
+      console.log('   public/app-icon-source.png (PNG)');
+      console.log('   OU');
+      console.log('   public/app-icon-source.svg (SVG)');
       process.exit(1);
     }
 

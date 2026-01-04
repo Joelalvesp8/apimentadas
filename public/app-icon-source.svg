@@ -1,0 +1,81 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with glow -->
+  <circle cx="512" cy="512" r="512" fill="#000000"/>
+  <circle cx="512" cy="512" r="450" fill="url(#glow)" opacity="0.3"/>
+
+  <!-- Gradients -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+    </radialGradient>
+
+    <linearGradient id="pepperGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b91c1c;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="stemGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#86efac;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Pepper body -->
+  <g filter="url(#shadow)">
+    <!-- Main pepper shape -->
+    <path d="
+      M 512 200
+      C 460 220, 420 260, 400 320
+      C 380 380, 370 450, 380 520
+      C 390 590, 410 650, 440 700
+      C 450 720, 460 735, 470 745
+      C 480 760, 490 770, 500 775
+      C 510 780, 520 780, 530 775
+      C 545 768, 560 755, 575 735
+      C 590 715, 600 690, 615 650
+      C 630 610, 640 560, 645 510
+      C 650 460, 648 410, 640 360
+      C 632 310, 620 270, 600 240
+      C 580 210, 550 195, 512 200
+      Z
+    " fill="url(#pepperGradient)" stroke="#991b1b" stroke-width="3"/>
+
+    <!-- Pepper tip (bottom part) -->
+    <ellipse cx="515" cy="775" rx="25" ry="15" fill="#991b1b" opacity="0.6"/>
+
+    <!-- Highlight on pepper -->
+    <ellipse cx="480" cy="350" rx="40" ry="80" fill="white" opacity="0.2"/>
+    <ellipse cx="470" cy="320" rx="20" ry="30" fill="white" opacity="0.3"/>
+
+    <!-- Stem (caule) -->
+    <path d="
+      M 512 200
+      C 520 190, 535 175, 545 165
+      C 555 155, 565 150, 570 145
+      C 575 135, 580 125, 582 115
+      Q 585 100, 580 90
+      C 578 85, 575 82, 572 80
+    " fill="none" stroke="url(#stemGradient)" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Stem curve detail -->
+    <path d="
+      M 572 80
+      C 568 75, 575 70, 585 75
+      C 595 80, 600 90, 598 100
+      C 596 108, 590 112, 585 110
+    " fill="#22c55e"/>
+
+    <!-- Water drops for spicy effect -->
+    <ellipse cx="600" cy="400" rx="8" ry="12" fill="#fbbf24" opacity="0.7"/>
+    <ellipse cx="620" cy="480" rx="6" ry="10" fill="#fbbf24" opacity="0.6"/>
+    <ellipse cx="590" cy="560" rx="7" ry="11" fill="#fbbf24" opacity="0.7"/>
+    <ellipse cx="430" cy="450" rx="6" ry="10" fill="#fbbf24" opacity="0.6"/>
+    <ellipse cx="450" cy="550" rx="8" ry="12" fill="#fbbf24" opacity="0.7"/>
+  </g>
+</svg>
