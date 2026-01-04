@@ -1,0 +1,214 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import * as XLSX from 'xlsx';
+import { parse } from 'csv-parse/sync';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const VALID_TYPES = ['pergunta', 'tarefa'];
+const VALID_CATEGORIES = ['casais', 'trios', 'grupos'];
+const VALID_DIFFICULTIES = ['facil', 'leve', 'medio', 'dificil', 'picante', 'extremo'];
+
+export async function POST(req: NextRequest) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+
+    if (!file) {
+      return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
+    }
+
+    console.log('[IMPORT-FILE] Starting file import:', {
+      filename: file.name,
+      size: file.size,
+      type: file.type,
+    });
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const filename = file.name.toLowerCase();
+
+    let rows: any[] = [];
+
+    // 📄 CSV
+    if (filename.endsWith('.csv')) {
+      rows = parse(buffer, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+        encoding: 'utf-8',
+      });
+      console.log('[IMPORT-FILE] Parsed CSV:', rows.length, 'rows');
+    }
+    // 📊 XLSX
+    else if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(sheet);
+      console.log('[IMPORT-FILE] Parsed XLSX:', rows.length, 'rows');
+    } else {
+      return NextResponse.json(
+        { error: 'Formato não suportado. Use CSV, XLS ou XLSX.' },
+        { status: 400 }
+      );
+    }
+
+    if (rows.length === 0) {
+      return NextResponse.json(
+        { error: 'Arquivo vazio ou sem dados válidos' },
+        { status: 400 }
+      );
+    }
+
+    const validCards = [];
+    const errors: any[] = [];
+
+    rows.forEach((row, index) => {
+      const lineNumber = index + 2; // +1 for 0-index, +1 for header
+      const { type, category, difficulty, content } = row;
+
+      // Validações detalhadas
+      const validationErrors = [];
+
+      if (!type || !VALID_TYPES.includes(type)) {
+        validationErrors.push(`type deve ser "pergunta" ou "tarefa", recebido: "${type}"`);
+      }
+
+      if (!category || !VALID_CATEGORIES.includes(category)) {
+        validationErrors.push(`category deve ser "casais", "trios" ou "grupos", recebido: "${category}"`);
+      }
+
+      if (!difficulty || !VALID_DIFFICULTIES.includes(difficulty)) {
+        validationErrors.push(`difficulty deve ser "facil", "leve", "medio", "dificil", "picante" ou "extremo", recebido: "${difficulty}"`);
+      }
+
+      if (!content || content.trim().length === 0) {
+        validationErrors.push('content não pode estar vazio');
+      }
+
+      if (content && content.length > 1000) {
+        validationErrors.push(`content muito longo (${content.length} caracteres, máximo 1000)`);
+      }
+
+      if (validationErrors.length > 0) {
+        errors.push({
+          line: lineNumber,
+          row: {
+            type: type || '(vazio)',
+            category: category || '(vazio)',
+            difficulty: difficulty || '(vazio)',
+            content: content ? content.substring(0, 50) + '...' : '(vazio)',
+          },
+          errors: validationErrors,
+        });
+        return;
+      }
+
+      validCards.push({
+        type,
+        category,
+        difficulty,
+        content: content.trim(),
+        isOfficial: true,
+      });
+    });
+
+    console.log('[IMPORT-FILE] Validation results:', {
+      totalRows: rows.length,
+      validCards: validCards.length,
+      errors: errors.length,
+    });
+
+    if (validCards.length === 0) {
+      return NextResponse.json(
+        {
+          error: 'Nenhuma carta válida encontrada',
+          totalLinhas: rows.length,
+          errosEncontrados: errors.length,
+          detalhesErros: errors,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Inserir cartas válidas
+    const inserted = await prisma.card.createMany({
+      data: validCards,
+      skipDuplicates: true,
+    });
+
+    console.log('[IMPORT-FILE] Inserted:', inserted.count, 'cards');
+
+    // Estatísticas finais
+    const stats = await prisma.card.groupBy({
+      by: ['type', 'category', 'difficulty'],
+      _count: true,
+    });
+
+    const totalCards = await prisma.card.count();
+
+    return NextResponse.json({
+      success: true,
+      message: `${inserted.count} cartas importadas com sucesso!`,
+      data: {
+        totalLinhasLidas: rows.length,
+        cartasValidas: validCards.length,
+        cartasInseridas: inserted.count,
+        errosEncontrados: errors.length,
+        totalCartasNoBanco: totalCards,
+      },
+      stats: stats.map((s) => ({
+        type: s.type,
+        category: s.category,
+        difficulty: s.difficulty,
+        count: s._count,
+      })),
+      detalhesErros: errors.length > 0 ? errors : undefined,
+    });
+  } catch (err: any) {
+    console.error('[IMPORT-FILE] Error:', err);
+    return NextResponse.json(
+      {
+        error: 'Erro ao importar arquivo',
+        details: err.message,
+        stack: err.stack,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// GET - Show upload form instructions
+export async function GET() {
+  return NextResponse.json({
+    message: 'Upload de cartas via CSV ou XLSX',
+    endpoint: '/api/admin/import-cards-file',
+    method: 'POST',
+    contentType: 'multipart/form-data',
+    fields: {
+      file: 'Arquivo CSV ou XLSX',
+    },
+    formato: {
+      colunas: ['type', 'category', 'difficulty', 'content'],
+      exemplo: [
+        {
+          type: 'pergunta',
+          category: 'casais',
+          difficulty: 'medio',
+          content: 'Qual foi a primeira vez que você sentiu ciúmes?',
+        },
+        {
+          type: 'tarefa',
+          category: 'casais',
+          difficulty: 'picante',
+          content: 'Mostre sua zona erógena favorita',
+        },
+      ],
+    },
+    valoresPermitidos: {
+      type: VALID_TYPES,
+      category: VALID_CATEGORIES,
+      difficulty: VALID_DIFFICULTIES,
+    },
+  });
+}
