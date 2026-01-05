@@ -62,6 +62,10 @@ model Profile {
   connectionsTo       Connection[]         @relation("ConnectionTo")
   sessionParticipants SessionParticipant[]
   onlineAnswers       OnlineAnswer[]
+  invitationsSent     SessionInvitation[]  @relation("InvitationSender")
+  invitationsReceived SessionInvitation[]  @relation("InvitationReceiver")
+  ratingsGiven        UserRating[]         @relation("RatingFrom")
+  ratingsReceived     UserRating[]         @relation("RatingTo")
 
   // Marketplace relations
   cartItems     CartItem[]
@@ -88,6 +92,43 @@ model Connection {
 
   @@unique([fromId, toId])
   @@map("connections")
+}
+
+// User ratings - avaliações entre usuários após sessões
+model UserRating {
+  id        String   @id @default(cuid())
+  fromId    String   @map("from_id") // Quem avaliou
+  toId      String   @map("to_id") // Quem foi avaliado
+  sessionId String?  @map("session_id") // Sessão onde jogaram juntos (opcional)
+  rating    Int // 1-5 estrelas
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  from Profile @relation("RatingFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Profile @relation("RatingTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId, sessionId]) // Uma avaliação por sessão
+  @@map("user_ratings")
+}
+
+// Session invitations - convites para sessões
+model SessionInvitation {
+  id        String   @id @default(cuid())
+  senderId  String   @map("sender_id") // Quem enviou o convite
+  receiverId String  @map("receiver_id") // Quem recebeu
+  sessionId String?  @map("session_id") // Sessão para qual foi convidado (pode ser null se ainda não criada)
+  sessionType String @map("session_type") // "casal" | "trisal" | "grupo"
+  status    String   @default("pending") // "pending" | "accepted" | "rejected" | "cancelled"
+  message   String?  @db.Text // Mensagem personalizada do convite
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  sender   Profile @relation("InvitationSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver Profile @relation("InvitationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("session_invitations")
 }
 
 // ============================================================================
