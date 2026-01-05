@@ -1,5 +1,5 @@
 -- CreateTable: connections
-CREATE TABLE "connections" (
+CREATE TABLE IF NOT EXISTS "connections" (
     "id" TEXT NOT NULL,
     "from_id" TEXT NOT NULL,
     "to_id" TEXT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE "connections" (
 );
 
 -- CreateTable: user_ratings
-CREATE TABLE "user_ratings" (
+CREATE TABLE IF NOT EXISTS "user_ratings" (
     "id" TEXT NOT NULL,
     "from_id" TEXT NOT NULL,
     "to_id" TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE "user_ratings" (
 );
 
 -- CreateTable: session_invitations
-CREATE TABLE "session_invitations" (
+CREATE TABLE IF NOT EXISTS "session_invitations" (
     "id" TEXT NOT NULL,
     "sender_id" TEXT NOT NULL,
     "receiver_id" TEXT NOT NULL,
@@ -38,26 +38,73 @@ CREATE TABLE "session_invitations" (
     CONSTRAINT "session_invitations_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex: Unique constraint on connections
-CREATE UNIQUE INDEX "connections_from_id_to_id_key" ON "connections"("from_id", "to_id");
+-- CreateIndex: Unique constraint on connections (only if doesn't exist)
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'connections_from_id_to_id_key') THEN
+        CREATE UNIQUE INDEX "connections_from_id_to_id_key" ON "connections"("from_id", "to_id");
+    END IF;
+END $$;
 
--- CreateIndex: Unique constraint on user_ratings
-CREATE UNIQUE INDEX "user_ratings_from_id_to_id_session_id_key" ON "user_ratings"("from_id", "to_id", "session_id");
+-- CreateIndex: Unique constraint on user_ratings (only if doesn't exist)
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'user_ratings_from_id_to_id_session_id_key') THEN
+        CREATE UNIQUE INDEX "user_ratings_from_id_to_id_session_id_key" ON "user_ratings"("from_id", "to_id", "session_id");
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "connections" ADD CONSTRAINT "connections_from_id_fkey" FOREIGN KEY ("from_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AddForeignKey: connections (only if doesn't exist)
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'connections_from_id_fkey'
+    ) THEN
+        ALTER TABLE "connections" ADD CONSTRAINT "connections_from_id_fkey"
+        FOREIGN KEY ("from_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "connections" ADD CONSTRAINT "connections_to_id_fkey" FOREIGN KEY ("to_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'connections_to_id_fkey'
+    ) THEN
+        ALTER TABLE "connections" ADD CONSTRAINT "connections_to_id_fkey"
+        FOREIGN KEY ("to_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "user_ratings" ADD CONSTRAINT "user_ratings_from_id_fkey" FOREIGN KEY ("from_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AddForeignKey: user_ratings (only if doesn't exist)
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'user_ratings_from_id_fkey'
+    ) THEN
+        ALTER TABLE "user_ratings" ADD CONSTRAINT "user_ratings_from_id_fkey"
+        FOREIGN KEY ("from_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "user_ratings" ADD CONSTRAINT "user_ratings_to_id_fkey" FOREIGN KEY ("to_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'user_ratings_to_id_fkey'
+    ) THEN
+        ALTER TABLE "user_ratings" ADD CONSTRAINT "user_ratings_to_id_fkey"
+        FOREIGN KEY ("to_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "session_invitations" ADD CONSTRAINT "session_invitations_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AddForeignKey: session_invitations (only if doesn't exist)
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'session_invitations_sender_id_fkey'
+    ) THEN
+        ALTER TABLE "session_invitations" ADD CONSTRAINT "session_invitations_sender_id_fkey"
+        FOREIGN KEY ("sender_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "session_invitations" ADD CONSTRAINT "session_invitations_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'session_invitations_receiver_id_fkey'
+    ) THEN
+        ALTER TABLE "session_invitations" ADD CONSTRAINT "session_invitations_receiver_id_fkey"
+        FOREIGN KEY ("receiver_id") REFERENCES "profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
