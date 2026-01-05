@@ -115,12 +115,12 @@ export async function POST(
       playedCount: playedCardIds.length,
     });
 
-    // First, count available cards
+    // First, count available cards (official + user-created)
     const availableCardsCount = await prisma.card.count({
       where: {
         type: 'pergunta',
         category: cardCategory,
-        isOfficial: true,
+        // Removed isOfficial filter to include user-created cards
         id: {
           notIn: playedCardIds,
         },
@@ -143,7 +143,7 @@ export async function POST(
       where: {
         type: 'pergunta', // CRITICAL: Only questions in online mode
         category: cardCategory, // FIXED: Use mapped category (plural)
-        isOfficial: true,
+        // Removed isOfficial filter to include user-created cards
         id: {
           notIn: playedCardIds, // CRITICAL: Exclude already played cards
         },
