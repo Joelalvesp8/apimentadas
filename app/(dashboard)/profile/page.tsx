@@ -109,8 +109,8 @@ export default function ProfilePage() {
 
   if (isLoading || !profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
-        <p className="text-muted-foreground">Carregando perfil...</p>
+      <div className="min-h-screen bg-black p-4 flex items-center justify-center">
+        <p className="text-gray-400">Carregando perfil...</p>
       </div>
     );
   }
@@ -118,12 +118,14 @@ export default function ProfilePage() {
   // Show error if profile couldn't be loaded for other reasons
   if (profileError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 flex items-center justify-center">
-        <Card>
+      <div className="min-h-screen bg-black p-4 flex items-center justify-center">
+        <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50">
           <CardContent className="p-8 text-center">
-            <p className="mb-4 text-red-600">Erro ao carregar perfil</p>
-            <p className="mb-4 text-sm text-gray-600">{profileError ? String(profileError) : 'Erro desconhecido'}</p>
-            <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+            <p className="mb-4 text-red-400">Erro ao carregar perfil</p>
+            <p className="mb-4 text-sm text-gray-400">{profileError ? String(profileError) : 'Erro desconhecido'}</p>
+            <Button onClick={() => window.location.reload()} className="bg-red-700 hover:bg-red-800">
+              Tentar Novamente
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -131,31 +133,31 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+    <div className="min-h-screen bg-black py-6 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Meu Perfil</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold mb-2 text-white">Meu Perfil</h1>
+          <p className="text-gray-400">
             Gerencie suas informações pessoais
           </p>
         </div>
 
         {/* Profile Image Card */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/30">
           <CardHeader>
-            <CardTitle>Foto de Perfil</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Foto de Perfil</CardTitle>
+            <CardDescription className="text-gray-400">
               Adicione ou altere sua foto de perfil
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center gap-4">
-              <Avatar className="w-32 h-32">
+              <Avatar className="w-32 h-32 border-2 border-red-700/50">
                 <AvatarImage
                   src={imagePreview || profile?.user?.image || undefined}
                   alt={profile?.user?.name || 'User'}
                 />
-                <AvatarFallback className="text-4xl">
+                <AvatarFallback className="text-4xl bg-red-900 text-red-200">
                   {profile?.nickname?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -172,6 +174,7 @@ export default function ProfilePage() {
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
+                  className="bg-zinc-800 border-zinc-700 text-gray-300 hover:bg-zinc-700"
                 >
                   <Camera className="w-4 h-4 mr-2" />
                   Escolher Imagem
@@ -182,12 +185,14 @@ export default function ProfilePage() {
                     <Button
                       onClick={handleSaveImage}
                       disabled={updateImage.isPending}
+                      className="bg-red-700 hover:bg-red-800"
                     >
                       Salvar Imagem
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setImagePreview(null)}
+                      className="bg-zinc-800 border-zinc-700 text-gray-300 hover:bg-zinc-700"
                     >
                       Cancelar
                     </Button>
@@ -195,7 +200,7 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-400">
                 JPG, PNG ou GIF. Tamanho máximo: 5MB
               </p>
             </div>
@@ -203,10 +208,10 @@ export default function ProfilePage() {
         </Card>
 
         {/* Profile Info Card */}
-        <Card>
+        <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/30">
           <CardHeader>
-            <CardTitle>Informações do Perfil</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Informações do Perfil</CardTitle>
+            <CardDescription className="text-gray-400">
               Atualize suas informações pessoais
             </CardDescription>
           </CardHeader>
@@ -214,7 +219,7 @@ export default function ProfilePage() {
             <form onSubmit={handleSaveProfile} className="space-y-4">
               {/* Email (read-only) */}
               <div className="space-y-2">
-                <Label htmlFor="email">
+                <Label htmlFor="email" className="text-gray-200">
                   <Mail className="w-4 h-4 inline mr-2" />
                   Email
                 </Label>
@@ -223,13 +228,13 @@ export default function ProfilePage() {
                   type="email"
                   value={profile?.user?.email || ''}
                   disabled
-                  className="bg-gray-100"
+                  className="bg-zinc-800/50 border-zinc-700 text-gray-400"
                 />
               </div>
 
               {/* Name (read-only) */}
               <div className="space-y-2">
-                <Label htmlFor="name">
+                <Label htmlFor="name" className="text-gray-200">
                   <User className="w-4 h-4 inline mr-2" />
                   Nome
                 </Label>
@@ -238,13 +243,13 @@ export default function ProfilePage() {
                   type="text"
                   value={profile?.user?.name || ''}
                   disabled
-                  className="bg-gray-100"
+                  className="bg-zinc-800/50 border-zinc-700 text-gray-400"
                 />
               </div>
 
               {/* Nickname */}
               <div className="space-y-2">
-                <Label htmlFor="nickname">Apelido / Nickname *</Label>
+                <Label htmlFor="nickname" className="text-gray-200">Apelido / Nickname *</Label>
                 <Input
                   id="nickname"
                   type="text"
@@ -252,35 +257,37 @@ export default function ProfilePage() {
                   onChange={(e) => setNickname(e.target.value)}
                   placeholder="Como você quer ser chamado(a)"
                   required
+                  className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-gray-500 focus:border-red-700"
                 />
               </div>
 
               {/* Bio */}
               <div className="space-y-2">
-                <Label htmlFor="bio">Sobre Você</Label>
+                <Label htmlFor="bio" className="text-gray-200">Sobre Você</Label>
                 <Textarea
                   id="bio"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Conte um pouco sobre você..."
                   rows={4}
+                  className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-gray-500 focus:border-red-700"
                 />
               </div>
 
               {/* Orientation */}
               <div className="space-y-2">
-                <Label htmlFor="orientation">Orientação</Label>
+                <Label htmlFor="orientation" className="text-gray-200">Orientação</Label>
                 <select
                   id="orientation"
                   value={orientation}
                   onChange={(e) => setOrientation(e.target.value as 'heterosexual' | 'homosexual' | 'bisexual' | 'other' | '')}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full rounded-md border-2 border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700"
                 >
-                  <option value="">Selecione...</option>
-                  <option value="heterosexual">Heterossexual</option>
-                  <option value="homosexual">Homossexual</option>
-                  <option value="bisexual">Bissexual</option>
-                  <option value="other">Outro</option>
+                  <option value="" className="bg-zinc-900">Selecione...</option>
+                  <option value="heterosexual" className="bg-zinc-900">Heterossexual</option>
+                  <option value="homosexual" className="bg-zinc-900">Homossexual</option>
+                  <option value="bisexual" className="bg-zinc-900">Bissexual</option>
+                  <option value="other" className="bg-zinc-900">Outro</option>
                 </select>
               </div>
 
@@ -288,7 +295,7 @@ export default function ProfilePage() {
                 <Button
                   type="submit"
                   disabled={updateProfile.isPending}
-                  className="flex-1"
+                  className="flex-1 bg-red-700 hover:bg-red-800"
                 >
                   {updateProfile.isPending ? 'Salvando...' : 'Salvar Alterações'}
                 </Button>
@@ -296,6 +303,7 @@ export default function ProfilePage() {
                   type="button"
                   variant="outline"
                   onClick={() => router.push('/dashboard')}
+                  className="bg-zinc-800 border-zinc-700 text-gray-300 hover:bg-zinc-700"
                 >
                   Cancelar
                 </Button>
@@ -305,20 +313,20 @@ export default function ProfilePage() {
         </Card>
 
         {/* Marketplace - Seller Card */}
-        <Card className="mt-6 border-2 border-purple-200">
+        <Card className="mt-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-purple-700/30">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Store className="w-5 h-5 text-purple-600" />
-              <CardTitle className="text-purple-700">Modo Vendedor 🛍️</CardTitle>
+              <Store className="w-5 h-5 text-purple-400" />
+              <CardTitle className="text-purple-300">Modo Vendedor 🛍️</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Ative o modo vendedor para vender produtos no marketplace
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSaveProfile} className="space-y-4">
               {/* Enable Vendor Mode */}
-              <div className="flex items-center space-x-2 p-4 bg-purple-50 rounded-lg">
+              <div className="flex items-center space-x-2 p-4 bg-purple-900/20 border border-purple-700/30 rounded-lg">
                 <input
                   id="isVendor"
                   type="checkbox"
@@ -326,9 +334,9 @@ export default function ProfilePage() {
                   onChange={(e) => setIsVendor(e.target.checked)}
                   className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                 />
-                <Label htmlFor="isVendor" className="cursor-pointer flex-1">
+                <Label htmlFor="isVendor" className="cursor-pointer flex-1 text-gray-200">
                   <span className="font-semibold">Quero vender no marketplace</span>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-gray-400 mt-1">
                     Ao ativar, você poderá cadastrar produtos e receber pagamentos via PIX
                   </p>
                 </Label>
@@ -339,7 +347,7 @@ export default function ProfilePage() {
                 <>
                   {/* PIX Key */}
                   <div className="space-y-2">
-                    <Label htmlFor="pixKey" className="flex items-center gap-2">
+                    <Label htmlFor="pixKey" className="flex items-center gap-2 text-gray-200">
                       <CreditCard className="w-4 h-4" />
                       Chave PIX *
                     </Label>
@@ -350,15 +358,16 @@ export default function ProfilePage() {
                       onChange={(e) => setPixKey(e.target.value)}
                       placeholder="CPF, CNPJ, email, telefone ou chave aleatória"
                       required={isVendor}
+                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-gray-500 focus:border-purple-700"
                     />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-400">
                       Esta chave será exibida aos compradores para pagamento
                     </p>
                   </div>
 
                   {/* Store Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="storeName">Nome da Loja</Label>
+                    <Label htmlFor="storeName" className="text-gray-200">Nome da Loja</Label>
                     <Input
                       id="storeName"
                       type="text"
@@ -366,12 +375,13 @@ export default function ProfilePage() {
                       onChange={(e) => setStoreName(e.target.value)}
                       placeholder="Ex: Sexy Shop da Maria"
                       maxLength={50}
+                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-gray-500 focus:border-purple-700"
                     />
                   </div>
 
                   {/* Store Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="storeDescription">Descrição da Loja</Label>
+                    <Label htmlFor="storeDescription" className="text-gray-200">Descrição da Loja</Label>
                     <Textarea
                       id="storeDescription"
                       value={storeDescription}
@@ -379,6 +389,7 @@ export default function ProfilePage() {
                       placeholder="Conte sobre sua loja, produtos e diferenciais..."
                       rows={4}
                       maxLength={1000}
+                      className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-gray-500 focus:border-purple-700"
                     />
                   </div>
                 </>
@@ -388,7 +399,7 @@ export default function ProfilePage() {
                 <Button
                   type="submit"
                   disabled={updateProfile.isPending}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  className="flex-1 bg-purple-700 hover:bg-purple-800"
                 >
                   {updateProfile.isPending ? 'Salvando...' : 'Salvar Configurações'}
                 </Button>
