@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Home, Users, LogOut, Store, Package, ShoppingBag, Compass, User } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function DashboardLayout({
   children,
@@ -121,6 +122,9 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="relative z-10 overflow-y-auto">{children}</main>
+
+      {/* Toast notifications */}
+      <Toaster />
     </div>
   );
 }
