@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
 // ============================================================================
@@ -14,7 +14,7 @@ export interface ExploreUser {
   sessionsPlayed: number;
   averageRating: number | null;
   lastActiveAt: string;
-  memberSince: string;
+  connectionStatus: 'none' | 'pending_sent' | 'pending_received' | 'connected';
 }
 
 export interface PublicProfile {
@@ -51,23 +51,60 @@ export interface PublicProfile {
 
 /**
  * Hook to fetch users for exploration/discovery
- * @param search - Optional search term to filter by nickname
- * @param sortBy - Sort by 'activity' (default) or 'rating'
+ * @param search - Optional search term to filter by nickname or bio
+ * @param orientation - Optional filter by orientation
  */
-export function useExploreUsers(
-  search?: string,
-  sortBy: 'activity' | 'rating' = 'activity'
-) {
+export function useExploreUsers(search?: string, orientation?: string) {
   const params = new URLSearchParams();
   if (search) params.append('search', search);
-  if (sortBy) params.append('sortBy', sortBy);
+  if (orientation) params.append('orientation', orientation);
 
   return useQuery({
-    queryKey: ['users', 'explore', search, sortBy],
-    queryFn: () =>
-      apiClient.get<ExploreUser[]>(
-        `/api/users/explore${params.toString() ? `?${params.toString()}` : ''}`
-      ),
+    queryKey: ['users', 'explore', search, orientation],
+    queryFn: async () => {
+      const response = await apiClient.get<{
+        users: ExploreUser[];
+        pagination: { total: number; limit: number; offset: number; hasMore: boolean };
+      }>(`/api/explore${params.toString() ? `?${params.toString()}` : ''}`);
+      return response.users;
+    },
+  });
+}
+
+/**
+ * Hook to request connection with a user
+ */
+export function useRequestConnection() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (toProfileId: string) => {
+      return apiClient.post('/api/connections/request', { toProfileId });
+    },
+    onSuccess: () => {
+      // Invalidate explore users to refresh connection status
+      queryClient.invalidateQueries({ queryKey: ['users', 'explore'] });
+    },
+  });
+}
+
+/**
+ * Hook to send session invitation
+ */
+export function useSendInvitation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      receiverId: string;
+      sessionType: 'casal' | 'trisal' | 'grupo';
+      message?: string;
+    }) => {
+      return apiClient.post('/api/invitations', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invitations'] });
+    },
   });
 }
 
