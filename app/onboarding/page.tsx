@@ -25,12 +25,12 @@ export default function OnboardingPage() {
   const [orientation, setOrientation] = useState<string>('');
   const [error, setError] = useState('');
 
-  // If user already has a profile with nickname, redirect to dashboard
+  // If user already has a profile with nickname, redirect to explore
   // This prevents users from being stuck in onboarding loop
   useEffect(() => {
     if (existingProfile && existingProfile.nickname) {
-      console.log('[DEBUG] Onboarding - Profile exists, redirecting to dashboard');
-      router.push('/dashboard');
+      console.log('[DEBUG] Onboarding - Profile exists, redirecting to explore');
+      router.push('/explore');
     }
   }, [existingProfile, router]);
 
@@ -47,16 +47,16 @@ export default function OnboardingPage() {
         orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
       });
 
-      console.log('[DEBUG] Onboarding - Profile created successfully, redirecting to dashboard');
-      router.push('/dashboard');
+      console.log('[DEBUG] Onboarding - Profile created successfully, redirecting to explore');
+      router.push('/explore');
     } catch (error: any) {
       const errorMessage = error.message || 'Erro ao criar perfil';
       console.log('[DEBUG] Onboarding - Error creating profile:', errorMessage);
 
-      // If profile already exists, redirect to dashboard instead of showing error
+      // If profile already exists, redirect to explore instead of showing error
       if (errorMessage.includes('já existe') || errorMessage.includes('already exists')) {
-        console.log('[DEBUG] Onboarding - Profile already exists, redirecting to dashboard');
-        router.push('/dashboard');
+        console.log('[DEBUG] Onboarding - Profile already exists, redirecting to explore');
+        router.push('/explore');
         return;
       }
 

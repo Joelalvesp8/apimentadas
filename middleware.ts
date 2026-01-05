@@ -9,6 +9,7 @@ export default auth((req) => {
   // Lista de rotas protegidas
   const protectedRoutes = [
     '/dashboard',
+    '/explore',
     '/onboarding',
     '/connections',
     '/game',
@@ -23,7 +24,7 @@ export default auth((req) => {
 
   // Redirecionar usuários logados para longe das páginas de autenticação
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
+    return NextResponse.redirect(new URL('/explore', req.nextUrl));
   }
 
   // Redirecionar usuários não logados de rotas protegidas
@@ -37,6 +38,7 @@ export default auth((req) => {
 export const config = {
   matcher: [
     '/dashboard/:path*',
+    '/explore/:path*',
     '/onboarding',
     '/connections/:path*',
     '/game/:path*',
