@@ -43,7 +43,6 @@ export function useNotifications() {
       const notification = new Notification(title, {
         icon: '/icon-192x192.png',
         badge: '/icon-192x192.png',
-        vibrate: [200, 100, 200],
         ...options,
       });
 
