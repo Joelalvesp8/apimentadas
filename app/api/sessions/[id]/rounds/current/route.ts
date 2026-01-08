@@ -150,6 +150,18 @@ export async function GET(
     const answeredIds = currentRound.answers.map((a) => a.profileId);
     const waitingIds = participantIds.filter((id) => !answeredIds.includes(id));
 
+    // Check turn logic
+    const isCurrentUserTurn = currentRound.currentTurnProfileId === profile.id;
+    const currentTurnUser = session.sessionParticipants.find(
+      (p) => p.profileId === currentRound.currentTurnProfileId
+    );
+    const hasCurrentTurnAnswered = answeredIds.includes(currentRound.currentTurnProfileId);
+
+    // User can see the question if:
+    // 1. It's their turn (they need to answer first)
+    // 2. OR the person whose turn it is has already answered
+    const canSeeQuestion = isCurrentUserTurn || hasCurrentTurnAnswered;
+
     const roundWithMeta = {
       ...currentRound,
       metadata: {
@@ -164,6 +176,12 @@ export async function GET(
             image: p.profile.user?.image || null,
           })),
         currentUserAnswered: answeredIds.includes(profile.id),
+        // Turn information
+        isCurrentUserTurn,
+        currentTurnUserId: currentRound.currentTurnProfileId,
+        currentTurnUserNickname: currentTurnUser?.profile.nickname || 'Desconhecido',
+        hasCurrentTurnAnswered,
+        canSeeQuestion,
       },
     };
 

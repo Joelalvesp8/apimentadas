@@ -276,41 +276,69 @@ export default function GameOnlinePage() {
         {/* Current round card */}
         {effectiveCurrentRound && (
           <>
-            <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <span className="text-3xl">❓</span>
-                  Pergunta da Rodada #{effectiveCurrentRound.roundNumber}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-black/40 border-2 border-red-700/30 rounded-lg p-6 mb-6">
-                  <p className="text-xl text-white leading-relaxed">
-                    {effectiveCurrentRound.card?.content || 'Carregando pergunta...'}
+            {/* Show "waiting for turn" message if user can't see question yet */}
+            {!effectiveCurrentRound.metadata?.canSeeQuestion && (
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-yellow-700/50 shadow-[0_0_40px_rgba(251,191,36,0.3)]">
+                <CardContent className="p-8 text-center">
+                  <div className="text-6xl mb-4">🎴</div>
+                  <h3 className="text-2xl font-bold text-yellow-300 mb-2">
+                    Aguardando {effectiveCurrentRound.metadata?.currentTurnUserNickname} virar a carta...
+                  </h3>
+                  <p className="text-gray-400">
+                    {effectiveCurrentRound.metadata?.currentTurnUserNickname} está virando a carta e responderá primeiro.
+                    Quando {effectiveCurrentRound.metadata?.currentTurnUserNickname} responder, a pergunta aparecerá para você.
                   </p>
-                </div>
+                </CardContent>
+              </Card>
+            )}
 
-                <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <Badge variant="outline" className="border-zinc-600">
-                    {effectiveCurrentRound.card?.difficulty || 'N/A'}
-                  </Badge>
-                  <Badge variant="outline" className="border-zinc-600">
-                    {effectiveCurrentRound.card?.category || 'N/A'}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Show question only if user can see it */}
+            {effectiveCurrentRound.metadata?.canSeeQuestion && (
+              <>
+                <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-3xl">❓</span>
+                        Pergunta da Rodada #{effectiveCurrentRound.roundNumber}
+                      </div>
+                      {effectiveCurrentRound.metadata?.isCurrentUserTurn && (
+                        <Badge className="bg-yellow-700 border-yellow-600">
+                          Sua vez de virar!
+                        </Badge>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-black/40 border-2 border-red-700/30 rounded-lg p-6 mb-6">
+                      <p className="text-xl text-white leading-relaxed">
+                        {effectiveCurrentRound.card?.content || 'Carregando pergunta...'}
+                      </p>
+                    </div>
 
-            {/* Answer counter */}
-            <OnlineAnswerCounter
-              totalParticipants={effectiveCurrentRound.metadata?.totalParticipants || 0}
-              answeredCount={effectiveCurrentRound.metadata?.totalAnswers || 0}
-              waitingParticipants={waitingParticipants}
-              answeredParticipants={answeredParticipants}
-            />
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Badge variant="outline" className="border-zinc-600">
+                        {effectiveCurrentRound.card?.difficulty || 'N/A'}
+                      </Badge>
+                      <Badge variant="outline" className="border-zinc-600">
+                        {effectiveCurrentRound.card?.category || 'N/A'}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Answer form (only if round is active and user hasn't answered) */}
-            {isRoundActive && !hasAnswered && (
+                {/* Answer counter */}
+                <OnlineAnswerCounter
+                  totalParticipants={effectiveCurrentRound.metadata?.totalParticipants || 0}
+                  answeredCount={effectiveCurrentRound.metadata?.totalAnswers || 0}
+                  waitingParticipants={waitingParticipants}
+                  answeredParticipants={answeredParticipants}
+                />
+              </>
+            )}
+
+            {/* Answer form (only if round is active, user can see question, and hasn't answered) */}
+            {isRoundActive && effectiveCurrentRound.metadata?.canSeeQuestion && !hasAnswered && (
               <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
                 <CardHeader>
                   <CardTitle className="text-white">Sua Resposta</CardTitle>

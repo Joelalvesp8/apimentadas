@@ -88,6 +88,30 @@ export async function POST(
     const lastRound = session.onlineRounds[0];
     const nextRoundNumber = lastRound ? lastRound.roundNumber + 1 : 1;
 
+    // Determine who should pick the card this round (alternating turns)
+    // Get all participants ordered by join time for consistent turn order
+    const participants = await prisma.sessionParticipant.findMany({
+      where: { sessionId: session.id },
+      orderBy: { joinedAt: 'asc' },
+      select: { profileId: true },
+    });
+
+    if (participants.length === 0) {
+      return errorResponse('Nenhum participante encontrado', 404);
+    }
+
+    // Calculate whose turn it is based on round number
+    // Round 1 -> participant 0, Round 2 -> participant 1, etc.
+    const turnIndex = (nextRoundNumber - 1) % participants.length;
+    const currentTurnProfileId = participants[turnIndex].profileId;
+
+    console.log('[START ROUND] Turn assignment:', {
+      roundNumber: nextRoundNumber,
+      totalParticipants: participants.length,
+      turnIndex,
+      currentTurnProfileId,
+    });
+
     // Get all cards already played in this session to avoid repetition
     const playedCardIds = await prisma.onlineRound.findMany({
       where: { sessionId: session.id },
@@ -174,6 +198,7 @@ export async function POST(
         sessionId: session.id,
         cardId: card.id,
         roundNumber: nextRoundNumber,
+        currentTurnProfileId, // Define de quem é a vez de virar a carta
         status: 'waiting',
       },
       include: {

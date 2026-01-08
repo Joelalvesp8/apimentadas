@@ -249,13 +249,14 @@ model PlayedCard {
 
 // Online Mode - Each card in online mode is a "round" where all players must answer
 model OnlineRound {
-  id          String    @id @default(cuid())
-  sessionId   String    @map("session_id")
-  cardId      String    @map("card_id")
-  roundNumber Int       @map("round_number")
-  status      String    @default("waiting") // "waiting" | "completed"
-  startedAt   DateTime  @default(now()) @map("started_at")
-  completedAt DateTime? @map("completed_at")
+  id                   String    @id @default(cuid())
+  sessionId            String    @map("session_id")
+  cardId               String    @map("card_id")
+  roundNumber          Int       @map("round_number")
+  currentTurnProfileId String    @map("current_turn_profile_id") // Profile ID que vira a carta e responde primeiro
+  status               String    @default("waiting") // "waiting" | "completed"
+  startedAt            DateTime  @default(now()) @map("started_at")
+  completedAt          DateTime? @map("completed_at")
 
   // Relations
   session GameSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
