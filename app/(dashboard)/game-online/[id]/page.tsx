@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession as useAuthSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,13 +13,14 @@ import {
   useLeaveSession,
 } from '@/hooks/useSessions';
 import { useProfile } from '@/hooks/useProfile';
+import { useGameNotifications } from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { OnlineAnswerCounter } from '@/components/online/online-answer-counter';
 import { OnlineAnswersDisplay } from '@/components/online/online-answers-display';
-import { ArrowLeft, Play, Send, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Play, Send, CheckCircle, XCircle, Bell, BellOff } from 'lucide-react';
 
 export default function GameOnlinePage() {
   const params = useParams();
@@ -39,6 +40,20 @@ export default function GameOnlinePage() {
 
   const [answerText, setAnswerText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Notifications
+  const {
+    isSupported: notificationsSupported,
+    permission: notificationPermission,
+    requestPermission,
+    notifyYourTurn,
+    notifyQuestionReady,
+    notifyRoundCompleted,
+  } = useGameNotifications();
+
+  // Track previous state to detect changes
+  const prevRoundRef = useRef<typeof currentRound>(null);
+  const hasRequestedPermission = useRef(false);
 
   // Debug logs
   console.log('[GAME-ONLINE] Current round data:', {
@@ -63,6 +78,69 @@ export default function GameOnlinePage() {
       hasCard: !!currentRound.card,
     });
   }
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if (notificationsSupported && notificationPermission === 'default' && !hasRequestedPermission.current) {
+      hasRequestedPermission.current = true;
+      requestPermission();
+    }
+  }, [notificationsSupported, notificationPermission, requestPermission]);
+
+  // Detect round changes and send notifications
+  useEffect(() => {
+    if (!effectiveCurrentRound || !profile) return;
+
+    const prevRound = prevRoundRef.current;
+
+    // New round started
+    if (!prevRound || prevRound.id !== effectiveCurrentRound.id) {
+      const isMyTurn = effectiveCurrentRound.metadata?.isCurrentUserTurn;
+      const canSee = effectiveCurrentRound.metadata?.canSeeQuestion;
+
+      // Notify if it's user's turn to flip the card
+      if (isMyTurn && !effectiveCurrentRound.metadata?.currentUserAnswered) {
+        console.log('[NOTIFICATIONS] Your turn to flip card');
+        notifyYourTurn(effectiveCurrentRound.roundNumber);
+      }
+      // Notify if question became available (someone else flipped)
+      else if (!isMyTurn && canSee && prevRound?.metadata?.canSeeQuestion === false) {
+        console.log('[NOTIFICATIONS] Question ready');
+        notifyQuestionReady(
+          effectiveCurrentRound.roundNumber,
+          effectiveCurrentRound.metadata?.currentTurnUserNickname || 'Outro jogador'
+        );
+      }
+    }
+
+    // Round completed - all answered
+    if (
+      effectiveCurrentRound.status === 'completed' &&
+      prevRound?.status === 'waiting'
+    ) {
+      console.log('[NOTIFICATIONS] Round completed');
+      notifyRoundCompleted(effectiveCurrentRound.roundNumber);
+    }
+
+    // Question became visible (turn player answered)
+    if (
+      prevRound &&
+      prevRound.id === effectiveCurrentRound.id &&
+      !prevRound.metadata?.canSeeQuestion &&
+      effectiveCurrentRound.metadata?.canSeeQuestion &&
+      !effectiveCurrentRound.metadata?.isCurrentUserTurn &&
+      !effectiveCurrentRound.metadata?.currentUserAnswered
+    ) {
+      console.log('[NOTIFICATIONS] Question now visible');
+      notifyQuestionReady(
+        effectiveCurrentRound.roundNumber,
+        effectiveCurrentRound.metadata?.currentTurnUserNickname || 'Outro jogador'
+      );
+    }
+
+    // Update ref
+    prevRoundRef.current = effectiveCurrentRound;
+  }, [effectiveCurrentRound, profile, notifyYourTurn, notifyQuestionReady, notifyRoundCompleted]);
 
   // Handle start round
   const handleStartRound = async () => {
@@ -209,14 +287,46 @@ export default function GameOnlinePage() {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={() => router.push('/dashboard')}
-            className="bg-zinc-900/60 border-zinc-700/50 text-gray-300 hover:bg-zinc-800"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/dashboard')}
+              className="bg-zinc-900/60 border-zinc-700/50 text-gray-300 hover:bg-zinc-800"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+
+            {/* Notification status */}
+            {notificationsSupported && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={requestPermission}
+                disabled={notificationPermission === 'granted'}
+                className={`border-zinc-700/50 ${
+                  notificationPermission === 'granted'
+                    ? 'bg-green-900/40 border-green-700/50 text-green-400'
+                    : notificationPermission === 'denied'
+                    ? 'bg-red-900/40 border-red-700/50 text-red-400'
+                    : 'bg-zinc-900/60 text-gray-400 hover:bg-zinc-800'
+                }`}
+                title={
+                  notificationPermission === 'granted'
+                    ? 'Notificações habilitadas'
+                    : notificationPermission === 'denied'
+                    ? 'Notificações bloqueadas - permita nas configurações do navegador'
+                    : 'Clique para habilitar notificações'
+                }
+              >
+                {notificationPermission === 'granted' ? (
+                  <Bell className="w-4 h-4" />
+                ) : (
+                  <BellOff className="w-4 h-4" />
+                )}
+              </Button>
+            )}
+          </div>
 
           <div className="flex items-center gap-3">
             <Badge className="bg-gradient-to-r from-red-600 to-red-700 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.4)]">
