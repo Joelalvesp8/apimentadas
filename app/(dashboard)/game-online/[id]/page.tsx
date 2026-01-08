@@ -173,6 +173,15 @@ export default function GameOnlinePage() {
   const canStartNext = status?.canStartNext || false;
   const hasAnswered = effectiveCurrentRound?.metadata?.currentUserAnswered || false;
 
+  // Calculate who will have the turn in the NEXT round
+  const participants = session.sessionParticipants || [];
+  const nextRoundNumber = (effectiveCurrentRound?.roundNumber || 0) + 1;
+  const nextTurnIndex = participants.length > 0 ? (nextRoundNumber - 1) % participants.length : 0;
+  const nextTurnProfileId = participants.length > 0
+    ? participants.sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime())[nextTurnIndex]?.profileId
+    : null;
+  const isMyTurnNext = profile?.id === nextTurnProfileId;
+
   // Debug: Log round status
   console.log('[GAME-ONLINE] Render state:', {
     hasCurrentRound: !!effectiveCurrentRound,
@@ -253,24 +262,41 @@ export default function GameOnlinePage() {
           </CardContent>
         </Card>
 
-        {/* No active round - show start button */}
+        {/* No active round - show start button only to first player */}
         {!effectiveCurrentRound && canStartNext && (
-          <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
-            <CardContent className="p-12 text-center">
-              <Play className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Pronto para começar?</h2>
-              <p className="text-gray-400 mb-6">
-                Clique no botão abaixo para sortear a primeira pergunta
-              </p>
-              <Button
-                onClick={handleStartRound}
-                disabled={startRound.isPending}
-                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 border-2 border-red-600/50 shadow-[0_0_20px_rgba(220,38,38,0.4)] text-lg px-8 py-6"
-              >
-                {startRound.isPending ? 'Sorteando...' : 'Iniciar Primeira Rodada'}
-              </Button>
-            </CardContent>
-          </Card>
+          <>
+            {isMyTurnNext ? (
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-yellow-700/50 shadow-[0_0_40px_rgba(251,191,36,0.3)]">
+                <CardContent className="p-12 text-center">
+                  <Play className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                  <Badge className="bg-yellow-700 border-yellow-600 mb-4">
+                    Sua vez de virar a primeira carta!
+                  </Badge>
+                  <h2 className="text-2xl font-bold text-white mb-2">Pronto para começar?</h2>
+                  <p className="text-gray-400 mb-6">
+                    Clique no botão abaixo para sortear a primeira pergunta
+                  </p>
+                  <Button
+                    onClick={handleStartRound}
+                    disabled={startRound.isPending}
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 border-2 border-red-600/50 shadow-[0_0_20px_rgba(220,38,38,0.4)] text-lg px-8 py-6"
+                  >
+                    {startRound.isPending ? 'Sorteando...' : 'Virar Primeira Carta'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-zinc-700/50">
+                <CardContent className="p-12 text-center">
+                  <div className="text-6xl mb-4">⏳</div>
+                  <h2 className="text-2xl font-bold text-gray-300 mb-2">Aguardando início...</h2>
+                  <p className="text-gray-400">
+                    {participants.find(p => p.profileId === nextTurnProfileId)?.profile?.nickname || 'Outro jogador'} irá virar a primeira carta
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
 
         {/* Current round card */}
@@ -396,10 +422,15 @@ export default function GameOnlinePage() {
                   currentUserId={profile?.id}
                 />
 
-                {/* Next round button */}
-                {canStartNext && (
-                  <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50">
+                {/* Next round button - only show to the player whose turn is next */}
+                {canStartNext && isMyTurnNext && (
+                  <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-yellow-700/50 shadow-[0_0_40px_rgba(251,191,36,0.3)]">
                     <CardContent className="p-6 text-center">
+                      <div className="mb-4">
+                        <Badge className="bg-yellow-700 border-yellow-600 mb-2">
+                          Sua vez de virar a próxima carta!
+                        </Badge>
+                      </div>
                       <Button
                         onClick={handleStartRound}
                         disabled={startRound.isPending}
@@ -411,10 +442,25 @@ export default function GameOnlinePage() {
                         ) : (
                           <>
                             <Play className="w-5 h-5 mr-2" />
-                            Próxima Pergunta
+                            Virar Próxima Carta
                           </>
                         )}
                       </Button>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Show waiting message to other players */}
+                {canStartNext && !isMyTurnNext && (
+                  <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-zinc-700/50">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-4xl mb-3">⏳</div>
+                      <h3 className="text-lg font-bold text-gray-300 mb-2">
+                        Aguardando próxima rodada...
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        {participants.find(p => p.profileId === nextTurnProfileId)?.profile?.nickname || 'Outro jogador'} irá virar a próxima carta
+                      </p>
                     </CardContent>
                   </Card>
                 )}
