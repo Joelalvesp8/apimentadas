@@ -130,6 +130,7 @@ export interface OnlineRound {
   sessionId: string;
   cardId: string;
   roundNumber: number;
+  currentTurnProfileId: string; // Profile ID que vira a carta e responde primeiro
   status: 'waiting' | 'completed';
   startedAt: string;
   completedAt: string | null;
@@ -164,6 +165,12 @@ export interface OnlineRound {
       image: string | null;
     }>;
     currentUserAnswered: boolean;
+    // Turn information
+    isCurrentUserTurn: boolean;
+    currentTurnUserId: string;
+    currentTurnUserNickname: string;
+    hasCurrentTurnAnswered: boolean;
+    canSeeQuestion: boolean;
   };
 }
 
