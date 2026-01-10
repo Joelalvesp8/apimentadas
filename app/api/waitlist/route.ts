@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendWaitlistConfirmation } from '@/lib/email-service';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -43,6 +44,11 @@ export async function POST(request: NextRequest) {
         email: email.toLowerCase(),
         status: 'pending',
       },
+    });
+
+    // Send confirmation email (async, don't wait for it)
+    sendWaitlistConfirmation(email.toLowerCase()).catch((error) => {
+      console.error('Failed to send waitlist confirmation email:', error);
     });
 
     return successResponse({

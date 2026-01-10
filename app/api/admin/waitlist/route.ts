@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { sendApprovalEmail } from '@/lib/email-service';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -85,6 +86,11 @@ export async function PATCH(request: NextRequest) {
           data: { approved: true },
         });
       }
+
+      // Send approval email with registration instructions (async, don't wait for it)
+      sendApprovalEmail(updated.email).catch((error) => {
+        console.error('Failed to send approval email:', error);
+      });
     }
 
     return successResponse(updated);
