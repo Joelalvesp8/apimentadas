@@ -8,9 +8,15 @@ export function Mood() {
   ];
 
   return (
-    <section className="relative py-32 px-6 bg-black">
-      {/* Subtle red glow */}
-      <div className="absolute inset-0 bg-gradient-radial from-red-900/10 via-transparent to-transparent opacity-50" />
+    <section className="relative py-32 px-6 bg-black overflow-hidden">
+      {/* Background Image with Strong Overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+        style={{
+          backgroundImage: 'url(/cards-wine.jpg)',
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-black" />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-16">
