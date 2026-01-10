@@ -13,7 +13,7 @@ export function Mood() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
         style={{
-          backgroundImage: 'url(/cards-wine.jpg)',
+          backgroundImage: 'url(/cards-wine.png)',
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-black" />

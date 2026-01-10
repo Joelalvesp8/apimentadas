@@ -5,7 +5,7 @@ export function Suspense() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15"
         style={{
-          backgroundImage: 'url(/couple-smiling.jpg)',
+          backgroundImage: 'url(/couple-smiling.png)',
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black" />
