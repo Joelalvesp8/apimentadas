@@ -1,9 +1,6 @@
 import { Resend } from 'resend';
 import { getWaitlistConfirmationEmail, getApprovalEmail } from './email-templates';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM_EMAIL = process.env.EMAIL_FROM || 'Apimentadas <onboarding@resend.dev>';
 
 export interface SendEmailResult {
@@ -12,13 +9,23 @@ export interface SendEmailResult {
   error?: string;
 }
 
+// Lazy initialize Resend only when needed
+function getResendClient() {
+  if (!process.env.RESEND_API_KEY) {
+    return null;
+  }
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
 /**
  * Send waitlist confirmation email
  */
 export async function sendWaitlistConfirmation(email: string): Promise<SendEmailResult> {
   try {
+    const resend = getResendClient();
+
     // Check if Resend is configured
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.log('[EMAIL] Resend not configured, skipping email send');
       console.log('='.repeat(80));
       console.log('WAITLIST CONFIRMATION EMAIL');
@@ -54,8 +61,10 @@ export async function sendWaitlistConfirmation(email: string): Promise<SendEmail
  */
 export async function sendApprovalEmail(email: string): Promise<SendEmailResult> {
   try {
+    const resend = getResendClient();
+
     // Check if Resend is configured
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.log('[EMAIL] Resend not configured, skipping email send');
       console.log('='.repeat(80));
       console.log('APPROVAL EMAIL');
