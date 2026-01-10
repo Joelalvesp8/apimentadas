@@ -24,6 +24,7 @@ model User {
   image              String?
   resetToken         String?   @unique @map("reset_token")
   resetTokenExpiry   DateTime? @map("reset_token_expiry")
+  approved           Boolean   @default(false) // User approved to access the app
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
@@ -34,6 +35,18 @@ model User {
   cardLikes    CardLike[]
 
   @@map("users")
+}
+
+// Waitlist for beta testers
+model Waitlist {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  status    String   @default("pending") // "pending" | "approved" | "rejected"
+  notes     String? // Admin notes
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("waitlist")
 }
 
 model Profile {

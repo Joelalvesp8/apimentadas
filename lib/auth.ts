@@ -49,6 +49,11 @@ export const authConfig: NextAuthConfig = {
           throw new Error('Credenciais inválidas');
         }
 
+        // Check if user is approved (admin is always approved)
+        if (!user.approved && user.email !== 'joelalvesp8@gmail.com') {
+          throw new Error('Sua conta ainda não foi aprovada. Aguarde a aprovação do administrador.');
+        }
+
         return {
           id: user.id,
           email: user.email,
