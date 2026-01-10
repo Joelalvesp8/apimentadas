@@ -15,15 +15,17 @@ datasource db {
 // ============================================================================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String
-  password      String? // Null for OAuth users
-  provider      String    @default("credentials") // "credentials" | "google"
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  password           String? // Null for OAuth users
+  provider           String    @default("credentials") // "credentials" | "google"
+  emailVerified      DateTime? @map("email_verified")
+  image              String?
+  resetToken         String?   @unique @map("reset_token")
+  resetTokenExpiry   DateTime? @map("reset_token_expiry")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   // Relations
   profile      Profile?
