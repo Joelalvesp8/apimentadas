@@ -5,6 +5,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { isAdminEmail } from '@/lib/admin';
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma) as any,
@@ -50,8 +51,7 @@ export const authConfig: NextAuthConfig = {
         }
 
         // Check if user is approved (admin is always approved)
-        // Admin email: joelalvesp8@icloud.com
-        if (!user.approved && user.email !== 'joelalvesp8@icloud.com') {
+        if (!user.approved && !isAdminEmail(user.email)) {
           throw new Error('Sua conta ainda não foi aprovada. Aguarde a aprovação do administrador.');
         }
 

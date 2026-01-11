@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { AdminNav } from '@/components/admin/admin-nav';
+import { isAdminEmail } from '@/lib/admin';
 
 export default async function AdminLayout({
   children,
@@ -14,10 +15,8 @@ export default async function AdminLayout({
     redirect('/login');
   }
 
-  // Check if user is admin (only joelalvesp8@icloud.com)
-  const isAdmin = session.user.email === 'joelalvesp8@icloud.com';
-
-  if (!isAdmin) {
+  // Check if user is admin
+  if (!isAdminEmail(session.user.email)) {
     // Non-admin users cannot access admin panel
     redirect('/dashboard');
   }

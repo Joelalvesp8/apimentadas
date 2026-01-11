@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { sendWaitlistConfirmation } from '@/lib/email-service';
+import { getAdminEmails } from '@/lib/admin';
 
 export async function GET() {
-  const testEmail = 'joelalvesp8@icloud.com'; // Usando email do admin
+  const adminEmails = getAdminEmails();
+  const testEmail = adminEmails[0] || 'test@example.com'; // Usando primeiro email admin
 
   console.log('='.repeat(80));
   console.log('[TEST] Starting email test...');

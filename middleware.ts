@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import { isAdminEmail } from '@/lib/admin';
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
@@ -8,7 +9,7 @@ export default auth((req) => {
   const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
 
   // Check if user is admin
-  const isAdmin = req.auth?.user?.email === 'joelalvesp8@icloud.com';
+  const isAdmin = isAdminEmail(req.auth?.user?.email);
 
   // Lista de rotas protegidas (somente para usuários comuns, não admin)
   const protectedRoutes = [
