@@ -5,8 +5,12 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const isAuthPage = req.nextUrl.pathname.startsWith('/login') ||
                      req.nextUrl.pathname.startsWith('/register');
+  const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
 
-  // Lista de rotas protegidas
+  // Check if user is admin
+  const isAdmin = req.auth?.user?.email === 'joelalvesp8@icloud.com';
+
+  // Lista de rotas protegidas (somente para usuários comuns, não admin)
   const protectedRoutes = [
     '/dashboard',
     '/explore',
@@ -22,8 +26,30 @@ export default auth((req) => {
     req.nextUrl.pathname.startsWith(route)
   );
 
+  // Admin routes protection
+  if (isAdminPage) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL('/login', req.nextUrl));
+    }
+    if (!isAdmin) {
+      // Non-admin trying to access admin panel, redirect to dashboard
+      return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
+    }
+    // Admin can access admin panel
+    return NextResponse.next();
+  }
+
+  // Admin trying to access regular user routes - redirect to admin panel
+  if (isLoggedIn && isAdmin && isProtectedRoute) {
+    return NextResponse.redirect(new URL('/admin', req.nextUrl));
+  }
+
   // Redirecionar usuários logados para longe das páginas de autenticação
   if (isAuthPage && isLoggedIn) {
+    // Redirect based on user type
+    if (isAdmin) {
+      return NextResponse.redirect(new URL('/admin', req.nextUrl));
+    }
     return NextResponse.redirect(new URL('/explore', req.nextUrl));
   }
 
@@ -45,6 +71,7 @@ export const config = {
     '/create-card',
     '/popular-cards',
     '/new-session',
+    '/admin/:path*',
     '/login',
     '/register',
   ],
