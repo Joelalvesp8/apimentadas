@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 import { sendApprovalEmail } from '@/lib/email-service';
 
 export const dynamic = 'force-dynamic';
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
     if (!user) return unauthorizedResponse();
 
     // Check if user is admin
-    if (user.email !== 'joelalvesp8@gmail.com') {
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Acesso negado - Admin apenas' }, { status: 403 });
     }
 
@@ -50,7 +51,7 @@ export async function PATCH(request: NextRequest) {
     if (!user) return unauthorizedResponse();
 
     // Check if user is admin
-    if (user.email !== 'joelalvesp8@gmail.com') {
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Acesso negado - Admin apenas' }, { status: 403 });
     }
 

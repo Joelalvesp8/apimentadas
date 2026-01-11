@@ -1,7 +1,9 @@
 import { Resend } from 'resend';
 import { getWaitlistConfirmationEmail, getApprovalEmail } from './email-templates';
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Apimentadas <onboarding@resend.dev>';
+// Temporarily force fallback email until apimentadas.app domain is verified on Resend
+// TODO: Remove this override once domain is verified and use: process.env.EMAIL_FROM
+const FROM_EMAIL = 'Apimentadas <onboarding@resend.dev>';
 
 export interface SendEmailResult {
   success: boolean;

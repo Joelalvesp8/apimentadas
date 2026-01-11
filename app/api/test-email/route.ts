@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { sendWaitlistConfirmation } from '@/lib/email-service';
 
 export async function GET() {
-  const testEmail = 'joelalvesp8@gmail.com'; // Usando seu email admin
+  const testEmail = 'joelalvesp8@icloud.com'; // Usando email do admin
 
   console.log('='.repeat(80));
   console.log('[TEST] Starting email test...');

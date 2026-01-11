@@ -50,7 +50,8 @@ export const authConfig: NextAuthConfig = {
         }
 
         // Check if user is approved (admin is always approved)
-        if (!user.approved && user.email !== 'joelalvesp8@gmail.com') {
+        // Admin email: joelalvesp8@icloud.com
+        if (!user.approved && user.email !== 'joelalvesp8@icloud.com') {
           throw new Error('Sua conta ainda não foi aprovada. Aguarde a aprovação do administrador.');
         }
 

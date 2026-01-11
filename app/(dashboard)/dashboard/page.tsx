@@ -29,6 +29,14 @@ export default function DashboardPage() {
   const { data: activeSessions, isLoading: activeSessionsLoading } = useActiveSessions();
   const { data: adminData } = useIsAdmin();
 
+  // Redirect admin to admin panel - admins don't participate in the game
+  useEffect(() => {
+    if (adminData?.isAdmin) {
+      console.log('[DEBUG] Dashboard - User is admin, redirecting to admin panel');
+      router.push('/admin');
+    }
+  }, [adminData, router]);
+
   // Only redirect to onboarding if profile truly doesn't exist (404 error)
   useEffect(() => {
     if (!profileLoading && !profile && profileError) {
