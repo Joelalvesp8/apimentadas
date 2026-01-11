@@ -1,12 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  useAdminUserCards,
-  useApproveUserCard,
-  useDeleteUserCard,
-  UserCard,
-} from '@/hooks/useAdmin';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import { useApproveUserCard, useDeleteUserCard } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, Trash2, Plus, Eye } from 'lucide-react';
+import { Check, X, Trash2, Plus, Eye, Shield } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -34,13 +31,37 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export default function AdminCardsPage() {
-  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'all'>('pending');
-  const [deleteDialogCard, setDeleteDialogCard] = useState<UserCard | null>(null);
-  const [viewCardDialog, setViewCardDialog] = useState<UserCard | null>(null);
+interface AllCard {
+  id: string;
+  content: string;
+  type: string;
+  category: string;
+  difficulty: string;
+  approved: boolean;
+  isOfficial: boolean;
+  createdBy: string;
+  createdByEmail: string;
+  createdAt: string;
+  likesCount: number;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
 
-  // Hooks
-  const { data: userCards, isLoading: cardsLoading } = useAdminUserCards(activeTab);
+export default function AdminCardsPage() {
+  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'official' | 'all'>('official');
+  const [deleteDialogCard, setDeleteDialogCard] = useState<AllCard | null>(null);
+  const [viewCardDialog, setViewCardDialog] = useState<AllCard | null>(null);
+  const queryClient = useQueryClient();
+
+  // Fetch all cards
+  const { data: allCards, isLoading: cardsLoading } = useQuery({
+    queryKey: ['admin', 'all-cards', activeTab],
+    queryFn: () => apiClient.get<AllCard[]>(`/api/admin/all-cards?status=${activeTab}`),
+  });
+
   const approveCard = useApproveUserCard();
   const deleteCard = useDeleteUserCard();
 
@@ -85,9 +106,10 @@ export default function AdminCardsPage() {
   };
 
   const stats = {
-    pending: userCards?.filter((c) => !c.approved).length || 0,
-    approved: userCards?.filter((c) => c.approved).length || 0,
-    total: userCards?.length || 0,
+    pending: allCards?.filter((c) => !c.isOfficial && !c.approved).length || 0,
+    approved: allCards?.filter((c) => c.approved).length || 0,
+    official: allCards?.filter((c) => c.isOfficial).length || 0,
+    total: allCards?.length || 0,
   };
 
   if (cardsLoading) {
@@ -123,7 +145,18 @@ export default function AdminCardsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-zinc-900/60 border-zinc-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm text-gray-400 font-normal">
+              Cartas Oficiais
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-blue-500">{stats.official}</p>
+          </CardContent>
+        </Card>
+
         <Card className="bg-zinc-900/60 border-zinc-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm text-gray-400 font-normal">
@@ -162,6 +195,12 @@ export default function AdminCardsPage() {
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
         <TabsList className="bg-zinc-900/90 border border-zinc-800">
           <TabsTrigger
+            value="official"
+            className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
+          >
+            Oficiais ({stats.official})
+          </TabsTrigger>
+          <TabsTrigger
             value="pending"
             className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
           >
@@ -196,16 +235,17 @@ export default function AdminCardsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {!userCards || userCards.length === 0 ? (
+                  {!allCards || allCards.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                         Nenhuma carta encontrada
                       </TableCell>
                     </TableRow>
                   ) : (
-                    userCards.map((card) => (
+                    allCards.map((card) => (
                       <TableRow key={card.id} className="border-zinc-800 hover:bg-zinc-800/50">
                         <TableCell className="text-white font-medium max-w-md truncate">
+                          {card.isOfficial && <Shield className="inline w-4 h-4 mr-2 text-blue-500" />}
                           {card.content}
                         </TableCell>
                         <TableCell>
@@ -219,11 +259,11 @@ export default function AdminCardsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-gray-400">
-                          {card.user?.name || 'N/A'}
+                          {card.createdBy}
                         </TableCell>
                         <TableCell>
                           <Badge className={card.approved ? 'bg-green-900/50 text-green-300' : 'bg-yellow-900/50 text-yellow-300'}>
-                            {card.approved ? 'Aprovada' : 'Pendente'}
+                            {card.isOfficial ? 'Oficial' : card.approved ? 'Aprovada' : 'Pendente'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -236,7 +276,7 @@ export default function AdminCardsPage() {
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            {!card.approved && (
+                            {!card.isOfficial && !card.approved && (
                               <Button
                                 size="sm"
                                 onClick={() => handleApprove(card.id)}
@@ -246,14 +286,16 @@ export default function AdminCardsPage() {
                                 <Check className="w-4 h-4" />
                               </Button>
                             )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setDeleteDialogCard(card)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {!card.isOfficial && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setDeleteDialogCard(card)}
+                                className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
