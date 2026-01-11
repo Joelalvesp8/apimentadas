@@ -269,9 +269,12 @@ export default function AdminSalesPage() {
                           #{order.id.slice(0, 8)}
                         </TableCell>
                         <TableCell className="text-gray-400">{order.buyer.nickname}</TableCell>
-                        <TableCell className="text-gray-400">{order.product.name}</TableCell>
+                        <TableCell className="text-gray-400">
+                          {order.orderItems.length > 0 ? order.orderItems[0].productName : '-'}
+                          {order.orderItems.length > 1 && ` +${order.orderItems.length - 1}`}
+                        </TableCell>
                         <TableCell className="text-white font-semibold">
-                          R$ {order.totalPrice.toFixed(2)}
+                          R$ {order.totalAmount.toFixed(2)}
                         </TableCell>
                         <TableCell>{getOrderStatusBadge(order.status)}</TableCell>
                         <TableCell className="text-gray-400">
@@ -319,30 +322,45 @@ export default function AdminSalesPage() {
                   <div className="mt-1">{getOrderStatusBadge(orderDetailsDialog.status)}</div>
                 </div>
               </div>
+
               <div>
-                <label className="text-sm text-gray-400">Produto</label>
-                <p className="text-white mt-1">{orderDetailsDialog.product.name}</p>
+                <label className="text-sm text-gray-400 mb-2 block">Itens do Pedido</label>
+                <div className="space-y-2">
+                  {orderDetailsDialog.orderItems.map((item, index) => (
+                    <div key={item.id} className="bg-zinc-800/50 p-3 rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-white font-medium">{item.productName}</p>
+                          <p className="text-sm text-gray-400">
+                            {item.quantity}x R$ {item.productPrice.toFixed(2)}
+                          </p>
+                        </div>
+                        <p className="text-white font-semibold">R$ {item.subtotal.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm text-gray-400">Quantidade</label>
-                  <p className="text-white mt-1">{orderDetailsDialog.quantity} un.</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Preço Unitário</label>
-                  <p className="text-white mt-1">R$ {orderDetailsDialog.unitPrice.toFixed(2)}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Total</label>
-                  <p className="text-white mt-1 font-bold">R$ {orderDetailsDialog.totalPrice.toFixed(2)}</p>
+
+              <div className="border-t border-zinc-700 pt-3">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm text-gray-400">Total do Pedido</label>
+                  <p className="text-white text-xl font-bold">R$ {orderDetailsDialog.totalAmount.toFixed(2)}</p>
                 </div>
               </div>
-              {orderDetailsDialog.shippingAddress && (
-                <div>
-                  <label className="text-sm text-gray-400">Endereço de Entrega</label>
-                  <p className="text-white mt-1">{orderDetailsDialog.shippingAddress}</p>
-                </div>
-              )}
+
+              <div>
+                <label className="text-sm text-gray-400">Endereço de Entrega</label>
+                <p className="text-white mt-1">
+                  {orderDetailsDialog.deliveryAddress}
+                  {orderDetailsDialog.deliveryComplement && `, ${orderDetailsDialog.deliveryComplement}`}
+                </p>
+                <p className="text-gray-400 text-sm">
+                  {orderDetailsDialog.deliveryCity} - {orderDetailsDialog.deliveryState}
+                </p>
+                <p className="text-gray-400 text-sm">CEP: {orderDetailsDialog.deliveryZipCode}</p>
+              </div>
+
               <div>
                 <label className="text-sm text-gray-400">Data do Pedido</label>
                 <p className="text-white mt-1">
