@@ -46,7 +46,7 @@ export default function AdminCardsPage() {
 
   const handleApprove = async (id: string) => {
     try {
-      await approveCard.mutateAsync(id);
+      await approveCard.mutateAsync({ id, approved: true });
     } catch (error) {
       console.error('Error approving card:', error);
       alert('Erro ao aprovar carta');
@@ -206,7 +206,7 @@ export default function AdminCardsPage() {
                     userCards.map((card) => (
                       <TableRow key={card.id} className="border-zinc-800 hover:bg-zinc-800/50">
                         <TableCell className="text-white font-medium max-w-md truncate">
-                          {card.question}
+                          {card.content}
                         </TableCell>
                         <TableCell>
                           <Badge className={getCategoryBadgeColor(card.category)}>
@@ -276,7 +276,7 @@ export default function AdminCardsPage() {
             <div className="space-y-4">
               <div>
                 <label className="text-sm text-gray-400">Pergunta</label>
-                <p className="text-white mt-1">{viewCardDialog.question}</p>
+                <p className="text-white mt-1">{viewCardDialog.content}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
