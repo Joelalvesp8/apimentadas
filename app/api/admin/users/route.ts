@@ -23,8 +23,14 @@ export async function GET() {
         createdAt: true,
         _count: {
           select: {
-            sessions: true,
-            connections: true,
+            gameSessions: true,
+            userCards: true,
+          },
+        },
+        profile: {
+          select: {
+            nickname: true,
+            sessionsPlayed: true,
           },
         },
       },
@@ -33,7 +39,20 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ data: users });
+    // Transform data to match expected interface
+    const transformedUsers = users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      approved: u.approved,
+      createdAt: u.createdAt,
+      _count: {
+        sessions: u._count.gameSessions,
+        connections: u.profile?.sessionsPlayed || 0,
+      },
+    }));
+
+    return NextResponse.json({ data: transformedUsers });
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json({ error: 'Erro ao buscar usuários' }, { status: 500 });
