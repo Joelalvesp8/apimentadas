@@ -268,7 +268,7 @@ export default function AdminSalesPage() {
                         <TableCell className="text-white font-mono text-sm">
                           #{order.id.slice(0, 8)}
                         </TableCell>
-                        <TableCell className="text-gray-400">{order.buyer.name}</TableCell>
+                        <TableCell className="text-gray-400">{order.buyer.nickname}</TableCell>
                         <TableCell className="text-gray-400">{order.product.name}</TableCell>
                         <TableCell className="text-white font-semibold">
                           R$ {order.totalPrice.toFixed(2)}
@@ -311,8 +311,8 @@ export default function AdminSalesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-gray-400">Cliente</label>
-                  <p className="text-white mt-1">{orderDetailsDialog.buyer.name}</p>
-                  <p className="text-sm text-gray-500">{orderDetailsDialog.buyer.email}</p>
+                  <p className="text-white mt-1">{orderDetailsDialog.buyer.nickname}</p>
+                  <p className="text-sm text-gray-500">{orderDetailsDialog.buyer.user.email}</p>
                 </div>
                 <div>
                   <label className="text-sm text-gray-400">Status</label>
