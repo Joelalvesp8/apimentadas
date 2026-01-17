@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export function WaitlistForm() {
   const [email, setEmail] = useState('');
@@ -61,9 +62,17 @@ export function WaitlistForm() {
             Em breve você receberá um email com instruções para acessar o Apimentadas.
           </p>
 
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 mb-8">
             Fique atento à sua caixa de entrada.
           </p>
+
+          <Link href="/login">
+            <Button
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-lg hover:shadow-red-500/50 transition-all"
+            >
+              Fazer Login
+            </Button>
+          </Link>
         </div>
       </section>
     );
@@ -127,6 +136,18 @@ export function WaitlistForm() {
           <p className="text-xs text-gray-500 mt-4">
             Sem spam. Apenas quando for a hora certa.
           </p>
+
+          <div className="mt-6 pt-6 border-t border-gray-800">
+            <p className="text-sm text-gray-400">
+              Já tem conta?{' '}
+              <Link
+                href="/login"
+                className="text-red-500 hover:text-red-400 font-semibold underline-offset-4 hover:underline transition-colors"
+              >
+                Faça login aqui
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </section>

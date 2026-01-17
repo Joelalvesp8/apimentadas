@@ -1,12 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
-interface HeroProps {
-  onCTAClick: () => void;
-}
-
-export function Hero({ onCTAClick }: HeroProps) {
+export function Hero() {
+  const router = useRouter();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
       {/* Background Image with Overlay */}
@@ -45,11 +43,11 @@ export function Hero({ onCTAClick }: HeroProps) {
         </p>
 
         <Button
-          onClick={onCTAClick}
+          onClick={() => router.push('/login')}
           size="lg"
           className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg px-12 py-6 shadow-[0_0_40px_rgba(220,38,38,0.6)] hover:shadow-[0_0_60px_rgba(220,38,38,0.9)] transition-all duration-500 border-2 border-red-600/50 hover:border-red-500/80 animate-fade-in-delay-2"
         >
-          Entrar na lista de espera
+          Entrar no Jogo
         </Button>
       </div>
 
