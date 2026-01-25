@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Validate request
     const validatedData = createOnlineSessionSchema.parse(body);
-    const { participantIds, difficulty } = validatedData;
+    const { participantIds, difficulty, sessionType: requestedSessionType } = validatedData;
 
     // Get user's profile
     const creatorProfile = await prisma.profile.findUnique({
@@ -56,18 +56,23 @@ export async function POST(request: NextRequest) {
       participantIds.push(creatorProfile.id);
     }
 
-    // Determine session type based on participant count
+    // Determine session type: use requested type or auto-determine based on participant count
     let sessionType: string;
-    const participantCount = participantIds.length;
 
-    if (participantCount === 1) {
-      sessionType = 'solteiro';
-    } else if (participantCount === 2) {
-      sessionType = 'casal';
-    } else if (participantCount === 3) {
-      sessionType = 'trisal';
+    if (requestedSessionType) {
+      // Use explicitly requested session type (e.g., 'solteiro' for singles mixer)
+      sessionType = requestedSessionType;
     } else {
-      sessionType = 'grupo';
+      // Auto-determine based on participant count
+      const participantCount = participantIds.length;
+
+      if (participantCount === 2) {
+        sessionType = 'casal';
+      } else if (participantCount === 3) {
+        sessionType = 'trisal';
+      } else {
+        sessionType = 'grupo';
+      }
     }
 
     // Create online session

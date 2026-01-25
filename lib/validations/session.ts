@@ -25,6 +25,7 @@ export const createOnlineSessionSchema = z.object({
     .min(1, 'Modo online requer no mínimo 1 participante adicional (você + 1 = 2 jogadores)')
     .max(10, 'Máximo de 10 participantes'),
   difficulty: z.enum(['facil', 'medio', 'dificil', 'extremo']).optional(),
+  sessionType: z.enum(['casal', 'trisal', 'grupo', 'solteiro']).optional(),
 });
 
 export const submitAnswerSchema = z.object({

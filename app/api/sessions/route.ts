@@ -127,9 +127,7 @@ export async function POST(request: NextRequest) {
     const totalParticipants = participantIds.length + 1; // +1 for creator
     let sessionType: string;
 
-    if (totalParticipants === 1) {
-      sessionType = 'solteiro';
-    } else if (totalParticipants === 2) {
+    if (totalParticipants === 2) {
       sessionType = 'casal';
     } else if (totalParticipants === 3) {
       sessionType = 'trisal';
