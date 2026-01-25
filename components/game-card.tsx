@@ -77,7 +77,7 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: 'url(/card-background.jpg)',
+                backgroundImage: 'url(/card-background.png)',
               }}
             />
 
