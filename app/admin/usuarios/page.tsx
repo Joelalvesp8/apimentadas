@@ -60,7 +60,7 @@ export default function AdminUsersPage() {
   });
 
   // Fetch all users
-  const { data: usersData, isLoading: usersLoading } = useQuery({
+  const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
       const res = await fetch('/api/admin/users');
@@ -69,6 +69,27 @@ export default function AdminUsersPage() {
       return data.data as User[];
     },
   });
+
+  const updateUserStatus = async (userId: string, approved: boolean) => {
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          approved,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update user');
+
+      await refetchUsers();
+      alert(`Usuário ${approved ? 'aprovado' : 'rejeitado'} com sucesso!`);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Erro ao atualizar usuário');
+    }
+  };
 
   const updateWaitlistStatus = async (id: string, status: 'approved' | 'rejected') => {
     try {
@@ -361,6 +382,7 @@ export default function AdminUsersPage() {
                     <TableHead className="text-gray-400">Sessões</TableHead>
                     <TableHead className="text-gray-400">Conexões</TableHead>
                     <TableHead className="text-gray-400">Cadastro</TableHead>
+                    <TableHead className="text-gray-400 text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -369,7 +391,7 @@ export default function AdminUsersPage() {
                       <TableCell className="text-white font-medium">{user.name}</TableCell>
                       <TableCell className="text-gray-400">{user.email}</TableCell>
                       <TableCell>
-                        <Badge className={user.approved ? 'bg-green-900/50 text-green-300' : 'bg-yellow-900/50 text-yellow-300'}>
+                        <Badge className={user.approved ? 'bg-green-900/50 text-green-300 border-green-700/50' : 'bg-yellow-900/50 text-yellow-300 border-yellow-700/50'}>
                           {user.approved ? 'Aprovado' : 'Pendente'}
                         </Badge>
                       </TableCell>
@@ -377,6 +399,29 @@ export default function AdminUsersPage() {
                       <TableCell className="text-gray-400">{user._count.connections}</TableCell>
                       <TableCell className="text-gray-400">
                         {new Date(user.createdAt).toLocaleDateString('pt-BR')}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!user.approved && (
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => updateUserStatus(user.id, true)}
+                              className="bg-green-900/50 hover:bg-green-800 text-green-200 border border-green-700/50"
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Aprovar
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => updateUserStatus(user.id, false)}
+                              variant="outline"
+                              className="border-red-700/50 text-red-300 hover:bg-red-900/50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Rejeitar
+                            </Button>
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

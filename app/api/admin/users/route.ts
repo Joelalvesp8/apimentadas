@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
 import { isAdmin } from '@/lib/utils/admin-helper';
@@ -56,5 +56,36 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json({ error: 'Erro ao buscar usuários' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const user = await getAuthenticatedUser();
+
+    if (!user || !isAdmin(user)) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { userId, approved } = body;
+
+    if (!userId || typeof approved !== 'boolean') {
+      return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
+    }
+
+    // Update user approval status
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { approved },
+    });
+
+    return NextResponse.json({
+      data: updatedUser,
+      message: `Usuário ${approved ? 'aprovado' : 'rejeitado'} com sucesso`
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return NextResponse.json({ error: 'Erro ao atualizar usuário' }, { status: 500 });
   }
 }
