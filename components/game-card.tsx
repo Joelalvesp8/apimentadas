@@ -72,19 +72,28 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
 
         {/* Back */}
         <div className="flip-card-back">
-          <Card className="w-full h-full flex flex-col bg-white border-4 border-purple-500">
-            <CardContent className="p-8 flex flex-col h-full justify-between">
-              <div className="space-y-4">
-                <div className="flex gap-2 justify-center">
-                  <Badge>
+          <Card className="w-full h-full flex flex-col overflow-hidden border-none relative">
+            {/* Background Image */}
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: 'url(/card-background.jpg)',
+              }}
+            />
+
+            {/* Content Overlay */}
+            <CardContent className="relative z-10 p-8 flex flex-col h-full justify-between">
+              <div className="space-y-6">
+                <div className="flex gap-2 justify-center flex-wrap">
+                  <Badge className="bg-white/90 text-gray-900 hover:bg-white border border-amber-400">
                     {typeLabels[card.type as keyof typeof typeLabels]}
                   </Badge>
-                  <Badge variant="secondary">
+                  <Badge className="bg-white/90 text-gray-900 hover:bg-white border border-amber-400">
                     {categoryLabels[card.category as keyof typeof categoryLabels]}
                   </Badge>
                   <Badge
                     className={cn(
-                      'text-white',
+                      'text-white border border-amber-400',
                       difficultyColors[card.difficulty as keyof typeof difficultyColors]
                     )}
                   >
@@ -92,12 +101,14 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
                   </Badge>
                 </div>
 
-                <div className="text-center">
-                  <p className="text-lg leading-relaxed">{card.content}</p>
+                <div className="text-center px-4 py-8">
+                  <p className="text-xl md:text-2xl font-serif leading-relaxed text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                    {card.content}
+                  </p>
                 </div>
               </div>
 
-              <p className="text-xs text-center text-muted-foreground">
+              <p className="text-sm text-center text-white/70 drop-shadow-lg">
                 Clique para virar
               </p>
             </CardContent>
