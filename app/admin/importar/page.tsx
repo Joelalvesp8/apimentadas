@@ -333,7 +333,7 @@ tarefa,grupos,extremo,"Tire uma peça de roupa"`;
           </ul>
           <p><strong className="text-white">3.</strong> Salve como CSV (separado por vírgula)</p>
           <p><strong className="text-white">4.</strong> Faça upload do arquivo</p>
-          <p><strong className="text-white">5.</strong> Confira o preview e clique em "Importar Cartas"</p>
+          <p><strong className="text-white">5.</strong> Confira o preview e clique em &quot;Importar Cartas&quot;</p>
         </CardContent>
       </Card>
     </div>
