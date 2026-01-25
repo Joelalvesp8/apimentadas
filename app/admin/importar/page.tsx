@@ -300,16 +300,16 @@ tarefa,grupos,extremo,"Tire uma peça de roupa"`;
             {result.messages.length > 0 && (
               <Alert className="bg-zinc-800 border-zinc-700">
                 <AlertDescription className="text-gray-300">
-                  <ul className="list-disc list-inside space-y-1">
-                    {result.messages.slice(0, 10).map((msg, i) => (
-                      <li key={i} className="text-sm">{msg}</li>
-                    ))}
-                    {result.messages.length > 10 && (
-                      <li className="text-sm text-gray-500">
-                        ... e mais {result.messages.length - 10} mensagens
-                      </li>
-                    )}
-                  </ul>
+                  <div className="max-h-96 overflow-y-auto pr-2">
+                    <ul className="list-disc list-inside space-y-1">
+                      {result.messages.map((msg, i) => (
+                        <li key={i} className="text-sm">{msg}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-zinc-700">
+                    Total de mensagens: {result.messages.length}
+                  </p>
                 </AlertDescription>
               </Alert>
             )}
