@@ -94,12 +94,16 @@ export async function POST(
       return errorResponse('Não é sua vez de pegar uma carta', 403);
     }
 
-    // Check if card exists
-    const card = await prisma.card.findUnique({
+    // Check if card exists (can be official card or user-created card)
+    const officialCard = await prisma.card.findUnique({
       where: { id: cardId },
     });
 
-    if (!card) {
+    const userCard = !officialCard ? await prisma.userCard.findUnique({
+      where: { id: cardId },
+    }) : null;
+
+    if (!officialCard && !userCard) {
       return errorResponse('Carta não encontrada', 404);
     }
 
