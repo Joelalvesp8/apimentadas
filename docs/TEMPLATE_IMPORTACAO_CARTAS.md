@@ -18,6 +18,7 @@ A planilha deve ter as seguintes colunas (em ordem):
 - `casais` - Para 2 pessoas
 - `trios` - Para 3 pessoas
 - `grupos` - Para 4+ pessoas
+- `solteiros` - Para solteiros flertarem e se conhecerem
 
 ### Difficulty (Dificuldade):
 - `facil` - Perguntas/tarefas fáceis
@@ -31,12 +32,13 @@ A planilha deve ter as seguintes colunas (em ordem):
 
 ## Exemplo de Planilha:
 
-| type     | category | difficulty | content                                           |
-|----------|----------|------------|---------------------------------------------------|
-| pergunta | casais   | facil      | Qual foi o seu primeiro beijo?                    |
-| tarefa   | casais   | medio      | Dê um beijo de 10 segundos no seu parceiro        |
-| pergunta | trios    | dificil    | Qual é a sua maior fantasia sexual?               |
-| tarefa   | grupos   | extremo    | Tire uma peça de roupa                            |
+| type     | category  | difficulty | content                                           |
+|----------|-----------|------------|---------------------------------------------------|
+| pergunta | casais    | facil      | Qual foi o seu primeiro beijo?                    |
+| tarefa   | casais    | medio      | Dê um beijo de 10 segundos no seu parceiro        |
+| pergunta | trios     | dificil    | Qual é a sua maior fantasia sexual?               |
+| tarefa   | grupos    | extremo    | Tire uma peça de roupa                            |
+| pergunta | solteiros | facil      | O que você procura em um relacionamento?          |
 
 ## Formato do Arquivo:
 - **CSV** (recomendado): arquivo .csv separado por vírgula

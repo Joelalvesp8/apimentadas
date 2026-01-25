@@ -60,7 +60,9 @@ export async function POST(request: NextRequest) {
     let sessionType: string;
     const participantCount = participantIds.length;
 
-    if (participantCount === 2) {
+    if (participantCount === 1) {
+      sessionType = 'solteiro';
+    } else if (participantCount === 2) {
       sessionType = 'casal';
     } else if (participantCount === 3) {
       sessionType = 'trisal';

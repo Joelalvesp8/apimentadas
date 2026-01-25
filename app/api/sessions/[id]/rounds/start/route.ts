@@ -119,12 +119,13 @@ export async function POST(
     }).then((rounds) => rounds.map((r) => r.cardId));
 
     // Map sessionType (singular) to card category (plural)
-    // sessionType: "casal" | "trisal" | "grupo"
-    // card category: "casais" | "trios" | "grupos"
+    // sessionType: "casal" | "trisal" | "grupo" | "solteiro"
+    // card category: "casais" | "trios" | "grupos" | "solteiros"
     const categoryMap: Record<string, string> = {
       casal: 'casais',
       trisal: 'trios',
       grupo: 'grupos',
+      solteiro: 'solteiros',
     };
 
     const cardCategory = categoryMap[session.sessionType] || session.sessionType;

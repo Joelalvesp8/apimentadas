@@ -4,8 +4,8 @@ export const createCardSchema = z.object({
   type: z.enum(['pergunta', 'tarefa'], {
     errorMap: () => ({ message: 'Tipo deve ser "pergunta" ou "tarefa"' }),
   }),
-  category: z.enum(['casais', 'trios', 'grupos'], {
-    errorMap: () => ({ message: 'Categoria deve ser "casais", "trios" ou "grupos"' }),
+  category: z.enum(['casais', 'trios', 'grupos', 'solteiros'], {
+    errorMap: () => ({ message: 'Categoria deve ser "casais", "trios", "grupos" ou "solteiros"' }),
   }),
   difficulty: z.enum(['facil', 'medio', 'dificil', 'extremo'], {
     errorMap: () => ({

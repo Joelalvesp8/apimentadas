@@ -21,7 +21,7 @@ export default function CreateCardPage() {
   const createUserCard = useCreateUserCard();
 
   const [type, setType] = useState<'pergunta' | 'tarefa'>('pergunta');
-  const [category, setCategory] = useState<'casais' | 'trios' | 'grupos'>('casais');
+  const [category, setCategory] = useState<'casais' | 'trios' | 'grupos' | 'solteiros'>('casais');
   const [difficulty, setDifficulty] = useState<'facil' | 'medio' | 'dificil' | 'extremo'>('facil');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
@@ -136,8 +136,8 @@ export default function CreateCardPage() {
               {/* Category Selection */}
               <div className="space-y-2">
                 <Label className="text-gray-200 font-medium">Categoria *</Label>
-                <div className="grid grid-cols-3 gap-3">
-                  {(['casais', 'trios', 'grupos'] as const).map((cat) => (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {(['casais', 'trios', 'grupos', 'solteiros'] as const).map((cat) => (
                     <button
                       key={cat}
                       type="button"

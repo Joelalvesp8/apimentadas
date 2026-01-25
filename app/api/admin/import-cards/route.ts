@@ -21,7 +21,7 @@ interface ImportResult {
 }
 
 const VALID_TYPES = ['pergunta', 'tarefa'];
-const VALID_CATEGORIES = ['casais', 'trios', 'grupos'];
+const VALID_CATEGORIES = ['casais', 'trios', 'grupos', 'solteiros'];
 const VALID_DIFFICULTIES = ['facil', 'medio', 'dificil', 'extremo'];
 
 export async function POST(request: NextRequest) {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       if (!VALID_CATEGORIES.includes(card.category.toLowerCase())) {
         result.errors++;
         result.messages.push(
-          `Linha ${lineNumber}: Categoria inválida "${card.category}". Use: casais, trios ou grupos`
+          `Linha ${lineNumber}: Categoria inválida "${card.category}". Use: casais, trios, grupos ou solteiros`
         );
         continue;
       }

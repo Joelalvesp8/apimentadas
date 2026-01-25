@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const VALID_TYPES = ['pergunta', 'tarefa'];
-const VALID_CATEGORIES = ['casais', 'trios', 'grupos'];
+const VALID_CATEGORIES = ['casais', 'trios', 'grupos', 'solteiros'];
 const VALID_DIFFICULTIES = ['facil', 'leve', 'medio', 'dificil', 'picante', 'extremo'];
 
 export async function POST(req: NextRequest) {
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (!category || !VALID_CATEGORIES.includes(category)) {
-        validationErrors.push(`category deve ser "casais", "trios" ou "grupos", recebido: "${category}"`);
+        validationErrors.push(`category deve ser "casais", "trios", "grupos" ou "solteiros", recebido: "${category}"`);
       }
 
       if (!difficulty || !VALID_DIFFICULTIES.includes(difficulty)) {

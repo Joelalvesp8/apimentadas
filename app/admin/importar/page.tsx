@@ -327,7 +327,7 @@ tarefa,grupos,extremo,"Tire uma peça de roupa"`;
           <p><strong className="text-white">2.</strong> Preencha com suas cartas seguindo o formato:</p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li><strong>type:</strong> pergunta ou tarefa</li>
-            <li><strong>category:</strong> casais, trios ou grupos</li>
+            <li><strong>category:</strong> casais, trios, grupos ou solteiros</li>
             <li><strong>difficulty:</strong> facil, medio, dificil ou extremo</li>
             <li><strong>content:</strong> texto da pergunta/tarefa</li>
           </ul>
