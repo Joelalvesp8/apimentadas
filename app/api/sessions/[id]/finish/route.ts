@@ -51,42 +51,85 @@ export async function POST(
       return errorResponse('Você não pode finalizar esta sessão', 403);
     }
 
-    // Finish session
-    const finishedSession = await prisma.gameSession.update({
-      where: { id: params.id },
-      data: {
-        status: 'finished',
-        finishedAt: new Date(),
-      },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
+    // Finish session and update participant stats in transaction
+    const finishedSession = await prisma.$transaction(async (tx) => {
+      // 1. Mark session as finished
+      const updated = await tx.gameSession.update({
+        where: { id: params.id },
+        data: {
+          status: 'finished',
+          finishedAt: new Date(),
         },
-        sessionParticipants: {
-          include: {
-            profile: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    name: true,
-                    image: true,
+        include: {
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          sessionParticipants: {
+            include: {
+              profile: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                      image: true,
+                    },
                   },
                 },
               },
             },
           },
-        },
-        playedCards: {
-          include: {
-            card: true,
+          playedCards: {
+            include: {
+              card: true,
+            },
           },
         },
-      },
+      });
+
+      // 2. Update stats for each participant
+      for (const participant of updated.sessionParticipants) {
+        const profileId = participant.profileId;
+
+        // Get all finished sessions where this profile participated
+        const allFinishedSessions = await tx.gameSession.findMany({
+          where: {
+            status: 'finished',
+            sessionParticipants: {
+              some: {
+                profileId: profileId,
+              },
+            },
+          },
+          select: {
+            id: true,
+            averageRating: true,
+          },
+        });
+
+        // Calculate overall average rating across all sessions
+        const sessionsWithRating = allFinishedSessions.filter(s => s.averageRating !== null);
+        const totalRating = sessionsWithRating.reduce((sum, s) => sum + (s.averageRating || 0), 0);
+        const averageRating = sessionsWithRating.length > 0
+          ? totalRating / sessionsWithRating.length
+          : null;
+
+        // Update profile
+        await tx.profile.update({
+          where: { id: profileId },
+          data: {
+            sessionsPlayed: allFinishedSessions.length,
+            averageRating: averageRating,
+            lastActiveAt: new Date(),
+          },
+        });
+      }
+
+      return updated;
     });
 
     return successResponse(finishedSession);
