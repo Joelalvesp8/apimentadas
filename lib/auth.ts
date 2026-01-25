@@ -50,10 +50,7 @@ export const authConfig: NextAuthConfig = {
           throw new Error('Credenciais inválidas');
         }
 
-        // Check if user is approved (admin is always approved)
-        if (!user.approved && !isAdminEmail(user.email)) {
-          throw new Error('Sua conta ainda não foi aprovada. Aguarde a aprovação do administrador.');
-        }
+        // No approval check needed - all users are auto-approved on registration
 
         return {
           id: user.id,
@@ -65,9 +62,21 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
+      }
+      // Auto-approve OAuth users on first sign in
+      if (account && user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email || undefined },
+        });
+        if (dbUser && !dbUser.approved) {
+          await prisma.user.update({
+            where: { id: dbUser.id },
+            data: { approved: true },
+          });
+        }
       }
       return token;
     },

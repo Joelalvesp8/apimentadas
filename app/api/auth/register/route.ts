@@ -36,13 +36,14 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user (auto-approved - users can play immediately after registration)
     const user = await prisma.user.create({
       data: {
         email,
         name,
         password: hashedPassword,
         provider: 'credentials',
+        approved: true, // Auto-approve all new users
       },
       select: {
         id: true,
