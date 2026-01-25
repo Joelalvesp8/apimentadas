@@ -1,100 +1,157 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// POST /api/admin/import-cards - Import cards from JSON array
+interface ImportCard {
+  type: string;
+  category: string;
+  difficulty: string;
+  content: string;
+}
+
+interface ImportResult {
+  success: number;
+  errors: number;
+  duplicates: number;
+  messages: string[];
+}
+
+const VALID_TYPES = ['pergunta', 'tarefa'];
+const VALID_CATEGORIES = ['casais', 'trios', 'grupos'];
+const VALID_DIFFICULTIES = ['facil', 'medio', 'dificil', 'extremo'];
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const user = await getAuthenticatedUser();
 
-    if (!Array.isArray(body.cards)) {
-      return NextResponse.json(
-        { error: 'Body must contain "cards" array' },
-        { status: 400 }
-      );
+    if (!user || !isAdmin(user)) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
     }
 
-    const cards = body.cards;
+    const body = await request.json();
+    const { cards } = body as { cards: ImportCard[] };
 
-    console.log(`[IMPORT-CARDS] Starting import of ${cards.length} cards...`);
+    if (!Array.isArray(cards) || cards.length === 0) {
+      return NextResponse.json({ error: 'Nenhuma carta fornecida' }, { status: 400 });
+    }
 
-    // Validate each card
-    const errors = [];
+    const result: ImportResult = {
+      success: 0,
+      errors: 0,
+      duplicates: 0,
+      messages: [],
+    };
+
+    // Get existing cards to check for duplicates
+    const existingCards = await prisma.card.findMany({
+      select: { content: true },
+    });
+
+    const existingContents = new Set(
+      existingCards.map(c => c.content.toLowerCase().trim())
+    );
+
+    // Process each card
     for (let i = 0; i < cards.length; i++) {
       const card = cards[i];
+      const lineNumber = i + 2; // +2 because of header and 0-index
+
+      // Validation
       if (!card.type || !card.category || !card.difficulty || !card.content) {
-        errors.push(`Card ${i + 1}: Missing required fields (type, category, difficulty, content)`);
+        result.errors++;
+        result.messages.push(
+          `Linha ${lineNumber}: Campos obrigatórios faltando`
+        );
+        continue;
       }
-      if (!['pergunta', 'tarefa'].includes(card.type)) {
-        errors.push(`Card ${i + 1}: type must be "pergunta" or "tarefa"`);
+
+      if (!VALID_TYPES.includes(card.type.toLowerCase())) {
+        result.errors++;
+        result.messages.push(
+          `Linha ${lineNumber}: Tipo inválido "${card.type}". Use: pergunta ou tarefa`
+        );
+        continue;
       }
-      if (!['casais', 'trios', 'grupos'].includes(card.category)) {
-        errors.push(`Card ${i + 1}: category must be "casais", "trios", or "grupos"`);
+
+      if (!VALID_CATEGORIES.includes(card.category.toLowerCase())) {
+        result.errors++;
+        result.messages.push(
+          `Linha ${lineNumber}: Categoria inválida "${card.category}". Use: casais, trios ou grupos`
+        );
+        continue;
       }
-      if (!['facil', 'medio', 'dificil', 'extremo', 'picante'].includes(card.difficulty)) {
-        errors.push(`Card ${i + 1}: difficulty must be "facil", "medio", "dificil", "extremo", or "picante"`);
+
+      if (!VALID_DIFFICULTIES.includes(card.difficulty.toLowerCase())) {
+        result.errors++;
+        result.messages.push(
+          `Linha ${lineNumber}: Dificuldade inválida "${card.difficulty}". Use: facil, medio, dificil ou extremo`
+        );
+        continue;
+      }
+
+      // Check for duplicates
+      const normalizedContent = card.content.toLowerCase().trim();
+      if (existingContents.has(normalizedContent)) {
+        result.duplicates++;
+        result.messages.push(
+          `Linha ${lineNumber}: Carta duplicada (já existe no banco)`
+        );
+        continue;
+      }
+
+      // Create card
+      try {
+        await prisma.card.create({
+          data: {
+            type: card.type.toLowerCase(),
+            category: card.category.toLowerCase(),
+            difficulty: card.difficulty.toLowerCase(),
+            content: card.content.trim(),
+            isOfficial: true,
+          },
+        });
+
+        existingContents.add(normalizedContent);
+        result.success++;
+      } catch (error: any) {
+        result.errors++;
+        result.messages.push(
+          `Linha ${lineNumber}: Erro ao salvar - ${error.message}`
+        );
       }
     }
 
-    if (errors.length > 0) {
-      return NextResponse.json(
-        { error: 'Validation errors', details: errors },
-        { status: 400 }
+    // Summary message
+    if (result.success > 0) {
+      result.messages.unshift(
+        `✅ ${result.success} carta(s) importada(s) com sucesso`
       );
     }
 
-    // Insert cards
-    let insertedCount = 0;
-    const insertedIds = [];
-
-    for (const card of cards) {
-      const created = await prisma.card.create({
-        data: {
-          type: card.type,
-          category: card.category,
-          difficulty: card.difficulty,
-          content: card.content,
-          isOfficial: true,
-        },
-      });
-      insertedCount++;
-      insertedIds.push(created.id);
-
-      if (insertedCount % 10 === 0) {
-        console.log(`[IMPORT-CARDS] Inserted ${insertedCount}/${cards.length}...`);
-      }
+    if (result.duplicates > 0) {
+      result.messages.push(
+        `⚠️ ${result.duplicates} carta(s) ignorada(s) por serem duplicadas`
+      );
     }
 
-    console.log(`[IMPORT-CARDS] Successfully inserted ${insertedCount} cards`);
-
-    // Get updated stats
-    const stats = await prisma.card.groupBy({
-      by: ['type', 'category'],
-      _count: true,
-    });
-
-    const totalCards = await prisma.card.count();
+    if (result.errors > 0) {
+      result.messages.push(
+        `❌ ${result.errors} carta(s) com erro`
+      );
+    }
 
     return NextResponse.json({
-      success: true,
-      message: `Successfully imported ${insertedCount} cards`,
-      data: {
-        insertedCount,
-        totalCards,
-        stats,
-        insertedIds: insertedIds.slice(0, 5), // Show first 5 IDs
-      },
+      result,
+      message: `Importação concluída: ${result.success} sucesso, ${result.duplicates} duplicadas, ${result.errors} erros`,
     });
   } catch (error: any) {
-    console.error('[IMPORT-CARDS] Error:', error);
+    console.error('Error importing cards:', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-        stack: error.stack,
-      },
+      { error: 'Erro ao importar cartas', details: error.message },
       { status: 500 }
     );
   }

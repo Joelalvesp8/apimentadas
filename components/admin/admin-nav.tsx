@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { Users, FileText, ShoppingCart, LayoutDashboard, LogOut } from 'lucide-react';
+import { Users, FileText, ShoppingCart, LayoutDashboard, LogOut, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -24,6 +24,12 @@ const navItems = [
     href: '/admin/cartas',
     icon: FileText,
     description: 'Gerenciar, aprovar, editar cartas',
+  },
+  {
+    title: 'Importar',
+    href: '/admin/importar',
+    icon: Upload,
+    description: 'Importar cartas em massa via CSV/Excel',
   },
   {
     title: 'Vendas',
