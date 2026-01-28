@@ -264,7 +264,7 @@ export default function DashboardPage() {
                 <span className="text-xs md:text-sm text-center leading-tight">Ver Conexões</span>
               </Button>
             </Link>
-            <Link href="/create-card" className="w-full">
+            <Link href="/create-card" className="w-full" data-tour="create-card">
               <Button variant="outline" className="w-full h-24 md:h-20 bg-zinc-900/60 border-2 border-zinc-700/50 text-gray-300 hover:bg-zinc-800 hover:border-red-700/50 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 transition-all duration-300">
                 <span className="text-xl md:text-xl">🎴</span>
                 <span className="text-xs md:text-sm text-center leading-tight">Criar Carta</span>

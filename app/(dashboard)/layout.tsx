@@ -63,7 +63,7 @@ export default function DashboardLayout({
           </Link>
 
           <nav className="flex items-center gap-1 sm:gap-2">
-            <Link href="/dashboard">
+            <Link href="/dashboard" data-tour="new-session">
               <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
                 <Home className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Dashboard</span>
@@ -89,13 +89,13 @@ export default function DashboardLayout({
                 </Button>
               </Link>
             )}
-            <Link href="/profile">
+            <Link href="/profile" data-tour="profile">
               <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
                 <User className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Perfil</span>
               </Button>
             </Link>
-            <Link href="/connections">
+            <Link href="/connections" data-tour="connections">
               <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
                 <Users className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Conexões</span>

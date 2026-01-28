@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -12,8 +13,11 @@ import {
 } from '@/components/ui/select';
 import { useExploreUsers, useRequestConnection, useSendInvitation } from '@/hooks/useSocial';
 import { UserCard } from '@/components/explore/user-card';
-import { Search, Users, Loader2, Filter } from 'lucide-react';
+import { Search, Users, Loader2, Filter, HelpCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { GameTour } from '@/components/tour/game-tour';
+import { useTour } from '@/hooks/useTour';
+import { exploreTourSteps } from '@/lib/tour-steps';
 
 export default function ExplorePage() {
   const { toast } = useToast();
@@ -23,6 +27,19 @@ export default function ExplorePage() {
   const { data: users, isLoading, error } = useExploreUsers(search, orientation || undefined);
   const requestConnection = useRequestConnection();
   const sendInvitation = useSendInvitation();
+
+  const { isTourActive, hasCompletedTour, startTour, completeTour, skipTour } = useTour();
+
+  // Iniciar tour automaticamente para novos usuários
+  useEffect(() => {
+    if (!hasCompletedTour) {
+      // Aguardar 1 segundo para garantir que a página está completamente carregada
+      const timer = setTimeout(() => {
+        startTour();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasCompletedTour, startTour]);
 
   const handleConnect = async (userId: string) => {
     try {
@@ -50,7 +67,7 @@ export default function ExplorePage() {
       });
       toast({
         title: 'Convite enviado!',
-        description: 'O convite para sessão foi enviado com sucesso.',
+        description: 'O convite para sessão foi enviada com sucesso.',
       });
     } catch (error: any) {
       toast({
@@ -65,20 +82,38 @@ export default function ExplorePage() {
     <div className="min-h-screen bg-black py-6 px-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
+        <Card
+          className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]"
+          data-tour="explore-header"
+        >
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-red-900/40 rounded-lg">
-                <Users className="w-8 h-8 text-red-500" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-red-900/40 rounded-lg">
+                  <Users className="w-8 h-8 text-red-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-3xl font-bold text-white flex items-center gap-2">
+                    Explorar Usuários
+                  </CardTitle>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Descubra pessoas ativas na comunidade
+                  </p>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-3xl font-bold text-white flex items-center gap-2">
-                  Explorar Usuários
-                </CardTitle>
-                <p className="text-sm text-gray-400 mt-1">
-                  Descubra pessoas ativas na comunidade
-                </p>
-              </div>
+
+              {/* Botão de ajuda para reiniciar tour */}
+              {hasCompletedTour && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={startTour}
+                  className="border-red-700/50 text-red-400 hover:bg-red-950/30 hover:text-red-300"
+                >
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Ver Tutorial
+                </Button>
+              )}
             </div>
           </CardHeader>
         </Card>
@@ -88,7 +123,7 @@ export default function ExplorePage() {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search input */}
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-tour="search-input">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   type="text"
@@ -161,7 +196,7 @@ export default function ExplorePage() {
 
         {/* Users grid with UserCard component */}
         {!isLoading && !error && users && users.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-tour="online-users">
             {users.map((user) => (
               <UserCard
                 key={user.id}
@@ -182,6 +217,15 @@ export default function ExplorePage() {
           </div>
         )}
       </div>
+
+      {/* Tour Component */}
+      {isTourActive && (
+        <GameTour
+          steps={exploreTourSteps}
+          onComplete={completeTour}
+          onSkip={skipTour}
+        />
+      )}
     </div>
   );
 }
