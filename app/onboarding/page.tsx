@@ -92,13 +92,19 @@ export default function OnboardingPage() {
             <span className="text-5xl drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer">🌶️</span>
           </div>
           <CardTitle className="text-2xl text-center text-white font-bold drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
-            Última etapa
+            Complete seu Perfil
           </CardTitle>
           <CardDescription className="text-center text-gray-300">
-            Escolha seu nickname e complete seu perfil
+            Defina seu nickname para começar a jogar
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 p-3 bg-red-950/40 border border-red-700/50 rounded-md">
+            <p className="text-sm text-red-200 text-center">
+              ⚠️ O nickname é <strong>obrigatório</strong> para participar do jogo
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">

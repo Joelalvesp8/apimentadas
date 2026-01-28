@@ -1,12 +1,15 @@
 import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { isAdminEmail } from '@/lib/admin';
+import { prisma } from '@/lib/prisma';
 
-export default auth((req) => {
+export default auth(async (req) => {
   const isLoggedIn = !!req.auth;
   const isAuthPage = req.nextUrl.pathname.startsWith('/login') ||
                      req.nextUrl.pathname.startsWith('/register');
   const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
+  const isOnboardingPage = req.nextUrl.pathname === '/onboarding';
+  const isProfilePage = req.nextUrl.pathname === '/profile';
 
   // Check if user is admin
   const isAdmin = isAdminEmail(req.auth?.user?.email);
@@ -15,12 +18,12 @@ export default auth((req) => {
   const protectedRoutes = [
     '/dashboard',
     '/explore',
-    '/onboarding',
     '/connections',
     '/game',
     '/create-card',
     '/popular-cards',
     '/new-session',
+    '/profile',
   ];
 
   const isProtectedRoute = protectedRoutes.some(route =>
@@ -51,12 +54,41 @@ export default auth((req) => {
     if (isAdmin) {
       return NextResponse.redirect(new URL('/admin', req.nextUrl));
     }
+
+    // Check if user has completed profile (has nickname)
+    if (req.auth?.user?.id) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId: req.auth.user.id },
+        select: { nickname: true },
+      });
+
+      // If no profile or no nickname, redirect to onboarding
+      if (!profile || !profile.nickname) {
+        return NextResponse.redirect(new URL('/onboarding', req.nextUrl));
+      }
+    }
+
     return NextResponse.redirect(new URL('/explore', req.nextUrl));
   }
 
   // Redirecionar usuários não logados de rotas protegidas
   if (isProtectedRoute && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));
+  }
+
+  // Check if logged-in user has completed profile (mandatory nickname)
+  if (isLoggedIn && !isAdmin && !isOnboardingPage && !isProfilePage && !isAuthPage) {
+    if (req.auth?.user?.id) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId: req.auth.user.id },
+        select: { nickname: true },
+      });
+
+      // If no profile or no nickname, force redirect to onboarding
+      if (!profile || !profile.nickname) {
+        return NextResponse.redirect(new URL('/onboarding', req.nextUrl));
+      }
+    }
   }
 
   return NextResponse.next();
@@ -75,5 +107,6 @@ export const config = {
     '/admin/:path*',
     '/login',
     '/register',
+    '/profile/:path*',
   ],
 };
