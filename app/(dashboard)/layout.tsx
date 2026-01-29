@@ -16,7 +16,7 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { data: profile } = useProfile();
+  const { data: profile, isLoading: profileLoading } = useProfile();
 
   // Redirect to login only on client-side
   useEffect(() => {
@@ -25,8 +25,21 @@ export default function DashboardLayout({
     }
   }, [status, router]);
 
-  // Show loading state during auth check
-  if (status === 'loading') {
+  // Check if user has completed profile (has nickname)
+  useEffect(() => {
+    // Only check after both session and profile are loaded
+    if (status === 'authenticated' && !profileLoading) {
+      const isOnboardingPage = window.location.pathname === '/onboarding';
+
+      // If no profile or no nickname, redirect to onboarding
+      if (!isOnboardingPage && (!profile || !profile.nickname)) {
+        router.push('/onboarding');
+      }
+    }
+  }, [status, profile, profileLoading, router]);
+
+  // Show loading state during auth check or profile check
+  if (status === 'loading' || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <p className="text-gray-400">Carregando...</p>
