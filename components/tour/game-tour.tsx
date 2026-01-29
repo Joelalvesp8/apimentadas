@@ -15,7 +15,7 @@ export interface TourStep {
   target: string; // CSS selector do elemento alvo
   title: string;
   description: string;
-  position?: 'top' | 'bottom' | 'left' | 'right';
+  position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
   action?: string; // Texto do botão de ação
 }
 
@@ -34,6 +34,7 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
     width: 0,
     height: 0,
   });
+  const [elementFound, setElementFound] = useState(false);
 
   const step = steps[currentStep];
   const isFirstStep = currentStep === 0;
@@ -45,7 +46,9 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
 
     const updatePosition = () => {
       const targetElement = document.querySelector(step.target);
+
       if (targetElement) {
+        setElementFound(true);
         const rect = targetElement.getBoundingClientRect();
         setHighlightPosition({
           top: rect.top + window.scrollY,
@@ -59,14 +62,26 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
           behavior: 'smooth',
           block: 'center',
         });
+      } else {
+        // Elemento não encontrado, usar posição central
+        setElementFound(false);
+        setHighlightPosition({
+          top: window.scrollY + window.innerHeight / 2 - 50,
+          left: window.scrollX + window.innerWidth / 2 - 150,
+          width: 300,
+          height: 100,
+        });
       }
     };
 
-    updatePosition();
+    // Aguardar um pouco para garantir que o DOM está pronto
+    const timer = setTimeout(updatePosition, 100);
+
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition);
     };
@@ -102,24 +117,40 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
   const getCardPosition = () => {
     const position = step.position || 'bottom';
     const padding = 20;
+    const cardWidth = 320;
+
+    // Se posição for center ou elemento não encontrado, centralizar
+    if (position === 'center' || !elementFound) {
+      return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        maxWidth: '90vw',
+      };
+    }
+
+    // Garantir que o card não saia da tela
+    let left = highlightPosition.left + highlightPosition.width / 2;
+    if (left - cardWidth / 2 < 10) left = cardWidth / 2 + 10;
+    if (left + cardWidth / 2 > window.innerWidth - 10) left = window.innerWidth - cardWidth / 2 - 10;
 
     switch (position) {
       case 'top':
         return {
-          top: `${highlightPosition.top - 220}px`,
-          left: `${highlightPosition.left + highlightPosition.width / 2}px`,
+          top: `${Math.max(highlightPosition.top - 240, 10)}px`,
+          left: `${left}px`,
           transform: 'translateX(-50%)',
         };
       case 'bottom':
         return {
           top: `${highlightPosition.top + highlightPosition.height + padding}px`,
-          left: `${highlightPosition.left + highlightPosition.width / 2}px`,
+          left: `${left}px`,
           transform: 'translateX(-50%)',
         };
       case 'left':
         return {
           top: `${highlightPosition.top + highlightPosition.height / 2}px`,
-          left: `${highlightPosition.left - 320 - padding}px`,
+          left: `${Math.max(highlightPosition.left - cardWidth - padding, 10)}px`,
           transform: 'translateY(-50%)',
         };
       case 'right':
@@ -131,7 +162,7 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
       default:
         return {
           top: `${highlightPosition.top + highlightPosition.height + padding}px`,
-          left: `${highlightPosition.left + highlightPosition.width / 2}px`,
+          left: `${left}px`,
           transform: 'translateX(-50%)',
         };
     }
@@ -140,38 +171,46 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
   return (
     <>
       {/* Overlay escuro */}
-      <div className="fixed inset-0 bg-black/70 z-[9998] pointer-events-none" />
-
-      {/* Destaque no elemento */}
       <div
-        className="fixed z-[9999] pointer-events-none"
-        style={{
-          top: `${highlightPosition.top - 8}px`,
-          left: `${highlightPosition.left - 8}px`,
-          width: `${highlightPosition.width + 16}px`,
-          height: `${highlightPosition.height + 16}px`,
-        }}
-      >
-        <div className="absolute inset-0 rounded-lg border-4 border-red-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] animate-pulse" />
-        <div className="absolute inset-0 rounded-lg bg-white/5 backdrop-blur-sm" />
-      </div>
+        className="fixed inset-0 bg-black/80 z-[9998]"
+        style={{ pointerEvents: 'none' }}
+      />
+
+      {/* Destaque no elemento (se encontrado) */}
+      {elementFound && highlightPosition.width > 0 && (
+        <div
+          className="fixed z-[9999] pointer-events-none"
+          style={{
+            top: `${highlightPosition.top - 8}px`,
+            left: `${highlightPosition.left - 8}px`,
+            width: `${highlightPosition.width + 16}px`,
+            height: `${highlightPosition.height + 16}px`,
+          }}
+        >
+          <div className="absolute inset-0 rounded-lg border-4 border-red-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.8)] animate-pulse" />
+          <div className="absolute inset-0 rounded-lg bg-white/5" />
+        </div>
+      )}
 
       {/* Card de explicação */}
       <div
         className="fixed z-[10000] w-80"
-        style={getCardPosition()}
+        style={{
+          ...getCardPosition(),
+          pointerEvents: 'auto',
+        }}
       >
-        <Card className="bg-gradient-to-br from-zinc-900/98 to-zinc-950/98 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.4)]">
-          <CardHeader className="relative">
+        <Card className="bg-zinc-900 border-2 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.6)]">
+          <CardHeader className="relative pb-3">
             <div className="flex items-start justify-between gap-2">
-              <div>
+              <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl">🌶️</span>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs font-semibold text-red-400 bg-red-950/50 px-2 py-1 rounded">
                     Passo {currentStep + 1} de {steps.length}
                   </div>
                 </div>
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-white text-lg leading-tight">
                   {step.title}
                 </CardTitle>
               </div>
@@ -179,18 +218,18 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
                 variant="ghost"
                 size="sm"
                 onClick={handleSkip}
-                className="text-gray-400 hover:text-white -mt-1 -mr-2"
+                className="text-gray-400 hover:text-white hover:bg-zinc-800 -mt-1 -mr-2"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <CardDescription className="text-gray-300">
+            <CardDescription className="text-gray-300 text-sm leading-relaxed mt-2">
               {step.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-0">
             {/* Progress bar */}
-            <div className="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+            <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
               <div
                 className="bg-gradient-to-r from-red-600 to-red-500 h-full transition-all duration-300"
                 style={{
@@ -206,7 +245,7 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
                 size="sm"
                 onClick={handlePrevious}
                 disabled={isFirstStep}
-                className="flex-1 border-zinc-700 text-gray-300 hover:bg-zinc-800 disabled:opacity-50"
+                className="flex-1 border-zinc-700 text-gray-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Anterior
@@ -214,7 +253,7 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
               <Button
                 onClick={handleNext}
                 size="sm"
-                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white shadow-lg"
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-lg"
               >
                 {isLastStep ? 'Concluir' : step.action || 'Próximo'}
                 {!isLastStep && <ChevronRight className="w-4 h-4 ml-1" />}
@@ -225,7 +264,7 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
               variant="ghost"
               size="sm"
               onClick={handleSkip}
-              className="w-full text-xs text-gray-500 hover:text-gray-300"
+              className="w-full text-xs text-gray-500 hover:text-gray-300 hover:bg-zinc-800"
             >
               Pular tutorial
             </Button>
