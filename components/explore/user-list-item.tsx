@@ -8,27 +8,20 @@ interface UserListItemProps {
   user: {
     id: string;
     nickname: string;
+    image?: string | null;
     bio?: string | null;
     orientation?: string | null;
     sessionsPlayed: number;
     averageRating: number | null;
-    user: {
-      name: string;
-      image?: string | null;
-    };
   };
   onConnect: (userId: string) => void;
   onInvite: (userId: string) => void;
 }
 
 export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
+  const getInitials = (nickname: string) => {
+    // Get first 2 characters of nickname
+    return nickname.substring(0, 2).toUpperCase();
   };
 
   const orientationLabels: Record<string, string> = {
@@ -42,9 +35,9 @@ export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
     <div className="flex items-center gap-3 py-3 px-4 hover:bg-zinc-900/50 transition-colors">
       {/* Avatar */}
       <Avatar className="h-12 w-12 border-2 border-red-600/30">
-        <AvatarImage src={user.user.image || undefined} alt={user.nickname} />
+        <AvatarImage src={user.image || undefined} alt={user.nickname} />
         <AvatarFallback className="bg-gradient-to-br from-red-900 to-red-950 text-white font-semibold">
-          {getInitials(user.user.name)}
+          {getInitials(user.nickname)}
         </AvatarFallback>
       </Avatar>
 
