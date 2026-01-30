@@ -44,6 +44,9 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
   useEffect(() => {
     if (!step) return;
 
+    let retryCount = 0;
+    const maxRetries = 5;
+
     const updatePosition = () => {
       const targetElement = document.querySelector(step.target);
 
@@ -63,7 +66,18 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
           block: 'center',
         });
       } else {
-        // Elemento não encontrado, usar posição central
+        // Elemento não encontrado
+        console.log(`[Tour] Elemento não encontrado: ${step.target}, tentativa ${retryCount + 1}/${maxRetries}`);
+
+        if (retryCount < maxRetries) {
+          // Tentar novamente após um delay
+          retryCount++;
+          setTimeout(updatePosition, 200);
+          return;
+        }
+
+        // Após todas as tentativas, usar posição central
+        console.log(`[Tour] Elemento ${step.target} não encontrado após ${maxRetries} tentativas, usando posição central`);
         setElementFound(false);
         setHighlightPosition({
           top: window.scrollY + window.innerHeight / 2 - 50,
