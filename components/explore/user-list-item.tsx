@@ -58,9 +58,8 @@ export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
             <span className="text-xs">⭐</span>
           )}
         </div>
-        <p className="text-gray-400 text-xs truncate">
-          {user.user.name}
-          {user.orientation && ` • ${orientationLabels[user.orientation]}`}
+        <p className="text-gray-400 text-xs">
+          {user.orientation && orientationLabels[user.orientation]}
         </p>
         {user.bio && (
           <p className="text-gray-500 text-xs truncate mt-0.5">
