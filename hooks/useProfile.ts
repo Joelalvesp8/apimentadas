@@ -10,6 +10,7 @@ export interface Profile {
   userId: string;
   nickname: string;
   bio: string | null;
+  sex: string | null;
   orientation: string | null;
   // Marketplace - Seller fields
   isVendor: boolean;

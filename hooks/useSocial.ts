@@ -11,6 +11,7 @@ export interface ExploreUser {
   image: string | null;
   bio: string | null;
   orientation: string | null;
+  sex: string | null;
   sessionsPlayed: number;
   averageRating: number | null;
   lastActiveAt: string;

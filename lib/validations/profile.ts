@@ -7,6 +7,7 @@ export const createProfileSchema = z.object({
     .max(20, 'Nickname deve ter no máximo 20 caracteres')
     .regex(/^[a-zA-Z0-9_]+$/, 'Nickname deve conter apenas letras, números e underscores'),
   bio: z.string().max(500, 'Bio deve ter no máximo 500 caracteres').optional(),
+  sex: z.enum(['male', 'female']).optional(),
   orientation: z.enum(['heterosexual', 'homosexual', 'bisexual', 'other']).optional(),
 });
 
@@ -18,6 +19,7 @@ export const updateProfileSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, 'Nickname deve conter apenas letras, números e underscores')
     .optional(),
   bio: z.string().max(500, 'Bio deve ter no máximo 500 caracteres').optional(),
+  sex: z.enum(['male', 'female']).optional(),
   orientation: z.enum(['heterosexual', 'homosexual', 'bisexual', 'other']).optional(),
   // Marketplace - Seller fields
   isVendor: z.boolean().optional(),

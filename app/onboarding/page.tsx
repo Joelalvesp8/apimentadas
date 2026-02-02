@@ -22,6 +22,7 @@ export default function OnboardingPage() {
 
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
+  const [sex, setSex] = useState<string>('');
   const [orientation, setOrientation] = useState<string>('');
   const [error, setError] = useState('');
 
@@ -38,12 +39,13 @@ export default function OnboardingPage() {
     e.preventDefault();
     setError('');
 
-    console.log('[DEBUG] Onboarding - Submitting profile:', { nickname, hasBio: !!bio, orientation });
+    console.log('[DEBUG] Onboarding - Submitting profile:', { nickname, hasBio: !!bio, sex, orientation });
 
     try {
       await createProfile.mutateAsync({
         nickname,
         bio: bio || undefined,
+        sex: sex ? (sex as 'male' | 'female') : undefined,
         orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
       });
 
@@ -146,6 +148,23 @@ export default function OnboardingPage() {
                 maxLength={500}
                 className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner min-h-[100px]"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sex" className="text-gray-200 font-medium">
+                Sexo (opcional)
+              </Label>
+              <select
+                id="sex"
+                className="flex h-10 w-full rounded-md border-2 border-zinc-700/50 bg-zinc-900/90 px-3 py-2 text-sm text-white ring-offset-background focus-visible:outline-none focus-visible:border-red-600/80 focus-visible:ring-2 focus-visible:ring-red-600/30 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+                value={sex}
+                onChange={(e) => setSex(e.target.value)}
+                disabled={createProfile.isPending}
+              >
+                <option value="" className="bg-zinc-900 text-white">Selecione...</option>
+                <option value="male" className="bg-zinc-900 text-white">Homem</option>
+                <option value="female" className="bg-zinc-900 text-white">Mulher</option>
+              </select>
             </div>
 
             <div className="space-y-2">

@@ -11,6 +11,7 @@ interface UserListItemProps {
     image?: string | null;
     bio?: string | null;
     orientation?: string | null;
+    sex?: string | null;
     sessionsPlayed: number;
     averageRating: number | null;
   };
@@ -29,6 +30,11 @@ export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
     homosexual: 'Homossexual',
     bisexual: 'Bissexual',
     other: 'Outro',
+  };
+
+  const sexLabels: Record<string, string> = {
+    male: 'Homem',
+    female: 'Mulher',
   };
 
   return (
@@ -52,6 +58,8 @@ export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
           )}
         </div>
         <p className="text-gray-400 text-xs">
+          {user.sex && sexLabels[user.sex]}
+          {user.sex && user.orientation && ' • '}
           {user.orientation && orientationLabels[user.orientation]}
         </p>
         {user.bio && (

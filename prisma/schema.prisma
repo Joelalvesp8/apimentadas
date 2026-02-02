@@ -55,6 +55,7 @@ model Profile {
   nickname    String  @unique
   bio         String?
   orientation String? // "heterosexual" | "homosexual" | "bisexual" | "other"
+  sex         String? // "male" | "female"
 
   // Delivery address fields
   deliveryAddress    String? @map("delivery_address")

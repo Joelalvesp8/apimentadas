@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(errors);
     }
 
-    const { nickname, bio, orientation } = validation.data;
+    const { nickname, bio, sex, orientation } = validation.data;
 
     // Check if nickname is already taken
     const nicknameExists = await prisma.profile.findUnique({
@@ -112,6 +112,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         nickname,
         bio,
+        sex,
         orientation,
       },
       include: {
@@ -166,6 +167,7 @@ export async function PUT(request: NextRequest) {
     const {
       nickname,
       bio,
+      sex,
       orientation,
       deliveryAddress,
       deliveryCity,
@@ -200,6 +202,7 @@ export async function PUT(request: NextRequest) {
       data: {
         ...(nickname && { nickname }),
         ...(bio !== undefined && { bio }),
+        ...(sex && { sex }),
         ...(orientation && { orientation }),
         ...(deliveryAddress !== undefined && { deliveryAddress }),
         ...(deliveryCity !== undefined && { deliveryCity }),
