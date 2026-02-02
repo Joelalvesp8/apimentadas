@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCreateProfile, useProfile } from '@/hooks/useProfile';
+import { useCreateProfile, useUpdateProfile, useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +18,7 @@ import {
 export default function OnboardingPage() {
   const router = useRouter();
   const createProfile = useCreateProfile();
+  const updateProfile = useUpdateProfile();
   const { data: existingProfile, isLoading: profileLoading } = useProfile();
 
   const [nickname, setNickname] = useState('');
@@ -26,42 +27,55 @@ export default function OnboardingPage() {
   const [orientation, setOrientation] = useState<string>('');
   const [error, setError] = useState('');
 
-  // If user already has a profile with nickname, redirect to explore
-  // This prevents users from being stuck in onboarding loop
+  // Load existing profile data into form fields
   useEffect(() => {
-    if (existingProfile && existingProfile.nickname) {
-      console.log('[DEBUG] Onboarding - Profile exists, redirecting to explore');
-      router.push('/explore');
+    if (existingProfile) {
+      console.log('[DEBUG] Onboarding - Loading existing profile data');
+      if (existingProfile.nickname) setNickname(existingProfile.nickname);
+      if (existingProfile.bio) setBio(existingProfile.bio);
+      if (existingProfile.sex) setSex(existingProfile.sex);
+      if (existingProfile.orientation) setOrientation(existingProfile.orientation);
     }
-  }, [existingProfile, router]);
+  }, [existingProfile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    console.log('[DEBUG] Onboarding - Submitting profile:', { nickname, hasBio: !!bio, sex, orientation });
+    const isUpdating = !!existingProfile;
+    console.log('[DEBUG] Onboarding - Submitting profile:', {
+      isUpdating,
+      nickname,
+      hasBio: !!bio,
+      sex,
+      orientation
+    });
 
     try {
-      await createProfile.mutateAsync({
-        nickname,
-        bio: bio || undefined,
-        sex: sex ? (sex as 'male' | 'female') : undefined,
-        orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
-      });
-
-      console.log('[DEBUG] Onboarding - Profile created successfully, redirecting to explore');
-      router.push('/explore');
-    } catch (error: any) {
-      const errorMessage = error.message || 'Erro ao criar perfil';
-      console.log('[DEBUG] Onboarding - Error creating profile:', errorMessage);
-
-      // If profile already exists, redirect to explore instead of showing error
-      if (errorMessage.includes('já existe') || errorMessage.includes('already exists')) {
-        console.log('[DEBUG] Onboarding - Profile already exists, redirecting to explore');
-        router.push('/explore');
-        return;
+      if (isUpdating) {
+        // Update existing profile
+        await updateProfile.mutateAsync({
+          nickname,
+          bio: bio || undefined,
+          sex: sex ? (sex as 'male' | 'female') : undefined,
+          orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
+        });
+        console.log('[DEBUG] Onboarding - Profile updated successfully, redirecting to explore');
+      } else {
+        // Create new profile
+        await createProfile.mutateAsync({
+          nickname,
+          bio: bio || undefined,
+          sex: sex ? (sex as 'male' | 'female') : undefined,
+          orientation: orientation ? (orientation as 'heterosexual' | 'homosexual' | 'bisexual' | 'other') : undefined,
+        });
+        console.log('[DEBUG] Onboarding - Profile created successfully, redirecting to explore');
       }
 
+      router.push('/explore');
+    } catch (error: any) {
+      const errorMessage = error.message || (isUpdating ? 'Erro ao atualizar perfil' : 'Erro ao criar perfil');
+      console.log('[DEBUG] Onboarding - Error:', errorMessage);
       setError(errorMessage);
     }
   };
@@ -94,18 +108,22 @@ export default function OnboardingPage() {
             <span className="text-5xl drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer">🌶️</span>
           </div>
           <CardTitle className="text-2xl text-center text-white font-bold drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
-            Complete seu Perfil
+            {existingProfile ? 'Atualize seu Perfil' : 'Complete seu Perfil'}
           </CardTitle>
           <CardDescription className="text-center text-gray-300">
-            Defina seu nickname para começar a jogar
+            {existingProfile
+              ? 'Atualize suas informações para continuar'
+              : 'Defina seu nickname para começar a jogar'}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 p-3 bg-red-950/40 border border-red-700/50 rounded-md">
-            <p className="text-sm text-red-200 text-center">
-              ⚠️ O nickname é <strong>obrigatório</strong> para participar do jogo
-            </p>
-          </div>
+          {!existingProfile && (
+            <div className="mb-4 p-3 bg-red-950/40 border border-red-700/50 rounded-md">
+              <p className="text-sm text-red-200 text-center">
+                ⚠️ O nickname é <strong>obrigatório</strong> para participar do jogo
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
@@ -116,7 +134,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-2">
               <Label htmlFor="nickname" className="text-gray-200 font-medium">
-                Nickname *
+                Nickname {!existingProfile && '*'}
               </Label>
               <Input
                 id="nickname"
@@ -124,14 +142,16 @@ export default function OnboardingPage() {
                 placeholder="seunickname"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                required
-                disabled={createProfile.isPending}
+                required={!existingProfile}
+                disabled={createProfile.isPending || updateProfile.isPending || !!existingProfile?.nickname}
                 minLength={3}
                 maxLength={20}
-                className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner"
+                className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner disabled:opacity-60 disabled:cursor-not-allowed"
               />
               <p className="text-xs text-gray-500">
-                Apenas letras, números e underscores (3-20 caracteres)
+                {existingProfile?.nickname
+                  ? 'Nickname não pode ser alterado'
+                  : 'Apenas letras, números e underscores (3-20 caracteres)'}
               </p>
             </div>
 
@@ -144,7 +164,7 @@ export default function OnboardingPage() {
                 placeholder="Conte um pouco sobre você..."
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                disabled={createProfile.isPending}
+                disabled={createProfile.isPending || updateProfile.isPending}
                 maxLength={500}
                 className="bg-zinc-900/90 border-2 border-zinc-700/50 text-white placeholder:text-gray-500 focus:border-red-600/80 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 shadow-inner min-h-[100px]"
               />
@@ -159,7 +179,7 @@ export default function OnboardingPage() {
                 className="flex h-10 w-full rounded-md border-2 border-zinc-700/50 bg-zinc-900/90 px-3 py-2 text-sm text-white ring-offset-background focus-visible:outline-none focus-visible:border-red-600/80 focus-visible:ring-2 focus-visible:ring-red-600/30 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
-                disabled={createProfile.isPending}
+                disabled={createProfile.isPending || updateProfile.isPending}
               >
                 <option value="" className="bg-zinc-900 text-white">Selecione...</option>
                 <option value="male" className="bg-zinc-900 text-white">Homem</option>
@@ -176,7 +196,7 @@ export default function OnboardingPage() {
                 className="flex h-10 w-full rounded-md border-2 border-zinc-700/50 bg-zinc-900/90 px-3 py-2 text-sm text-white ring-offset-background focus-visible:outline-none focus-visible:border-red-600/80 focus-visible:ring-2 focus-visible:ring-red-600/30 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                 value={orientation}
                 onChange={(e) => setOrientation(e.target.value)}
-                disabled={createProfile.isPending}
+                disabled={createProfile.isPending || updateProfile.isPending}
               >
                 <option value="" className="bg-zinc-900 text-white">Selecione...</option>
                 <option value="heterosexual" className="bg-zinc-900 text-white">Heterosexual</option>
@@ -189,9 +209,15 @@ export default function OnboardingPage() {
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50 hover:border-red-500/80 mt-6"
-              disabled={createProfile.isPending}
+              disabled={createProfile.isPending || updateProfile.isPending}
             >
-              {createProfile.isPending ? 'Criando perfil...' : 'Começar a Jogar'}
+              {createProfile.isPending || updateProfile.isPending
+                ? existingProfile
+                  ? 'Atualizando perfil...'
+                  : 'Criando perfil...'
+                : existingProfile
+                ? 'Atualizar e Continuar'
+                : 'Começar a Jogar'}
             </Button>
           </form>
         </CardContent>
