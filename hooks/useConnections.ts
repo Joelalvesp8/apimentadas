@@ -61,7 +61,7 @@ export function useUpdateConnection() {
 
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
-      apiClient.put<Connection>(`/api/connections/${id}`, { status }),
+      apiClient.patch<Connection>(`/api/connections/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['connections'] });
     },
