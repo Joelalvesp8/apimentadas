@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useExploreUsers, useRequestConnection, useSendInvitation } from '@/hooks/useSocial';
+import { useInfiniteExploreUsers, useRequestConnection, useSendInvitation } from '@/hooks/useSocial';
 import { UserListItem } from '@/components/explore/user-list-item';
 import { Search, Loader2, Filter, HelpCircle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -24,11 +24,25 @@ export default function ExplorePage() {
   const [search, setSearch] = useState('');
   const [orientation, setOrientation] = useState<string>('');
 
-  const { data: users, isLoading, error } = useExploreUsers(search, orientation || undefined);
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteExploreUsers(search, orientation || undefined);
+
   const requestConnection = useRequestConnection();
   const sendInvitation = useSendInvitation();
 
+  // Flatten all pages into single array of users
+  const users = data?.pages.flatMap((page) => page.users) ?? [];
+
   const { isTourActive, hasCompletedTour, startTour, completeTour, skipTour } = useTour();
+
+  // Ref para o elemento observer (para detectar scroll infinito)
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   // Iniciar tour automaticamente para novos usuários
   useEffect(() => {
@@ -40,6 +54,31 @@ export default function ExplorePage() {
       return () => clearTimeout(timer);
     }
   }, [hasCompletedTour, startTour]);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Se o elemento está visível e há mais páginas para carregar
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          console.log('[DEBUG] Loading more users...');
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 } // Trigger quando 10% do elemento está visível
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleConnect = async (userId: string) => {
     try {
@@ -174,25 +213,41 @@ export default function ExplorePage() {
 
         {/* Users List */}
         {!isLoading && !error && users && users.length > 0 && (
-          <div className="divide-y divide-zinc-800" data-tour="online-users">
-            {users.map((user) => (
-              <UserListItem
-                key={user.id}
-                user={user}
-                onConnect={handleConnect}
-                onInvite={handleInvite}
-              />
-            ))}
-          </div>
-        )}
+          <>
+            <div className="divide-y divide-zinc-800" data-tour="online-users">
+              {users.map((user) => (
+                <UserListItem
+                  key={user.id}
+                  user={user}
+                  onConnect={handleConnect}
+                  onInvite={handleInvite}
+                />
+              ))}
+            </div>
 
-        {/* Results count */}
-        {!isLoading && !error && users && users.length > 0 && (
-          <div className="text-center py-4">
-            <p className="text-xs text-gray-600">
-              {users.length} {users.length === 1 ? 'usuário' : 'usuários'}
-            </p>
-          </div>
+            {/* Loading more indicator */}
+            {isFetchingNextPage && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-red-500 animate-spin" />
+                <span className="ml-3 text-gray-400 text-sm">Carregando mais usuários...</span>
+              </div>
+            )}
+
+            {/* Observer target for infinite scroll */}
+            <div ref={observerTarget} className="h-4" />
+
+            {/* Results count */}
+            {!hasNextPage && (
+              <div className="text-center py-6 border-t border-zinc-800">
+                <p className="text-xs text-gray-500 mb-1">
+                  {users.length} {users.length === 1 ? 'usuário encontrado' : 'usuários encontrados'}
+                </p>
+                <p className="text-xs text-gray-600">
+                  ✓ Todos os usuários foram carregados
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 

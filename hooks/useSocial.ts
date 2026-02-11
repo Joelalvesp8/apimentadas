@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
 // ============================================================================
@@ -68,6 +68,41 @@ export function useExploreUsers(search?: string, orientation?: string) {
         pagination: { total: number; limit: number; offset: number; hasMore: boolean };
       }>(`/api/explore${params.toString() ? `?${params.toString()}` : ''}`);
       return response.users;
+    },
+  });
+}
+
+/**
+ * Hook to fetch users with infinite scroll pagination
+ * @param search - Optional search term to filter by nickname or bio
+ * @param orientation - Optional filter by orientation
+ */
+export function useInfiniteExploreUsers(search?: string, orientation?: string) {
+  return useInfiniteQuery({
+    queryKey: ['users', 'explore-infinite', search, orientation],
+    queryFn: async ({ pageParam = 0 }) => {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (orientation) params.append('orientation', orientation);
+      params.append('limit', '20');
+      params.append('offset', pageParam.toString());
+
+      const response = await apiClient.get<{
+        users: ExploreUser[];
+        pagination: { total: number; limit: number; offset: number; hasMore: boolean };
+      }>(`/api/explore?${params.toString()}`);
+
+      return {
+        users: response.users,
+        pagination: response.pagination,
+      };
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.hasMore) {
+        return lastPage.pagination.offset + lastPage.pagination.limit;
+      }
+      return undefined;
     },
   });
 }
