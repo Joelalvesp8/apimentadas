@@ -82,6 +82,8 @@ model Profile {
   invitationsReceived SessionInvitation[]  @relation("InvitationReceiver")
   ratingsGiven        UserRating[]         @relation("RatingFrom")
   ratingsReceived     UserRating[]         @relation("RatingTo")
+  messagesSent        DirectMessage[]      @relation("MessagesSent")
+  messagesReceived    DirectMessage[]      @relation("MessagesReceived")
 
   // Marketplace relations
   cartItems     CartItem[]
@@ -145,6 +147,22 @@ model SessionInvitation {
   receiver Profile @relation("InvitationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@map("session_invitations")
+}
+
+// Direct messages - mensagens diretas únicas para usuários sem conexão
+model DirectMessage {
+  id         String   @id @default(cuid())
+  senderId   String   @map("sender_id")
+  receiverId String   @map("receiver_id")
+  message    String   @db.Text
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  sender   Profile @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver Profile @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("direct_messages")
 }
 
 // ============================================================================

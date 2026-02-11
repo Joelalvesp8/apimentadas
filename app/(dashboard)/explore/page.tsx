@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { useInfiniteExploreUsers, useRequestConnection, useSendInvitation } from '@/hooks/useSocial';
 import { UserListItem } from '@/components/explore/user-list-item';
+import { SendMessageDialog } from '@/components/explore/send-message-dialog';
 import { Search, Loader2, Filter, HelpCircle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { GameTour } from '@/components/tour/game-tour';
@@ -23,6 +24,15 @@ export default function ExplorePage() {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [orientation, setOrientation] = useState<string>('');
+  const [messageDialog, setMessageDialog] = useState<{
+    open: boolean;
+    receiverId: string;
+    receiverNickname: string;
+  }>({
+    open: false,
+    receiverId: '',
+    receiverNickname: '',
+  });
 
   const {
     data,
@@ -114,6 +124,29 @@ export default function ExplorePage() {
         variant: 'destructive',
       });
     }
+  };
+
+  const handleMessage = (userId: string, nickname: string) => {
+    setMessageDialog({
+      open: true,
+      receiverId: userId,
+      receiverNickname: nickname,
+    });
+  };
+
+  const handleMessageSuccess = () => {
+    toast({
+      title: 'Mensagem enviada!',
+      description: 'Sua mensagem foi enviada com sucesso.',
+    });
+  };
+
+  const handleMessageError = (error: string) => {
+    toast({
+      title: 'Erro ao enviar mensagem',
+      description: error,
+      variant: 'destructive',
+    });
   };
 
   return (
@@ -221,6 +254,7 @@ export default function ExplorePage() {
                   user={user}
                   onConnect={handleConnect}
                   onInvite={handleInvite}
+                  onMessage={handleMessage}
                 />
               ))}
             </div>
@@ -250,6 +284,15 @@ export default function ExplorePage() {
           </>
         )}
       </div>
+
+      {/* Send Message Dialog */}
+      <SendMessageDialog
+        open={messageDialog.open}
+        onOpenChange={(open) => setMessageDialog({ ...messageDialog, open })}
+        receiverId={messageDialog.receiverId}
+        receiverNickname={messageDialog.receiverNickname}
+        onSuccess={handleMessageSuccess}
+      />
 
       {/* Tour Component */}
       {isTourActive && (

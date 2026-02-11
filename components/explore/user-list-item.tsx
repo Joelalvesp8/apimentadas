@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Send } from 'lucide-react';
+import { UserPlus, Send, MessageCircle } from 'lucide-react';
 
 interface UserListItemProps {
   user: {
@@ -14,12 +14,14 @@ interface UserListItemProps {
     sex?: string | null;
     sessionsPlayed: number;
     averageRating: number | null;
+    connectionStatus?: 'none' | 'pending_sent' | 'pending_received' | 'connected';
   };
   onConnect: (userId: string) => void;
   onInvite: (userId: string) => void;
+  onMessage: (userId: string, nickname: string) => void;
 }
 
-export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
+export function UserListItem({ user, onConnect, onInvite, onMessage }: UserListItemProps) {
   const getInitials = (nickname: string) => {
     // Get first 2 characters of nickname
     return nickname.substring(0, 2).toUpperCase();
@@ -71,6 +73,19 @@ export function UserListItem({ user, onConnect, onInvite }: UserListItemProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-2">
+        {/* Message button - only show for users without connection */}
+        {user.connectionStatus === 'none' && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onMessage(user.id, user.nickname)}
+            className="text-blue-400 hover:bg-blue-950/30 hover:text-blue-300 text-xs h-8 px-2"
+            title="Enviar mensagem única"
+          >
+            <MessageCircle className="w-4 h-4" />
+          </Button>
+        )}
+
         <Button
           variant="outline"
           size="sm"

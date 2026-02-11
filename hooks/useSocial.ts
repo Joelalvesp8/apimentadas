@@ -155,3 +155,30 @@ export function usePublicProfile(nickname: string) {
     enabled: !!nickname,
   });
 }
+
+/**
+ * Hook to send a direct message to a user without connection
+ */
+export function useSendDirectMessage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { receiverId: string; message: string }) => {
+      return apiClient.post('/api/messages/direct', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', 'direct'] });
+    },
+  });
+}
+
+/**
+ * Hook to fetch direct messages
+ * @param type - 'received' or 'sent'
+ */
+export function useDirectMessages(type: 'received' | 'sent' = 'received') {
+  return useQuery({
+    queryKey: ['messages', 'direct', type],
+    queryFn: () => apiClient.get(`/api/messages/direct?type=${type}`),
+  });
+}
