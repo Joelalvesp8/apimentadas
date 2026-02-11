@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useSendDirectMessage } from '@/hooks/useSocial';
-import { Loader2, MessageCircle } from 'lucide-react';
+import { Loader2, MessageCircle, AlertCircle } from 'lucide-react';
 
 interface SendMessageDialogProps {
   open: boolean;
@@ -30,10 +30,12 @@ export function SendMessageDialog({
   onSuccess,
 }: SendMessageDialogProps) {
   const [message, setMessage] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const sendMessage = useSendDirectMessage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
     if (!message.trim()) return;
 
@@ -45,16 +47,28 @@ export function SendMessageDialog({
 
       // Success - reset and close
       setMessage('');
+      setError(null);
       onOpenChange(false);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      // Error is handled by the hook and shown in toast by parent component
+
+      // Call success callback to show toast
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error: any) {
       console.error('Error sending message:', error);
+
+      // Extract error message
+      const errorMsg = error?.response?.data?.error ||
+                       error?.message ||
+                       'Erro ao enviar mensagem. Tente novamente.';
+
+      setError(errorMsg);
     }
   };
 
   const handleClose = () => {
     setMessage('');
+    setError(null);
     onOpenChange(false);
   };
 
@@ -72,6 +86,22 @@ export function SendMessageDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Error message */}
+          {error && (
+            <div className="p-3 bg-red-950/40 border border-red-700/50 rounded-md flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-red-200 font-semibold">Erro ao enviar</p>
+                <p className="text-xs text-red-300 mt-1">{error}</p>
+                {error.includes('migration') || error.includes('table') || error.includes('column') ? (
+                  <p className="text-xs text-red-400 mt-2">
+                    💡 Execute a migration do banco de dados primeiro. Veja: MIGRATION-DIRECT-MESSAGES.md
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          )}
+
           {/* Info box */}
           <div className="p-3 bg-blue-950/40 border border-blue-700/50 rounded-md">
             <p className="text-xs text-blue-200">

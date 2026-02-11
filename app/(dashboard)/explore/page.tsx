@@ -136,16 +136,9 @@ export default function ExplorePage() {
 
   const handleMessageSuccess = () => {
     toast({
-      title: 'Mensagem enviada!',
-      description: 'Sua mensagem foi enviada com sucesso.',
-    });
-  };
-
-  const handleMessageError = (error: string) => {
-    toast({
-      title: 'Erro ao enviar mensagem',
-      description: error,
-      variant: 'destructive',
+      title: '✅ Mensagem enviada!',
+      description: 'Sua mensagem foi enviada com sucesso. O usuário receberá sua mensagem.',
+      duration: 5000,
     });
   };
 
