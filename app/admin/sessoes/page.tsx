@@ -1,8 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Gamepad2,
   PlayCircle,
@@ -11,6 +13,7 @@ import {
   AlertCircle,
   Users,
   Clock,
+  Trash2,
 } from 'lucide-react';
 
 interface UserStat {
@@ -62,6 +65,9 @@ const modeLabels: Record<string, string> = {
 };
 
 export default function SessoesPage() {
+  const queryClient = useQueryClient();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const { data, isLoading, error } = useQuery<SessionsData>({
     queryKey: ['admin-sessions-stats'],
     queryFn: async () => {
@@ -69,6 +75,19 @@ export default function SessoesPage() {
       if (!res.ok) throw new Error('Erro ao carregar dados');
       const json = await res.json();
       return json.data;
+    },
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/admin/reset-sessions', { method: 'POST' });
+      if (!res.ok) throw new Error('Erro ao zerar sessões');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-sessions-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      setConfirmOpen(false);
     },
   });
 
@@ -94,10 +113,63 @@ export default function SessoesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Painel de Sessões</h1>
-        <p className="text-gray-400 text-sm">Histórico e engajamento dos jogadores</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-1">Painel de Sessões</h1>
+          <p className="text-gray-400 text-sm">Histórico e engajamento dos jogadores</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setConfirmOpen(true)}
+          className="border-red-800 text-red-400 hover:bg-red-950/40 hover:text-red-300 shrink-0"
+        >
+          <Trash2 className="h-4 w-4 mr-1.5" />
+          Zerar Sessões
+        </Button>
       </div>
+
+      {/* Confirmation Dialog */}
+      {confirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+          <div className="bg-zinc-900 border border-red-800/60 rounded-xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="bg-red-600/20 p-2 rounded-lg">
+                <Trash2 className="h-5 w-5 text-red-400" />
+              </div>
+              <h2 className="text-white font-bold text-lg">Zerar todas as sessões?</h2>
+            </div>
+            <p className="text-gray-400 text-sm mb-1">
+              Esta ação irá <strong className="text-white">deletar permanentemente</strong> todas as sessões de todos os usuários e zerar o contador de partidas.
+            </p>
+            <p className="text-red-400 text-xs mb-5">Esta ação não pode ser desfeita.</p>
+
+            {resetMutation.isError && (
+              <p className="text-red-400 text-sm mb-4 bg-red-950/30 px-3 py-2 rounded-lg">
+                Erro ao zerar sessões. Tente novamente.
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 border-zinc-700 text-gray-300"
+                onClick={() => setConfirmOpen(false)}
+                disabled={resetMutation.isPending}
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => resetMutation.mutate()}
+                disabled={resetMutation.isPending}
+              >
+                {resetMutation.isPending ? 'Zerando...' : 'Confirmar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
