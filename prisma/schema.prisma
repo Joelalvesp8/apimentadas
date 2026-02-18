@@ -84,6 +84,8 @@ model Profile {
   ratingsReceived     UserRating[]         @relation("RatingTo")
   messagesSent        DirectMessage[]      @relation("MessagesSent")
   messagesReceived    DirectMessage[]      @relation("MessagesReceived")
+  posts               Post[]
+  postLikes           PostLike[]
 
   // Marketplace relations
   cartItems     CartItem[]
@@ -147,6 +149,35 @@ model SessionInvitation {
   receiver Profile @relation("InvitationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@map("session_invitations")
+}
+
+// Posts - publicações estilo rede social (tipo X/Twitter)
+model Post {
+  id        String   @id @default(cuid())
+  profileId String   @map("profile_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  profile Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  likes   PostLike[]
+
+  @@map("posts")
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id")
+  profileId String   @map("profile_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, profileId])
+  @@map("post_likes")
 }
 
 // Direct messages - mensagens diretas únicas para usuários sem conexão
