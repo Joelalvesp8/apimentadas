@@ -12,6 +12,8 @@ export interface GameSession {
   currentRoundId: string | null; // For online mode
   averageRating: number | null;
   cardsPlayed: number;
+  skipsUsed: number;
+  maxSkips: number;
   createdAt: string;
   finishedAt: string | null;
   updatedAt: string;

@@ -15,7 +15,15 @@ import {
 import { GameCard } from '@/components/game-card';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
-import { ThumbsDown, Meh, ThumbsUp, Users, Heart, HeartOff } from 'lucide-react';
+import { ThumbsDown, Meh, ThumbsUp, Users, Heart, HeartOff, SkipForward, Flame } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Map sessionType to card category
 function getCardCategory(sessionType: string): string {
@@ -46,20 +54,23 @@ export default function GamePage() {
     return () => clearInterval(interval);
   }, [session, refetchSession]);
 
+  const [difficulty, setDifficulty] = useState<string>('');
   const cardCategory = session?.sessionType ? getCardCategory(session.sessionType) : undefined;
   const {
     data: currentCard,
     refetch: fetchCard,
     isLoading: cardLoading,
-  } = useRandomCard(undefined, cardCategory, sessionId);
+  } = useRandomCard(undefined, cardCategory, sessionId, difficulty || undefined);
 
   const playCard = usePlayCard(sessionId);
   const finishSession = useFinishSession();
 
+  const { toast } = useToast();
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [selectedCard, setSelectedCard] = useState<any>(null);
   const [showRatingScreen, setShowRatingScreen] = useState(false);
   const [cardRatings, setCardRatings] = useState<Record<string, boolean>>({});
+  const [isSkipping, setIsSkipping] = useState(false);
 
   // Check if it's my turn
   const isMyTurn = myProfile && session?.currentTurnProfileId === myProfile.id;
@@ -84,6 +95,29 @@ export default function GamePage() {
     if (result.data) {
       setSelectedCard(result.data);
       setIsCardFlipped(false);
+    }
+  };
+
+  const handleSkipCard = async () => {
+    if (!selectedCard || isCardFlipped) return;
+    setIsSkipping(true);
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/skip`, { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) {
+        toast({ title: json.error ?? 'Erro ao pular carta', variant: 'destructive' });
+        return;
+      }
+      const { remaining, maxSkips } = json.data;
+      setSelectedCard(null);
+      setIsCardFlipped(false);
+      await refetchSession();
+      toast({
+        title: `Carta pulada! Skips restantes: ${remaining}/${maxSkips}`,
+        variant: remaining === 0 ? 'destructive' : 'default',
+      });
+    } finally {
+      setIsSkipping(false);
     }
   };
 
@@ -353,6 +387,24 @@ export default function GamePage() {
               </div>
             </div>
 
+            {/* Intensity Filter */}
+            <div className="flex items-center gap-3 mb-4">
+              <Flame className="w-4 h-4 text-red-500 shrink-0" />
+              <span className="text-sm text-gray-400 shrink-0">Intensidade:</span>
+              <Select value={difficulty || 'all'} onValueChange={(v) => setDifficulty(v === 'all' ? '' : v)}>
+                <SelectTrigger className="h-8 bg-zinc-900/60 border-zinc-700 text-white text-xs focus:border-red-700/60">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 border-zinc-700">
+                  <SelectItem value="all" className="text-white text-xs">Todas</SelectItem>
+                  <SelectItem value="facil" className="text-white text-xs">🟢 Fácil</SelectItem>
+                  <SelectItem value="medio" className="text-white text-xs">🟡 Médio</SelectItem>
+                  <SelectItem value="dificil" className="text-white text-xs">🟠 Difícil</SelectItem>
+                  <SelectItem value="extremo" className="text-white text-xs">🔴 Extremo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Participants */}
             <div className="border-t border-zinc-700/40 pt-4">
               <div className="flex items-center gap-2 mb-3">
@@ -386,6 +438,20 @@ export default function GamePage() {
                 onFlip={setIsCardFlipped}
                 className="mb-4"
               />
+
+              {/* Skip button — only before flipping and on my turn */}
+              {!isCardFlipped && isMyTurn && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSkipCard}
+                  disabled={isSkipping || (session.skipsUsed ?? 0) >= (session.maxSkips ?? 3)}
+                  className="flex items-center gap-2 border-zinc-700 text-gray-400 hover:text-yellow-400 hover:border-yellow-700/60"
+                >
+                  <SkipForward className="h-4 w-4" />
+                  Pular ({(session.maxSkips ?? 3) - (session.skipsUsed ?? 0)} restantes)
+                </Button>
+              )}
 
               {isCardFlipped && isMyTurn && (
                 <Card className="w-full max-w-md bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.3)]">

@@ -4,8 +4,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Heart, Trash2, Loader2, Send } from 'lucide-react';
-import { usePosts, useCreatePost, useDeletePost, useLikePost, Post } from '@/hooks/usePosts';
+import { Heart, Trash2, Loader2, Send, MessageCircle, X } from 'lucide-react';
+import {
+  usePosts, useCreatePost, useDeletePost, useLikePost,
+  usePostComments, useAddComment, useDeleteComment,
+  Post,
+} from '@/hooks/usePosts';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -32,10 +36,14 @@ function PostCard({ post }: { post: Post }) {
   const likePost = useLikePost();
   const deletePost = useDeletePost();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [commentInput, setCommentInput] = useState('');
 
-  const handleLike = () => {
-    likePost.mutate(post.id);
-  };
+  const { data: comments, isLoading: commentsLoading } = usePostComments(post.id, showComments);
+  const addComment = useAddComment(post.id);
+  const deleteComment = useDeleteComment(post.id);
+
+  const handleLike = () => { likePost.mutate(post.id); };
 
   const handleDelete = () => {
     if (!confirmDelete) {
@@ -48,8 +56,17 @@ function PostCard({ post }: { post: Post }) {
     });
   };
 
+  const handleAddComment = () => {
+    const trimmed = commentInput.trim();
+    if (!trimmed) return;
+    addComment.mutate(trimmed, {
+      onSuccess: () => setCommentInput(''),
+      onError: (err: any) => toast({ title: err.message ?? 'Erro ao comentar', variant: 'destructive' }),
+    });
+  };
+
   return (
-    <div className="px-4 py-4 border-b border-zinc-800/60 hover:bg-zinc-900/30 transition-colors">
+    <div className="px-4 py-4 border-b border-zinc-800/60">
       <div className="flex gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 shrink-0 ring-1 ring-red-700/30">
@@ -77,15 +94,22 @@ function PostCard({ post }: { post: Post }) {
               disabled={likePost.isPending}
               className={cn(
                 'flex items-center gap-1.5 text-xs transition-colors',
-                post.likedByMe
-                  ? 'text-red-500 hover:text-red-400'
-                  : 'text-gray-500 hover:text-red-400'
+                post.likedByMe ? 'text-red-500 hover:text-red-400' : 'text-gray-500 hover:text-red-400'
               )}
             >
-              <Heart
-                className={cn('h-4 w-4', post.likedByMe && 'fill-red-500')}
-              />
+              <Heart className={cn('h-4 w-4', post.likedByMe && 'fill-red-500')} />
               <span>{post.likesCount > 0 ? post.likesCount : ''}</span>
+            </button>
+
+            <button
+              onClick={() => setShowComments((v) => !v)}
+              className={cn(
+                'flex items-center gap-1.5 text-xs transition-colors',
+                showComments ? 'text-blue-400' : 'text-gray-500 hover:text-blue-400'
+              )}
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>{post.commentsCount > 0 ? post.commentsCount : ''}</span>
             </button>
 
             {post.isOwn && (
@@ -94,9 +118,7 @@ function PostCard({ post }: { post: Post }) {
                 disabled={deletePost.isPending}
                 className={cn(
                   'flex items-center gap-1.5 text-xs transition-colors',
-                  confirmDelete
-                    ? 'text-red-500 hover:text-red-400'
-                    : 'text-gray-600 hover:text-red-400'
+                  confirmDelete ? 'text-red-500 hover:text-red-400' : 'text-gray-600 hover:text-red-400'
                 )}
                 title={confirmDelete ? 'Clique para confirmar' : 'Deletar post'}
               >
@@ -105,6 +127,71 @@ function PostCard({ post }: { post: Post }) {
               </button>
             )}
           </div>
+
+          {/* Comments Section */}
+          {showComments && (
+            <div className="mt-3 space-y-2">
+              {/* Comment input */}
+              <div className="flex gap-2">
+                <input
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                  placeholder="Adicionar comentário..."
+                  maxLength={280}
+                  className="flex-1 text-xs bg-zinc-900/60 border border-zinc-700 rounded-lg px-3 py-1.5 text-white placeholder:text-gray-600 focus:outline-none focus:border-red-700/60"
+                />
+                <button
+                  onClick={handleAddComment}
+                  disabled={!commentInput.trim() || addComment.isPending}
+                  className="p-1.5 rounded-lg bg-red-700/80 hover:bg-red-600 disabled:opacity-40 transition-colors"
+                >
+                  <Send className="h-3.5 w-3.5 text-white" />
+                </button>
+              </div>
+
+              {/* Comments list */}
+              {commentsLoading ? (
+                <div className="flex justify-center py-2">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-gray-500" />
+                </div>
+              ) : comments && comments.length > 0 ? (
+                <div className="space-y-2">
+                  {comments.map((c) => (
+                    <div key={c.id} className="flex gap-2 group">
+                      <Avatar className="h-6 w-6 shrink-0 ring-1 ring-zinc-700">
+                        <AvatarImage src={c.author.image ?? undefined} />
+                        <AvatarFallback className="bg-zinc-800 text-white text-[10px]">
+                          {getInitials(c.author.nickname)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0 bg-zinc-900/50 rounded-lg px-2.5 py-1.5">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-white text-xs font-medium">@{c.author.nickname}</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-600 text-[10px]">{timeAgo(c.createdAt)}</span>
+                            {c.isOwn && (
+                              <button
+                                onClick={() => deleteComment.mutate(c.id)}
+                                className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-gray-300 text-xs mt-0.5 leading-relaxed">{c.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 text-xs text-center py-2">
+                  Sem comentários ainda. Seja o primeiro!
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

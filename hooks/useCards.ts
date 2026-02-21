@@ -31,14 +31,15 @@ export interface UserCard {
   };
 }
 
-export function useRandomCard(type?: string, category?: string, sessionId?: string) {
+export function useRandomCard(type?: string, category?: string, sessionId?: string, difficulty?: string) {
   const params = new URLSearchParams();
   if (type) params.append('type', type);
   if (category) params.append('category', category);
   if (sessionId) params.append('sessionId', sessionId);
+  if (difficulty) params.append('difficulty', difficulty);
 
   return useQuery({
-    queryKey: ['cards', 'random', type, category, sessionId],
+    queryKey: ['cards', 'random', type, category, sessionId, difficulty],
     queryFn: () =>
       apiClient.get<Card>(
         `/api/cards/random${params.toString() ? `?${params.toString()}` : ''}`

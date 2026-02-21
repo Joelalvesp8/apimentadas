@@ -91,11 +91,22 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             nickname: true,
+            userId: true,
             user: { select: { image: true } },
           },
         },
       },
     });
+
+    // Create notification for the recipient
+    await prisma.notification.create({
+      data: {
+        userId: connection.to.userId,
+        type: 'connection_request',
+        message: `@${currentProfile.nickname} quer se conectar com você`,
+        data: { fromProfileId: currentProfile.id, fromNickname: currentProfile.nickname },
+      },
+    }).catch(() => {}); // Don't fail the request if notification fails
 
     return successResponse(connection, 201);
   } catch (error: any) {

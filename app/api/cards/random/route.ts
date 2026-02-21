@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type') || undefined;
     const category = searchParams.get('category') || undefined;
+    const difficulty = searchParams.get('difficulty') || undefined;
     const sessionId = searchParams.get('sessionId');
 
     // Get cards already played in this session to exclude them
@@ -48,6 +49,10 @@ export async function GET(request: NextRequest) {
       whereOfficial.category = category;
     }
 
+    if (difficulty) {
+      whereOfficial.difficulty = difficulty;
+    }
+
     // Exclude already played cards
     if (excludedCardIds.length > 0) {
       whereOfficial.id = {
@@ -66,6 +71,10 @@ export async function GET(request: NextRequest) {
 
     if (category) {
       whereUserCards.category = category;
+    }
+
+    if (difficulty) {
+      whereUserCards.difficulty = difficulty;
     }
 
     // Exclude already played cards (user cards use the same IDs)

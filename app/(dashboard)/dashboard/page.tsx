@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, GamepadIcon, Star, Clock, Shield, User } from 'lucide-react';
+import { Users, GamepadIcon, Star, Clock, Shield, User, TrendingUp, Layers } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -64,15 +64,18 @@ export default function DashboardPage() {
 
   const totalConnections = connections?.length || 0;
   const totalSessions = sessionHistory?.length || 0;
+  const totalCardsPlayed = sessionHistory?.reduce((sum, s) => sum + (s.cardsPlayed || 0), 0) || 0;
   const averageRating =
     sessionHistory && sessionHistory.length > 0
       ? (
-          sessionHistory.reduce(
-            (sum, s) => sum + (s.averageRating || 0),
-            0
-          ) / sessionHistory.length
+          sessionHistory.reduce((sum, s) => sum + (s.averageRating || 0), 0) / sessionHistory.length
         ).toFixed(1)
       : '0.0';
+  const bestRating =
+    sessionHistory && sessionHistory.length > 0
+      ? Math.max(...sessionHistory.map((s) => s.averageRating || 0)).toFixed(1)
+      : '0.0';
+  const recentSessions = sessionHistory?.slice(0, 3) || [];
 
   return (
     <div className="min-h-screen p-3 md:p-4 pb-8">
@@ -87,7 +90,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
           <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_rgba(220,38,38,0.3)] transition-all duration-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-200">Conexões</CardTitle>
@@ -128,7 +131,67 @@ export default function DashboardPage() {
               <p className="text-xs text-gray-500">De 5 estrelas</p>
             </CardContent>
           </Card>
+
+          <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_rgba(220,38,38,0.3)] transition-all duration-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-200">
+                Cartas Jogadas
+              </CardTitle>
+              <Layers className="h-4 w-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white">{totalCardsPlayed}</div>
+              <p className="text-xs text-gray-500">Total acumulado</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_rgba(220,38,38,0.3)] transition-all duration-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-200">
+                Melhor Sessão
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white">{bestRating}</div>
+              <p className="text-xs text-gray-500">Maior rating</p>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Recent Session History */}
+        {recentSessions.length > 0 && (
+          <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-white text-sm">
+                <Clock className="h-4 w-4 text-red-500" />
+                Últimas Sessões
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {recentSessions.map((s: any) => (
+                <div key={s.id} className="flex items-center justify-between py-2 border-b border-zinc-800/50 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline" className="border-zinc-700 text-gray-400 text-xs">
+                      {s.sessionType === 'casal' ? '💑 Casal' : s.sessionType === 'trisal' ? '💞 Trisal' : '👥 Grupo'}
+                    </Badge>
+                    <span className="text-gray-500 text-xs">{s.cardsPlayed} cartas</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {s.averageRating ? (
+                      <span className="text-xs text-yellow-400 font-medium">{s.averageRating.toFixed(1)} ⭐</span>
+                    ) : (
+                      <span className="text-xs text-gray-600">—</span>
+                    )}
+                    <span className="text-gray-600 text-xs">
+                      {s.finishedAt ? new Date(s.finishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Active Sessions */}
         {activeSessions && activeSessions.length > 0 && (

@@ -25,14 +25,17 @@ model User {
   resetToken         String?   @unique @map("reset_token")
   resetTokenExpiry   DateTime? @map("reset_token_expiry")
   approved           Boolean   @default(false) // User approved to access the app
+  isSystemUser       Boolean   @default(false) @map("is_system_user") // Ocultar de queries públicas
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  profile      Profile?
-  gameSessions GameSession[]
-  userCards    UserCard[]
-  cardLikes    CardLike[]
+  profile        Profile?
+  gameSessions   GameSession[]
+  userCards      UserCard[]
+  cardLikes      CardLike[]
+  notifications  Notification[]
+  postComments   PostComment[]
 
   @@map("users")
 }
@@ -160,10 +163,40 @@ model Post {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  profile Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  likes   PostLike[]
+  profile  Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  likes    PostLike[]
+  comments PostComment[]
 
   @@map("posts")
+}
+
+model PostComment {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("post_comments")
+}
+
+// Notifications - sistema de notificações
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  type      String   // "connection_request" | "connection_accepted" | "session_invitation" | "post_comment" | "post_like"
+  message   String
+  read      Boolean  @default(false)
+  data      Json?    // Extra data (e.g., fromNickname, postId)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 model PostLike {
@@ -268,6 +301,8 @@ model GameSession {
   currentRoundId       String?   @map("current_round_id") // Current round ID (online mode only)
   averageRating        Float?    @map("average_rating")
   cardsPlayed          Int       @default(0) @map("cards_played")
+  skipsUsed            Int       @default(0) @map("skips_used")
+  maxSkips             Int       @default(3) @map("max_skips")
   createdAt            DateTime  @default(now()) @map("created_at")
   finishedAt           DateTime? @map("finished_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")

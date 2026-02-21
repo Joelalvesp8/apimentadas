@@ -77,13 +77,14 @@ export function useExploreUsers(search?: string, orientation?: string) {
  * @param search - Optional search term to filter by nickname or bio
  * @param orientation - Optional filter by orientation
  */
-export function useInfiniteExploreUsers(search?: string, orientation?: string) {
+export function useInfiniteExploreUsers(search?: string, orientation?: string, sex?: string) {
   return useInfiniteQuery({
-    queryKey: ['users', 'explore-infinite', search, orientation],
+    queryKey: ['users', 'explore-infinite', search, orientation, sex],
     queryFn: async ({ pageParam = 0 }) => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (orientation) params.append('orientation', orientation);
+      if (sex) params.append('sex', sex);
       params.append('limit', '20');
       params.append('offset', pageParam.toString());
 

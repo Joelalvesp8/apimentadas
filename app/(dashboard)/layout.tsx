@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Home, Users, LogOut, Store, Package, ShoppingBag, Compass, User, Newspaper } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Toaster } from '@/components/ui/toaster';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 
 export default function DashboardLayout({
   children,
@@ -126,6 +127,7 @@ export default function DashboardLayout({
                 <span className="hidden sm:inline">Posts</span>
               </Button>
             </Link>
+            <NotificationBell />
             <Button
               variant="ghost"
               size="sm"

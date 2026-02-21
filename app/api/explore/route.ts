@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
     // Get query params
     const { searchParams } = new URL(request.url);
     const orientation = searchParams.get('orientation'); // Filtrar por orientação
+    const sex = searchParams.get('sex'); // Filtrar por gênero
     const search = searchParams.get('search'); // Buscar por nickname
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
@@ -44,10 +45,17 @@ export async function GET(request: NextRequest) {
       id: {
         not: currentProfile.id, // Não mostrar o próprio perfil
       },
+      user: {
+        isSystemUser: false, // Ocultar contas de sistema
+      },
     };
 
     if (orientation) {
       where.orientation = orientation;
+    }
+
+    if (sex) {
+      where.sex = sex;
     }
 
     if (search) {

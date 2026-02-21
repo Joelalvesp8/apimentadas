@@ -12,8 +12,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useInfiniteExploreUsers, useRequestConnection, useSendInvitation } from '@/hooks/useSocial';
-import { UserListItem } from '@/components/explore/user-list-item';
+import { UserListItem, ExploreUserData } from '@/components/explore/user-list-item';
 import { SendMessageDialog } from '@/components/explore/send-message-dialog';
+import { ProfilePreviewDialog } from '@/components/explore/profile-preview-dialog';
 import { Search, Loader2, Filter, HelpCircle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { GameTour } from '@/components/tour/game-tour';
@@ -24,6 +25,8 @@ export default function ExplorePage() {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [orientation, setOrientation] = useState<string>('');
+  const [sex, setSex] = useState<string>('');
+  const [previewUser, setPreviewUser] = useState<ExploreUserData | null>(null);
   const [messageDialog, setMessageDialog] = useState<{
     open: boolean;
     receiverId: string;
@@ -41,7 +44,7 @@ export default function ExplorePage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteExploreUsers(search, orientation || undefined);
+  } = useInfiniteExploreUsers(search, orientation || undefined, sex || undefined);
 
   const requestConnection = useRequestConnection();
   const sendInvitation = useSendInvitation();
@@ -168,9 +171,9 @@ export default function ExplorePage() {
               )}
             </div>
 
-            {/* Filter Button */}
-            <Select value={orientation} onValueChange={setOrientation}>
-              <SelectTrigger className="w-10 h-10 bg-zinc-900 border-zinc-800 text-white focus:border-red-700 p-0 flex items-center justify-center">
+            {/* Orientation Filter */}
+            <Select value={orientation} onValueChange={(v) => setOrientation(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-10 h-10 bg-zinc-900 border-zinc-800 text-white focus:border-red-700 p-0 flex items-center justify-center" title="Filtrar por orientação">
                 <Filter className="w-4 h-4" />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-700">
@@ -188,6 +191,24 @@ export default function ExplorePage() {
                 </SelectItem>
                 <SelectItem value="other" className="text-white hover:bg-zinc-800">
                   Outro
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Sex Filter */}
+            <Select value={sex} onValueChange={(v) => setSex(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-10 h-10 bg-zinc-900 border-zinc-800 text-white focus:border-red-700 p-0 flex items-center justify-center" title="Filtrar por gênero">
+                <span className="text-xs font-bold">♂♀</span>
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-700">
+                <SelectItem value="all" className="text-white hover:bg-zinc-800">
+                  Todos os gêneros
+                </SelectItem>
+                <SelectItem value="male" className="text-white hover:bg-zinc-800">
+                  Masculino
+                </SelectItem>
+                <SelectItem value="female" className="text-white hover:bg-zinc-800">
+                  Feminino
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -248,6 +269,7 @@ export default function ExplorePage() {
                   onConnect={handleConnect}
                   onInvite={handleInvite}
                   onMessage={handleMessage}
+                  onPreview={setPreviewUser}
                 />
               ))}
             </div>
@@ -285,6 +307,15 @@ export default function ExplorePage() {
         receiverId={messageDialog.receiverId}
         receiverNickname={messageDialog.receiverNickname}
         onSuccess={handleMessageSuccess}
+      />
+
+      {/* Profile Preview Dialog */}
+      <ProfilePreviewDialog
+        user={previewUser}
+        onClose={() => setPreviewUser(null)}
+        onConnect={handleConnect}
+        onInvite={handleInvite}
+        onMessage={handleMessage}
       />
 
       {/* Tour Component */}

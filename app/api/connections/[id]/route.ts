@@ -66,6 +66,7 @@ export async function PATCH(
           select: {
             id: true,
             nickname: true,
+            userId: true,
             user: { select: { image: true } },
           },
         },
@@ -78,6 +79,18 @@ export async function PATCH(
         },
       },
     });
+
+    // Notify the requester when their request is accepted
+    if (status === 'accepted') {
+      await prisma.notification.create({
+        data: {
+          userId: updatedConnection.from.userId,
+          type: 'connection_accepted',
+          message: `@${currentProfile.nickname} aceitou sua solicitação de conexão`,
+          data: { fromProfileId: currentProfile.id, fromNickname: currentProfile.nickname },
+        },
+      }).catch(() => {});
+    }
 
     return successResponse(updatedConnection);
   } catch (error: any) {

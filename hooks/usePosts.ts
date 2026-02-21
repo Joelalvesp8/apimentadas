@@ -2,6 +2,7 @@
 
 import {
   useInfiniteQuery,
+  useQuery,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -18,7 +19,16 @@ export interface Post {
   createdAt: string;
   author: PostAuthor;
   likesCount: number;
+  commentsCount: number;
   likedByMe: boolean;
+  isOwn: boolean;
+}
+
+export interface PostComment {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: PostAuthor;
   isOwn: boolean;
 }
 
@@ -87,6 +97,58 @@ export function useLikePost() {
       return json.data as { liked: boolean; likesCount: number };
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+}
+
+// Listar comentários de um post
+export function usePostComments(postId: string, enabled = false) {
+  return useQuery({
+    queryKey: ['post-comments', postId],
+    queryFn: async () => {
+      const res = await fetch(`/api/posts/${postId}/comments`);
+      if (!res.ok) throw new Error('Erro ao carregar comentários');
+      const json = await res.json();
+      return json.data as PostComment[];
+    },
+    enabled,
+  });
+}
+
+// Adicionar comentário
+export function useAddComment(postId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (content: string) => {
+      const res = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Erro ao comentar');
+      return json.data as PostComment;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+}
+
+// Deletar comentário
+export function useDeleteComment(postId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (commentId: string) => {
+      const res = await fetch(`/api/posts/${postId}/comments?commentId=${commentId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Erro ao deletar comentário');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });

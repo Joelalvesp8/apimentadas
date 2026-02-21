@@ -140,11 +140,14 @@ export async function POST(
       });
 
       const cardsPlayed = allPlayedCards.length;
-      const ratingsSum = allPlayedCards.reduce(
-        (sum, pc) => sum + (pc.rating || 0),
-        0
-      );
-      const ratingsCount = allPlayedCards.filter((pc) => pc.rating !== null).length;
+      // Convert qualitativeRating to numeric value: ruim=1, satisfatoria=3, excelente=5
+      const qualitativeToNum = (r: string | null) =>
+        r === 'ruim' ? 1 : r === 'satisfatoria' ? 3 : r === 'excelente' ? 5 : null;
+      const ratingsWithValue = allPlayedCards
+        .map((pc) => qualitativeToNum(pc.qualitativeRating))
+        .filter((v): v is number => v !== null);
+      const ratingsSum = ratingsWithValue.reduce((sum, v) => sum + v, 0);
+      const ratingsCount = ratingsWithValue.length;
       const averageRating = ratingsCount > 0 ? ratingsSum / ratingsCount : null;
 
       const updatedSession = await tx.gameSession.update({

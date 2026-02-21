@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
           },
         },
         likes: { select: { profileId: true } },
+        _count: { select: { comments: true } },
       },
     });
 
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
           image: post.profile.user.image,
         },
         likesCount: post.likes.length,
+        commentsCount: post._count.comments,
         likedByMe: post.likes.some((l) => l.profileId === currentProfile.id),
         isOwn: post.profile.id === currentProfile.id,
       })),
