@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { getWaitlistConfirmationEmail, getApprovalEmail } from './email-templates';
+import { getWaitlistConfirmationEmail, getApprovalEmail, getPasswordResetEmail } from './email-templates';
 
 // Temporarily force fallback email until apimentadas.app domain is verified on Resend
 // TODO: Remove this override once domain is verified and use: process.env.EMAIL_FROM
@@ -91,6 +91,50 @@ export async function sendApprovalEmail(email: string): Promise<SendEmailResult>
     }
 
     console.log('[EMAIL] Approval email sent successfully:', data?.id);
+    return { success: true, messageId: data?.id };
+  } catch (error: any) {
+    console.error('[EMAIL] Unexpected error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Send password reset email
+ */
+export async function sendPasswordResetEmail(
+  to: string,
+  name: string,
+  resetUrl: string
+): Promise<SendEmailResult> {
+  try {
+    const resend = getResendClient();
+
+    // Check if Resend is configured
+    if (!resend) {
+      console.log('[EMAIL] Resend not configured, skipping email send');
+      console.log('='.repeat(80));
+      console.log('PASSWORD RESET EMAIL');
+      console.log('='.repeat(80));
+      console.log(`To: ${to}`);
+      console.log(`Name: ${name}`);
+      console.log(`Reset URL: ${resetUrl}`);
+      console.log('='.repeat(80));
+      return { success: true, messageId: 'dev-mode' };
+    }
+
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject: 'Redefinir Senha - Apimentadas 🔑',
+      html: getPasswordResetEmail({ name, resetUrl }),
+    });
+
+    if (error) {
+      console.error('[EMAIL] Error sending password reset email:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('[EMAIL] Password reset email sent successfully:', data?.id);
     return { success: true, messageId: data?.id };
   } catch (error: any) {
     console.error('[EMAIL] Unexpected error:', error);

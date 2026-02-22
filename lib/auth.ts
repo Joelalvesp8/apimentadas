@@ -33,7 +33,7 @@ export const authConfig: NextAuthConfig = {
 
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email as string,
+            email: (credentials.email as string).toLowerCase(),
           },
         });
 

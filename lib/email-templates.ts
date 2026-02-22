@@ -5,6 +5,11 @@ interface EmailTemplateProps {
   email?: string;
 }
 
+interface PasswordResetTemplateProps {
+  name: string;
+  resetUrl: string;
+}
+
 export function getWaitlistConfirmationEmail(props: EmailTemplateProps): string {
   return `
     <!DOCTYPE html>
@@ -329,6 +334,186 @@ export function getApprovalEmail(props: EmailTemplateProps): string {
 
           <div class="footer">
             <p style="color: #22c55e; font-weight: 600;">Conexões começam com respeito</p>
+            <p>© ${new Date().getFullYear()} Apimentadas. Todos os direitos reservados.</p>
+            <p>Jogo para maiores de 18 anos</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+export function getPasswordResetEmail(props: PasswordResetTemplateProps): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Redefinir Senha - Apimentadas</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #000000;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #000000;
+          }
+          .header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            padding: 40px 20px;
+            text-align: center;
+          }
+          .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+          }
+          .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+          }
+          .content {
+            background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a1a 100%);
+            padding: 40px 30px;
+            border-left: 4px solid #dc2626;
+            border-right: 4px solid #dc2626;
+          }
+          .content h2 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+          }
+          .content p {
+            color: #d4d4d4;
+            font-size: 16px;
+            margin-bottom: 15px;
+          }
+          .highlight {
+            color: #ef4444;
+            font-weight: 600;
+          }
+          .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 18px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+          }
+          .warning-box {
+            background-color: #1a1a1a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+          }
+          .warning-box p {
+            color: #fbbf24;
+            margin: 5px 0;
+            font-size: 14px;
+          }
+          .link-box {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            word-break: break-all;
+          }
+          .link-box p {
+            color: #999;
+            font-size: 12px;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+          }
+          .footer {
+            background-color: #0a0a0a;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 2px solid #dc2626;
+          }
+          .footer p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+          }
+          .security-note {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+          }
+          .security-note p {
+            color: #999;
+            font-size: 14px;
+            margin: 8px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">🔑</div>
+            <div class="brand">APIMENTADAS</div>
+          </div>
+
+          <div class="content">
+            <h2>Olá, ${props.name}!</h2>
+
+            <p>
+              Recebemos uma solicitação para <span class="highlight">redefinir a senha</span> da sua conta.
+            </p>
+
+            <p>
+              Clique no botão abaixo para criar uma nova senha:
+            </p>
+
+            <p style="text-align: center;">
+              <a href="${props.resetUrl}" class="cta-button">Redefinir Minha Senha</a>
+            </p>
+
+            <p style="color: #999; font-size: 14px;">
+              Ou copie e cole este link no seu navegador:
+            </p>
+
+            <div class="link-box">
+              <p>${props.resetUrl}</p>
+            </div>
+
+            <div class="warning-box">
+              <p><strong>⏰ Este link expira em 1 hora</strong></p>
+              <p>Por segurança, você precisará solicitar um novo link caso este expire.</p>
+            </div>
+
+            <div class="security-note">
+              <p><strong style="color: #fff;">🔒 Dicas de Segurança:</strong></p>
+              <p>✓ Se você não solicitou esta alteração, ignore este email</p>
+              <p>✓ Nunca compartilhe sua senha com ninguém</p>
+              <p>✓ Use uma senha forte e única para cada serviço</p>
+              <p>✓ Não clique em links suspeitos de emails desconhecidos</p>
+            </div>
+
+            <p style="margin-top: 30px; color: #999; font-size: 14px;">
+              Se você não solicitou a redefinição de senha, pode ignorar este email com segurança. Sua senha atual permanecerá inalterada.
+            </p>
+          </div>
+
+          <div class="footer">
+            <p style="color: #ef4444; font-weight: 600;">Conexões começam com respeito</p>
             <p>© ${new Date().getFullYear()} Apimentadas. Todos os direitos reservados.</p>
             <p>Jogo para maiores de 18 anos</p>
           </div>

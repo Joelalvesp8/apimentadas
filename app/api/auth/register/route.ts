@@ -23,10 +23,11 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password, name } = validation.data;
+    const normalizedEmail = email.toLowerCase();
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Create user (auto-approved - users can play immediately after registration)
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         name,
         password: hashedPassword,
         provider: 'credentials',
