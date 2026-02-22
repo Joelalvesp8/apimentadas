@@ -141,7 +141,7 @@ export async function POST(
 
       const cardsPlayed = allPlayedCards.length;
       // Convert qualitativeRating to numeric value: ruim=1, satisfatoria=3, excelente=5
-      const qualitativeToNum = (r: string | null) =>
+      const qualitativeToNum = (r: string | null): number | null =>
         r === 'ruim' ? 1 : r === 'satisfatoria' ? 3 : r === 'excelente' ? 5 : null;
       const ratingsWithValue = allPlayedCards
         .map((pc) => qualitativeToNum(pc.qualitativeRating))
