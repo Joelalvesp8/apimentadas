@@ -149,7 +149,7 @@ export default function ProfilePage() {
               <Avatar className="w-32 h-32 border-2 border-red-700/50">
                 <AvatarImage
                   src={imagePreview || profile?.user?.image || undefined}
-                  alt={profile?.user?.name || 'User'}
+                  alt={profile?.nickname || 'User'}
                 />
                 <AvatarFallback className="text-4xl bg-red-900 text-red-200">
                   {profile?.nickname?.[0]?.toUpperCase() || 'U'}
@@ -221,21 +221,6 @@ export default function ProfilePage() {
                   id="email"
                   type="email"
                   value={profile?.user?.email || ''}
-                  disabled
-                  className="bg-zinc-800/50 border-zinc-700 text-gray-400"
-                />
-              </div>
-
-              {/* Name (read-only) */}
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-200">
-                  <User className="w-4 h-4 inline mr-2" />
-                  Nome
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={profile?.user?.name || ''}
                   disabled
                   className="bg-zinc-800/50 border-zinc-700 text-gray-400"
                 />

@@ -40,7 +40,6 @@ export async function GET() {
         creator: {
           select: {
             id: true,
-            name: true,
             image: true,
           },
         },
@@ -51,8 +50,7 @@ export async function GET() {
                 user: {
                   select: {
                     id: true,
-                    name: true,
-                    image: true,
+                            image: true,
                   },
                 },
               },
@@ -175,7 +173,6 @@ export async function POST(request: NextRequest) {
         creator: {
           select: {
             id: true,
-            name: true,
             image: true,
           },
         },
@@ -186,8 +183,7 @@ export async function POST(request: NextRequest) {
                 user: {
                   select: {
                     id: true,
-                    name: true,
-                    image: true,
+                            image: true,
                   },
                 },
               },

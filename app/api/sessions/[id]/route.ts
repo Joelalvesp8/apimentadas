@@ -24,7 +24,6 @@ export async function GET(
         creator: {
           select: {
             id: true,
-            name: true,
             image: true,
           },
         },
@@ -35,7 +34,6 @@ export async function GET(
                 user: {
                   select: {
                     id: true,
-                    name: true,
                     image: true,
                   },
                 },

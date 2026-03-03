@@ -92,7 +92,6 @@ export async function POST(request: NextRequest) {
         creator: {
           select: {
             id: true,
-            name: true,
             image: true,
           },
         },
@@ -105,7 +104,6 @@ export async function POST(request: NextRequest) {
                 user: {
                   select: {
                     id: true,
-                    name: true,
                     image: true,
                   },
                 },

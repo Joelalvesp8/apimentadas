@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
             user: {
               select: {
                 id: true,
-                name: true,
                 image: true,
               },
             },
@@ -52,7 +51,6 @@ export async function GET(request: NextRequest) {
             user: {
               select: {
                 id: true,
-                name: true,
                 image: true,
               },
             },
@@ -131,7 +129,6 @@ export async function POST(request: NextRequest) {
             user: {
               select: {
                 id: true,
-                name: true,
                 image: true,
               },
             },
@@ -142,7 +139,6 @@ export async function POST(request: NextRequest) {
             user: {
               select: {
                 id: true,
-                name: true,
                 image: true,
               },
             },

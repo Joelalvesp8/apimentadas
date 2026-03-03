@@ -87,7 +87,7 @@ export default function GamePage() {
       (p) => p.profileId === session.currentTurnProfileId
     );
     const nextIndex = (currentIndex + 1) % session.sessionParticipants.length;
-    return session.sessionParticipants[nextIndex].profile.user.name;
+    return session.sessionParticipants[nextIndex].profile.nickname;
   };
 
   const handleFetchCard = async () => {
@@ -351,7 +351,7 @@ export default function GamePage() {
                     ⏳ Aguarde...
                   </h2>
                   <p className="text-lg text-gray-400">
-                    {currentTurnParticipant?.profile.user.name} está pegando uma carta
+                    {currentTurnParticipant?.profile.nickname} está pegando uma carta
                   </p>
                 </>
               )}
@@ -506,7 +506,7 @@ export default function GamePage() {
                 <Card className="w-full max-w-md bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-zinc-700/50">
                   <CardContent className="py-6 text-center">
                     <p className="text-gray-400">
-                      Aguarde {currentTurnParticipant?.profile.user.name} avaliar sua resposta...
+                      Aguarde {currentTurnParticipant?.profile.nickname} avaliar sua resposta...
                     </p>
                   </CardContent>
                 </Card>
@@ -532,7 +532,7 @@ export default function GamePage() {
                 ) : (
                   <>
                     <p className="mb-4 text-gray-300">
-                      Aguarde {currentTurnParticipant?.profile.user.name} pegar uma carta
+                      Aguarde {currentTurnParticipant?.profile.nickname} pegar uma carta
                     </p>
                     <Button
                       size="lg"

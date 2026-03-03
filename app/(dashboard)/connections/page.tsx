@@ -166,9 +166,11 @@ export default function ConnectionsPage() {
                             </Avatar>
                             <div>
                               <p className="font-medium text-white">{profile.nickname}</p>
-                              <p className="text-sm text-gray-400">
-                                {profile.user.name}
-                              </p>
+                              {profile.bio && (
+                                <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                                  {profile.bio}
+                                </p>
+                              )}
                             </div>
                           </div>
                           <Button
@@ -229,9 +231,11 @@ export default function ConnectionsPage() {
                             </Avatar>
                             <div>
                               <p className="font-medium text-white">{profile.nickname}</p>
-                              <p className="text-sm text-gray-400">
-                                {profile.user.name}
-                              </p>
+                              {profile.bio && (
+                                <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                                  {profile.bio}
+                                </p>
+                              )}
                               {isReceiver && (
                                 <Badge variant="secondary" className="mt-1 bg-red-900/40 border-red-700/50 text-red-200">
                                   Quer se conectar com você
@@ -319,9 +323,11 @@ export default function ConnectionsPage() {
                           </Avatar>
                           <div>
                             <p className="font-medium text-white">{profile.nickname}</p>
-                            <p className="text-sm text-gray-400">
-                              {profile.user.name}
-                            </p>
+                            {profile.bio && (
+                              <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                                {profile.bio}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <Button

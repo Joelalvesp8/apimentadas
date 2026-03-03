@@ -254,9 +254,11 @@ export default function NewSessionPage() {
                           </Avatar>
                           <div>
                             <p className="font-medium text-white">{profile.nickname}</p>
-                            <p className="text-sm text-gray-400">
-                              {profile.user.name}
-                            </p>
+                            {profile.bio && (
+                              <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                                {profile.bio}
+                              </p>
+                            )}
                           </div>
                         </div>
                         {isSelected && (
