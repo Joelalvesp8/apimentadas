@@ -15,9 +15,13 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 export default function ConnectionsPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const { toast } = useToast();
   const { data: myProfile } = useProfile();
   const { data: acceptedConnections } = useConnections('accepted');
   const { data: pendingConnections } = useConnections('pending');
@@ -27,34 +31,82 @@ export default function ConnectionsPage() {
   const deleteConnection = useDeleteConnection();
 
   const handleSendRequest = async (profileId: string) => {
+    setProcessingId(profileId);
     try {
       await createConnection.mutateAsync(profileId);
-    } catch (error) {
+      toast({
+        title: 'Solicitação enviada!',
+        description: 'Aguarde a resposta do usuário.',
+      });
+    } catch (error: any) {
       console.error('Error sending request:', error);
+      toast({
+        title: 'Erro ao enviar solicitação',
+        description: error?.message || 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleAccept = async (connectionId: string) => {
+    setProcessingId(connectionId);
     try {
       await updateConnection.mutateAsync({ id: connectionId, status: 'accepted' });
-    } catch (error) {
+      toast({
+        title: 'Conexão aceita!',
+        description: 'Vocês agora estão conectados.',
+      });
+    } catch (error: any) {
       console.error('Error accepting connection:', error);
+      toast({
+        title: 'Erro ao aceitar conexão',
+        description: error?.message || 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleReject = async (connectionId: string) => {
+    setProcessingId(connectionId);
     try {
       await updateConnection.mutateAsync({ id: connectionId, status: 'rejected' });
-    } catch (error) {
+      toast({
+        title: 'Solicitação rejeitada',
+        description: 'A solicitação foi removida.',
+      });
+    } catch (error: any) {
       console.error('Error rejecting connection:', error);
+      toast({
+        title: 'Erro ao rejeitar conexão',
+        description: error?.message || 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleRemove = async (connectionId: string) => {
+    setProcessingId(connectionId);
     try {
       await deleteConnection.mutateAsync(connectionId);
-    } catch (error) {
+      toast({
+        title: 'Conexão removida',
+        description: 'A conexão foi removida com sucesso.',
+      });
+    } catch (error: any) {
       console.error('Error removing connection:', error);
+      toast({
+        title: 'Erro ao remover conexão',
+        description: error?.message || 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -123,9 +175,17 @@ export default function ConnectionsPage() {
                             variant="destructive"
                             size="sm"
                             onClick={() => handleRemove(connection.id)}
-                            className="bg-zinc-700 hover:bg-zinc-600 border-2 border-zinc-600 text-gray-300 hover:text-white transition-all duration-300"
+                            disabled={processingId === connection.id}
+                            className="bg-zinc-700 hover:bg-zinc-600 border-2 border-zinc-600 text-gray-300 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            Remover
+                            {processingId === connection.id ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Removendo...
+                              </>
+                            ) : (
+                              'Remover'
+                            )}
                           </Button>
                         </div>
                       );
@@ -184,17 +244,33 @@ export default function ConnectionsPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleAccept(connection.id)}
-                                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white border-2 border-red-600/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300"
+                                disabled={processingId === connection.id}
+                                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white border-2 border-red-600/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                Aceitar
+                                {processingId === connection.id ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Aceitando...
+                                  </>
+                                ) : (
+                                  'Aceitar'
+                                )}
                               </Button>
                               <Button
                                 variant="destructive"
                                 size="sm"
                                 onClick={() => handleReject(connection.id)}
-                                className="bg-zinc-700 hover:bg-zinc-600 border-2 border-zinc-600 text-gray-300 hover:text-white transition-all duration-300"
+                                disabled={processingId === connection.id}
+                                className="bg-zinc-700 hover:bg-zinc-600 border-2 border-zinc-600 text-gray-300 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                Rejeitar
+                                {processingId === connection.id ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Rejeitando...
+                                  </>
+                                ) : (
+                                  'Rejeitar'
+                                )}
                               </Button>
                             </div>
                           ) : (
@@ -251,10 +327,17 @@ export default function ConnectionsPage() {
                         <Button
                           size="sm"
                           onClick={() => handleSendRequest(profile.id)}
-                          disabled={createConnection.isPending}
-                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white border-2 border-red-600/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300"
+                          disabled={processingId === profile.id}
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white border-2 border-red-600/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Conectar
+                          {processingId === profile.id ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Enviando...
+                            </>
+                          ) : (
+                            'Conectar'
+                          )}
                         </Button>
                       </div>
                     ))}
