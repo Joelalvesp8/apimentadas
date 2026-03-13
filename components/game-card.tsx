@@ -82,9 +82,9 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
             />
 
             {/* Content Overlay */}
-            <CardContent className="relative z-10 p-8 flex flex-col h-full justify-between">
-              <div className="space-y-6">
-                <div className="flex gap-2 justify-center flex-wrap">
+            <CardContent className="relative z-10 p-8 flex flex-col h-full justify-between overflow-hidden">
+              <div className="flex-1 flex flex-col space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent">
+                <div className="flex gap-2 justify-center flex-wrap flex-shrink-0">
                   <Badge className="bg-white/90 text-gray-900 hover:bg-white border border-amber-400">
                     {typeLabels[card.type as keyof typeof typeLabels]}
                   </Badge>
@@ -101,14 +101,14 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
                   </Badge>
                 </div>
 
-                <div className="text-center px-4 py-8">
+                <div className="text-center px-4 py-8 flex-1">
                   <p className="text-xl md:text-2xl font-serif leading-relaxed text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                     {card.content}
                   </p>
                 </div>
               </div>
 
-              <p className="text-sm text-center text-white/70 drop-shadow-lg">
+              <p className="text-sm text-center text-white/70 drop-shadow-lg flex-shrink-0 mt-4">
                 Clique para virar
               </p>
             </CardContent>
