@@ -202,12 +202,23 @@ export default function ProductPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Image */}
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+                {product.link ? (
+                  <a href={product.link} target="_blank" rel="noopener noreferrer">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={imageUrl}
+                      alt={product.name}
+                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                    />
+                  </a>
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
 
               {/* Details */}

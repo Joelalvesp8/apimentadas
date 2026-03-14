@@ -97,7 +97,7 @@ export async function PATCH(
     // For now, any authenticated user can edit (should be restricted to admins only)
 
     const body = await request.json();
-    const { name, description, price, subcategoryId, stock, images, active } = body;
+    const { name, description, price, subcategoryId, stock, images, link, active } = body;
 
     // Validation
     if (price !== undefined && price <= 0) {
@@ -127,6 +127,7 @@ export async function PATCH(
         ...(subcategoryId && { subcategoryId }),
         ...(stock !== undefined && { stock }),
         ...(images && { images }),
+        ...(link !== undefined && { link }),
         ...(active !== undefined && { active }),
       },
       include: {

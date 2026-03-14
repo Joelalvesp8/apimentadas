@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     // For now, any authenticated user can create products (should be restricted to admins only)
 
     const body = await request.json();
-    const { name, description, price, subcategoryId, stock, images } = body;
+    const { name, description, price, subcategoryId, stock, images, link } = body;
 
     // Validation
     if (!name || !description || !price || !subcategoryId) {
@@ -138,6 +138,7 @@ export async function POST(request: NextRequest) {
         price,
         stock: stock || 0,
         images: images || [],
+        link: link || null,
       },
       include: {
         subcategory: {

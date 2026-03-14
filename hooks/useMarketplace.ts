@@ -38,6 +38,7 @@ export interface Product {
   price: number;
   stock: number;
   images: string[] | string | any; // Can be array, string, or Prisma Json type
+  link?: string | null; // Link externo para vendas
   active: boolean;
   featured: boolean;
   createdAt: string;
@@ -156,6 +157,7 @@ export function useCreateProduct() {
       category: string;
       stock: number;
       images?: string[];
+      link?: string;
     }) => apiClient.post<Product>('/api/products', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -174,6 +176,7 @@ export function useUpdateProduct(id: string) {
       category?: string;
       stock?: number;
       images?: string[];
+      link?: string;
       active?: boolean;
     }) => apiClient.patch<Product>(`/api/products/${id}`, data),
     onSuccess: () => {
@@ -196,6 +199,7 @@ export function useUpdateProductMutation() {
         category?: string;
         stock?: number;
         images?: string[];
+        link?: string;
         active?: boolean;
       };
     }) => apiClient.patch<Product>(`/api/products/${id}`, data),

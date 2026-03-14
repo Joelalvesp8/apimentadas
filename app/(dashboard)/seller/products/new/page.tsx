@@ -30,6 +30,7 @@ export default function NewProductPage() {
   const [category, setCategory] = useState('');
   const [stock, setStock] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  const [link, setLink] = useState('');
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -63,7 +64,8 @@ export default function NewProductPage() {
         price: parseFloat(price),
         category,
         stock: parseInt(stock),
-        images
+        images,
+        link: link || undefined
       });
 
       alert('Produto criado com sucesso!');
@@ -172,6 +174,21 @@ export default function NewProductPage() {
                   placeholder="0"
                   required
                 />
+              </div>
+
+              {/* Link */}
+              <div>
+                <Label htmlFor="link">Link Externo (opcional)</Label>
+                <Input
+                  id="link"
+                  type="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder="https://exemplo.com/produto"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Ao adicionar um link, ao clicar na foto o usuário será redirecionado para este link
+                </p>
               </div>
 
               {/* Images */}

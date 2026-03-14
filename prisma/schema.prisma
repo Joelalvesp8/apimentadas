@@ -429,6 +429,7 @@ model Product {
   price         Decimal  @db.Decimal(10, 2)
   stock         Int      @default(0)
   images        Json     @default("[]") // Array de URLs ou base64
+  link          String?  // Link externo para vendas
   active        Boolean  @default(true)
   featured      Boolean  @default(false) // Produto em destaque
   createdAt     DateTime @default(now()) @map("created_at")

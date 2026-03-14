@@ -132,41 +132,60 @@ export default function MarketplacePage() {
                 : '/placeholder-product.png';
 
               return (
-                <Link key={product.id} href={`/marketplace/${product.id}`}>
-                  <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-zinc-700/40 hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.3)] transition-all duration-300 cursor-pointer h-full">
-                    <div className="aspect-square bg-zinc-950 relative overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover rounded-t-lg hover:scale-105 transition-transform duration-500"
-                      />
-                      {product.stock === 0 && (
-                        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
-                          <Badge className="bg-red-900/80 text-red-200 border-red-700">Esgotado</Badge>
-                        </div>
-                      )}
-                    </div>
-                    <CardContent className="p-3">
-                      <h3 className="font-semibold text-sm md:text-base line-clamp-2 mb-1 text-white">
-                        {product.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 mb-2">
-                        {STORE_NAME}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-red-500 drop-shadow-[0_0_6px_rgba(220,38,38,0.4)]">
-                          R$ {Number(product.price).toFixed(2)}
-                        </span>
-                        {product.stock > 0 && product.stock <= 5 && (
-                          <Badge variant="outline" className="text-xs border-zinc-600 text-gray-400">
-                            {product.stock} restantes
-                          </Badge>
+                <Card key={product.id} className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-zinc-700/40 hover:border-red-700/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.3)] transition-all duration-300 cursor-pointer h-full">
+                  {/* Se o produto tem link externo, ao clicar na imagem abre o link */}
+                  {product.link ? (
+                    <a href={product.link} target="_blank" rel="noopener noreferrer">
+                      <div className="aspect-square bg-zinc-950 relative overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-t-lg hover:scale-105 transition-transform duration-500"
+                        />
+                        {product.stock === 0 && (
+                          <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                            <Badge className="bg-red-900/80 text-red-200 border-red-700">Esgotado</Badge>
+                          </div>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                    </a>
+                  ) : (
+                    <Link href={`/marketplace/${product.id}`}>
+                      <div className="aspect-square bg-zinc-950 relative overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-t-lg hover:scale-105 transition-transform duration-500"
+                        />
+                        {product.stock === 0 && (
+                          <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                            <Badge className="bg-red-900/80 text-red-200 border-red-700">Esgotado</Badge>
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  )}
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold text-sm md:text-base line-clamp-2 mb-1 text-white">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-2">
+                      {STORE_NAME}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-red-500 drop-shadow-[0_0_6px_rgba(220,38,38,0.4)]">
+                        R$ {Number(product.price).toFixed(2)}
+                      </span>
+                      {product.stock > 0 && product.stock <= 5 && (
+                        <Badge variant="outline" className="text-xs border-zinc-600 text-gray-400">
+                          {product.stock} restantes
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
