@@ -11,6 +11,7 @@ import {
   useStartRound,
   useSubmitAnswer,
   useLeaveSession,
+  useRoundHistory,
 } from '@/hooks/useSessions';
 import { useProfile } from '@/hooks/useProfile';
 import { useGameNotifications } from '@/hooks/useNotifications';
@@ -20,7 +21,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { OnlineAnswerCounter } from '@/components/online/online-answer-counter';
 import { OnlineAnswersDisplay } from '@/components/online/online-answers-display';
-import { ArrowLeft, Play, Send, CheckCircle, XCircle, Bell, BellOff } from 'lucide-react';
+import { RoundHistoryViewer } from '@/components/online/round-history-viewer';
+import { ArrowLeft, Play, Send, CheckCircle, XCircle, Bell, BellOff, History } from 'lucide-react';
 
 export default function GameOnlinePage() {
   const params = useParams();
@@ -33,6 +35,7 @@ export default function GameOnlinePage() {
   const { data: session, isLoading: sessionLoading } = useSession(sessionId);
   const { data: currentRound, isLoading: roundLoading } = useCurrentRound(sessionId);
   const { data: status } = useSessionStatus(sessionId);
+  const { data: roundHistory } = useRoundHistory(sessionId);
 
   const startRound = useStartRound(sessionId);
   const submitAnswer = useSubmitAnswer(sessionId, currentRound?.id || '');
@@ -40,6 +43,7 @@ export default function GameOnlinePage() {
 
   const [answerText, setAnswerText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Notifications
   const {
@@ -297,6 +301,23 @@ export default function GameOnlinePage() {
               Voltar
             </Button>
 
+            {/* History button */}
+            {roundHistory && roundHistory.rounds.length > 0 && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowHistory(!showHistory)}
+                className={`border-zinc-700/50 ${
+                  showHistory
+                    ? 'bg-purple-900/40 border-purple-700/50 text-purple-400'
+                    : 'bg-zinc-900/60 text-gray-400 hover:bg-zinc-800'
+                }`}
+                title="Ver histórico de rodadas"
+              >
+                <History className="w-4 h-4" />
+              </Button>
+            )}
+
             {/* Notification status */}
             {notificationsSupported && (
               <Button
@@ -337,6 +358,16 @@ export default function GameOnlinePage() {
             </Badge>
           </div>
         </div>
+
+        {/* Round history viewer */}
+        {showHistory && roundHistory && (
+          <RoundHistoryViewer
+            rounds={roundHistory.rounds}
+            currentRoundNumber={currentRound?.roundNumber || null}
+            currentUserId={profile?.id}
+            onClose={() => setShowHistory(false)}
+          />
+        )}
 
         {/* Session info card */}
         <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">

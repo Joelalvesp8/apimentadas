@@ -291,3 +291,20 @@ export function useLeaveSession() {
     },
   });
 }
+
+// Get round history for active online sessions (temporary history)
+export interface RoundHistory {
+  rounds: OnlineRound[];
+  totalRounds: number;
+  completedRounds: number;
+  sessionStatus: string;
+}
+
+export function useRoundHistory(sessionId: string) {
+  return useQuery({
+    queryKey: ['sessions', sessionId, 'rounds', 'history'],
+    queryFn: () => apiClient.get<RoundHistory>(`/api/sessions/${sessionId}/rounds/history`),
+    enabled: !!sessionId,
+    refetchInterval: 5000, // Poll every 5 seconds to keep history updated
+  });
+}

@@ -11,6 +11,8 @@ export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days - sessão permanece ativa por 30 dias
+    updateAge: 24 * 60 * 60, // 24 hours - atualiza a sessão a cada 24 horas de uso
   },
   pages: {
     signIn: '/login',
