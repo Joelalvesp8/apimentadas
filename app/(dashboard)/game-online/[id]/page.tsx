@@ -97,19 +97,18 @@ export default function GameOnlinePage() {
 
     const prevRound = prevRoundRef.current;
 
-    // New round started
+    // New round started - nova carta virada
     if (!prevRound || prevRound.id !== effectiveCurrentRound.id) {
       const isMyTurn = effectiveCurrentRound.metadata?.isCurrentUserTurn;
-      const canSee = effectiveCurrentRound.metadata?.canSeeQuestion;
 
       // Notify if it's user's turn to flip the card
       if (isMyTurn && !effectiveCurrentRound.metadata?.currentUserAnswered) {
-        console.log('[NOTIFICATIONS] Your turn to flip card');
+        console.log('[NOTIFICATIONS] Your turn - you flipped the card');
         notifyYourTurn(effectiveCurrentRound.roundNumber);
       }
-      // Notify if question became available (someone else flipped)
-      else if (!isMyTurn && canSee && prevRound?.metadata?.canSeeQuestion === false) {
-        console.log('[NOTIFICATIONS] Question ready');
+      // Notify everyone else that a new question is available
+      else if (!isMyTurn) {
+        console.log('[NOTIFICATIONS] New question available');
         notifyQuestionReady(
           effectiveCurrentRound.roundNumber,
           effectiveCurrentRound.metadata?.currentTurnUserNickname || 'Outro jogador'
@@ -124,22 +123,6 @@ export default function GameOnlinePage() {
     ) {
       console.log('[NOTIFICATIONS] Round completed');
       notifyRoundCompleted(effectiveCurrentRound.roundNumber);
-    }
-
-    // Question became visible (turn player answered)
-    if (
-      prevRound &&
-      prevRound.id === effectiveCurrentRound.id &&
-      !prevRound.metadata?.canSeeQuestion &&
-      effectiveCurrentRound.metadata?.canSeeQuestion &&
-      !effectiveCurrentRound.metadata?.isCurrentUserTurn &&
-      !effectiveCurrentRound.metadata?.currentUserAnswered
-    ) {
-      console.log('[NOTIFICATIONS] Question now visible');
-      notifyQuestionReady(
-        effectiveCurrentRound.roundNumber,
-        effectiveCurrentRound.metadata?.currentTurnUserNickname || 'Outro jogador'
-      );
     }
 
     // Update ref
@@ -443,25 +426,9 @@ export default function GameOnlinePage() {
         {/* Current round card */}
         {effectiveCurrentRound && (
           <>
-            {/* Show "waiting for turn" message if user can't see question yet */}
-            {!effectiveCurrentRound.metadata?.canSeeQuestion && (
-              <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-yellow-700/50 shadow-[0_0_40px_rgba(251,191,36,0.3)]">
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-4">🎴</div>
-                  <h3 className="text-2xl font-bold text-yellow-300 mb-2">
-                    Aguardando {effectiveCurrentRound.metadata?.currentTurnUserNickname} virar a carta...
-                  </h3>
-                  <p className="text-gray-400">
-                    {effectiveCurrentRound.metadata?.currentTurnUserNickname} está virando a carta e responderá primeiro.
-                    Quando {effectiveCurrentRound.metadata?.currentTurnUserNickname} responder, a pergunta aparecerá para você.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Show question only if user can see it */}
-            {effectiveCurrentRound.metadata?.canSeeQuestion && (
-              <>
+            {/* NOVA LÓGICA: A carta é sempre mostrada para todos quando é virada */}
+            {/* Todos veem e podem responder simultaneamente */}
+            <>
                 <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center justify-between">
@@ -471,7 +438,7 @@ export default function GameOnlinePage() {
                       </div>
                       {effectiveCurrentRound.metadata?.isCurrentUserTurn && (
                         <Badge className="bg-yellow-700 border-yellow-600">
-                          Sua vez de virar!
+                          Você virou esta carta!
                         </Badge>
                       )}
                     </CardTitle>
@@ -502,10 +469,10 @@ export default function GameOnlinePage() {
                   answeredParticipants={answeredParticipants}
                 />
               </>
-            )}
 
-            {/* Answer form (only if round is active, user can see question, and hasn't answered) */}
-            {isRoundActive && effectiveCurrentRound.metadata?.canSeeQuestion && !hasAnswered && (
+            {/* Answer form (only if round is active and user hasn't answered) */}
+            {/* NOVA LÓGICA: Todos podem responder simultaneamente */}
+            {isRoundActive && !hasAnswered && (
               <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
                 <CardHeader>
                   <CardTitle className="text-white">Sua Resposta</CardTitle>

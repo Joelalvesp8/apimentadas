@@ -157,10 +157,9 @@ export async function GET(
     );
     const hasCurrentTurnAnswered = answeredIds.includes(currentRound.currentTurnProfileId);
 
-    // User can see the question if:
-    // 1. It's their turn (they need to answer first)
-    // 2. OR the person whose turn it is has already answered
-    const canSeeQuestion = isCurrentUserTurn || hasCurrentTurnAnswered;
+    // NOVA LÓGICA: Todos podem ver a carta assim que ela é virada (quando o round é criado)
+    // Todos podem responder simultaneamente
+    const canSeeQuestion = true; // Sempre true - todos veem a carta ao mesmo tempo
 
     const roundWithMeta = {
       ...currentRound,
