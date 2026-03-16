@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCreateProduct } from '@/hooks/useMarketplace';
+import { useCreateProduct, useCategories } from '@/hooks/useMarketplace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,23 +11,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import Link from 'next/link';
 
-const categories = [
-  { value: 'vibradores', label: 'Vibradores' },
-  { value: 'lingerie', label: 'Lingerie' },
-  { value: 'acessorios', label: 'Acessórios' },
-  { value: 'lubrificantes', label: 'Lubrificantes' },
-  { value: 'fantasias', label: 'Fantasias' },
-  { value: 'outros', label: 'Outros' }
-];
-
 export default function NewProductPage() {
   const router = useRouter();
   const createProduct = useCreateProduct();
+  const { data: categories, isLoading: loadingCategories } = useCategories(true);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [category, setCategory] = useState('');
+  const [subcategoryId, setSubcategoryId] = useState('');
   const [stock, setStock] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [link, setLink] = useState('');
@@ -52,7 +44,7 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !description || !price || !category || !stock) {
+    if (!name || !description || !price || !subcategoryId || !stock) {
       alert('Por favor, preencha todos os campos obrigatórios');
       return;
     }
@@ -62,7 +54,7 @@ export default function NewProductPage() {
         name,
         description,
         price: parseFloat(price),
-        category,
+        subcategoryId,
         stock: parseInt(stock),
         images,
         link: link || undefined
@@ -143,21 +135,28 @@ export default function NewProductPage() {
                 />
               </div>
 
-              {/* Category */}
+              {/* Subcategory */}
               <div>
-                <Label htmlFor="category">Categoria *</Label>
+                <Label htmlFor="subcategory">Subcategoria *</Label>
                 <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  id="subcategory"
+                  value={subcategoryId}
+                  onChange={(e) => setSubcategoryId(e.target.value)}
                   className="w-full px-3 py-2 border border-input rounded-md bg-background"
                   required
+                  disabled={loadingCategories}
                 >
-                  <option value="">Selecione uma categoria</option>
-                  {categories.map((cat) => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
+                  <option value="">
+                    {loadingCategories ? 'Carregando...' : 'Selecione uma subcategoria'}
+                  </option>
+                  {categories?.map((category) => (
+                    <optgroup key={category.id} label={category.name}>
+                      {category.subcategories?.map((sub) => (
+                        <option key={sub.id} value={sub.id}>
+                          {sub.name}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>

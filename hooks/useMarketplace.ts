@@ -154,7 +154,7 @@ export function useCreateProduct() {
       name: string;
       description: string;
       price: number;
-      category: string;
+      subcategoryId: string;
       stock: number;
       images?: string[];
       link?: string;
@@ -173,7 +173,7 @@ export function useUpdateProduct(id: string) {
       name?: string;
       description?: string;
       price?: number;
-      category?: string;
+      subcategoryId?: string;
       stock?: number;
       images?: string[];
       link?: string;
@@ -196,7 +196,7 @@ export function useUpdateProductMutation() {
         name?: string;
         description?: string;
         price?: number;
-        category?: string;
+        subcategoryId?: string;
         stock?: number;
         images?: string[];
         link?: string;
