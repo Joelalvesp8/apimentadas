@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// GET /api/admin/seed-cards - Seed cards (can be called from browser)
-export async function GET() {
-  return POST();
-}
-
 // POST /api/admin/seed-cards - Seed cards in production database
 export async function POST() {
+  const user = await getAuthenticatedUser();
+  if (!user || !isAdmin(user)) {
+    return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+  }
+
   try {
     const cartas = [
       {
@@ -481,24 +483,19 @@ export async function POST() {
     const deleted = await prisma.card.deleteMany({
       where: { isOfficial: true },
     });
-    console.log(`[SEED] Deleted ${deleted.count} official cards`);
 
-    // Insert new cards
-    let insertedCount = 0;
-    for (const carta of cartas) {
-      await prisma.card.create({
-        data: {
-          type: carta.type,
-          category: carta.category,
-          difficulty: carta.difficulty,
-          content: carta.content,
-          isOfficial: true,
-        },
-      });
-      insertedCount++;
-    }
+    // Insert all cards in a single batch operation
+    const result = await prisma.card.createMany({
+      data: cartas.map((carta) => ({
+        type: carta.type,
+        category: carta.category,
+        difficulty: carta.difficulty,
+        content: carta.content,
+        isOfficial: true,
+      })),
+    });
 
-    console.log(`[SEED] Inserted ${insertedCount} cards successfully`);
+    const insertedCount = result.count;
 
     // Get final stats
     const stats = await prisma.card.groupBy({

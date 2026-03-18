@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================================================
@@ -37,6 +38,7 @@ model User {
   notifications  Notification[]
   postComments   PostComment[]
 
+  @@index([email])
   @@map("users")
 }
 
@@ -94,6 +96,8 @@ model Profile {
   cartItems     CartItem[]
   ordersAsBuyer Order[]
 
+  @@index([userId])
+  @@index([nickname])
   @@map("profiles")
 }
 
@@ -114,6 +118,8 @@ model Connection {
   to   Profile @relation("ConnectionTo", fields: [toId], references: [id], onDelete: Cascade)
 
   @@unique([fromId, toId])
+  @@index([fromId])
+  @@index([toId])
   @@map("connections")
 }
 
@@ -167,6 +173,8 @@ model Post {
   likes    PostLike[]
   comments PostComment[]
 
+  @@index([profileId])
+  @@index([createdAt])
   @@map("posts")
 }
 
@@ -196,6 +204,8 @@ model Notification {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([read])
   @@map("notifications")
 }
 
@@ -226,6 +236,9 @@ model DirectMessage {
   sender   Profile @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
   receiver Profile @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
 
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
   @@map("direct_messages")
 }
 
@@ -313,6 +326,9 @@ model GameSession {
   playedCards         PlayedCard[]
   onlineRounds        OnlineRound[]
 
+  @@index([creatorId])
+  @@index([status])
+  @@index([mode])
   @@map("game_sessions")
 }
 

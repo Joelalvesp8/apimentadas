@@ -2,15 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import * as XLSX from 'xlsx';
 import { parse } from 'csv-parse/sync';
+import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const VALID_TYPES = ['pergunta', 'tarefa'];
 const VALID_CATEGORIES = ['casais', 'trios', 'grupos', 'solteiros'];
-const VALID_DIFFICULTIES = ['facil', 'leve', 'medio', 'dificil', 'picante', 'extremo'];
+const VALID_DIFFICULTIES = ['facil', 'medio', 'dificil', 'extremo'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthenticatedUser();
+  if (!user || !isAdmin(user)) {
+    return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -19,11 +27,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
     }
 
-    console.log('[IMPORT-FILE] Starting file import:', {
-      filename: file.name,
-      size: file.size,
-      type: file.type,
-    });
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'Arquivo muito grande. Máximo: 5MB' }, { status: 400 });
+    }
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = file.name.toLowerCase();

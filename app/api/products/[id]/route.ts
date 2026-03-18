@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 
 // Force dynamic rendering - used by authenticated and public routes
 export const dynamic = 'force-dynamic';
@@ -93,8 +94,9 @@ export async function PATCH(
       return errorResponse('Produto não encontrado', 404);
     }
 
-    // TODO: Add admin authorization check here
-    // For now, any authenticated user can edit (should be restricted to admins only)
+    if (!isAdmin(user)) {
+      return errorResponse('Acesso negado. Apenas administradores podem editar produtos.', 403);
+    }
 
     const body = await request.json();
     const { name, description, price, subcategoryId, stock, images, link, active } = body;
@@ -174,8 +176,9 @@ export async function DELETE(
       return errorResponse('Produto não encontrado', 404);
     }
 
-    // TODO: Add admin authorization check here
-    // For now, any authenticated user can delete (should be restricted to admins only)
+    if (!isAdmin(user)) {
+      return errorResponse('Acesso negado. Apenas administradores podem deletar produtos.', 403);
+    }
 
     // Check if product has pending orders
     const pendingOrders = await prisma.orderItem.count({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 
 // Force dynamic rendering for authenticated routes
 export const dynamic = 'force-dynamic';
@@ -101,8 +102,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('Perfil não encontrado', 404);
     }
 
-    // TODO: Add admin authorization check here
-    // For now, any authenticated user can create products (should be restricted to admins only)
+    if (!isAdmin(user)) {
+      return errorResponse('Acesso negado. Apenas administradores podem criar produtos.', 403);
+    }
 
     const body = await request.json();
     const { name, description, price, subcategoryId, stock, images, link } = body;

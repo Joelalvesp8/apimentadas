@@ -15,15 +15,14 @@ export async function POST() {
     }
 
     // Delete in dependency order to avoid FK constraint violations
-    const [deletedAnswers, deletedRounds, deletedParticipants, deletedPlayedCards] =
-      await Promise.all([
-        prisma.onlineAnswer.deleteMany({}),
-        prisma.onlineRound.deleteMany({}),
-        prisma.sessionParticipant.deleteMany({}),
-        prisma.playedCard.deleteMany({}),
-      ]);
+    const deletedAnswers = await prisma.onlineAnswer.deleteMany({});
+    const deletedRounds = await prisma.onlineRound.deleteMany({});
+    const [deletedParticipants, deletedPlayedCards] = await Promise.all([
+      prisma.sessionParticipant.deleteMany({ where: { session: { mode: 'online' } } }),
+      prisma.playedCard.deleteMany({ where: { session: { mode: 'online' } } }),
+    ]);
 
-    const deletedSessions = await prisma.gameSession.deleteMany({});
+    const deletedSessions = await prisma.gameSession.deleteMany({ where: { mode: 'online' } });
 
     // Reset sessionsPlayed counter on all profiles
     const resetProfiles = await prisma.profile.updateMany({
