@@ -7,10 +7,14 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // POST /api/admin/seed-cards - Seed cards in production database
-export async function POST() {
-  const user = await getAuthenticatedUser();
-  if (!user || !isAdmin(user)) {
-    return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+export async function POST(req: import('next/server').NextRequest) {
+  // Permite acesso via chave secreta temporária (para setup inicial)
+  const seedSecret = req.headers.get('x-seed-secret');
+  if (seedSecret !== process.env.SEED_SECRET) {
+    const user = await getAuthenticatedUser();
+    if (!user || !isAdmin(user)) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+    }
   }
 
   try {
