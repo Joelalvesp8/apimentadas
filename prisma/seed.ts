@@ -23,22 +23,18 @@ async function main() {
 
   console.log('🗑️  Cartas oficiais antigas removidas...');
 
-  // Inserir cartas
-  let count = 0;
-  for (const carta of cartas) {
-    await prisma.card.create({
-      data: {
-        type: carta.type,
-        category: carta.category,
-        difficulty: carta.difficulty,
-        content: carta.content,
-        isOfficial: true,
-      },
-    });
-    count++;
-  }
+  // Inserir cartas em batch
+  const result = await prisma.card.createMany({
+    data: cartas.map((carta: { type: string; category: string; difficulty: string; content: string }) => ({
+      type: carta.type,
+      category: carta.category,
+      difficulty: carta.difficulty,
+      content: carta.content,
+      isOfficial: true,
+    })),
+  });
 
-  console.log(`✅ ${count} cartas oficiais inseridas com sucesso!`);
+  console.log(`✅ ${result.count} cartas oficiais inseridas com sucesso!`);
 
   // Estatísticas
   const stats = await prisma.card.groupBy({
