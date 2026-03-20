@@ -1,14 +1,23 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home, Users, LogOut, Store, Package, ShoppingBag, Compass, User, Newspaper } from 'lucide-react';
+import { Home, Users, LogOut, Store, Compass, User, Newspaper, Menu } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Toaster } from '@/components/ui/toaster';
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { cn } from '@/lib/utils';
+
+const bottomNavItems = [
+  { href: '/dashboard', icon: Home, label: 'Início' },
+  { href: '/explore', icon: Compass, label: 'Explorar' },
+  { href: '/posts', icon: Newspaper, label: 'Posts' },
+  { href: '/connections', icon: Users, label: 'Conexões' },
+  { href: '/profile', icon: User, label: 'Perfil' },
+];
 
 export default function DashboardLayout({
   children,
@@ -17,6 +26,7 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const { data: profile, isLoading: profileLoading } = useProfile();
 
   // Redirect to login only on client-side
@@ -67,82 +77,90 @@ export default function DashboardLayout({
       <div className="fixed top-20 right-1/4 w-[400px] h-[400px] bg-red-900/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-zinc-900/95 border-b-2 border-red-700/30 backdrop-blur-md shadow-[0_4px_20px_rgba(220,38,38,0.15)] overflow-x-hidden">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between gap-2 min-h-[56px]">
-          <Link href="/dashboard" className="flex items-center gap-1 sm:gap-2 group">
-            <span className="text-2xl sm:text-3xl drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] transition-all group-hover:drop-shadow-[0_0_25px_rgba(220,38,38,1)]">🌶️</span>
-            <span className="text-lg sm:text-2xl font-bold text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
+      <header className="sticky top-0 z-50 bg-zinc-900/95 border-b border-red-700/30 backdrop-blur-md shadow-[0_4px_20px_rgba(220,38,38,0.15)]">
+        <div className="px-3 sm:px-4 flex items-center justify-between gap-2 h-14">
+          {/* Logo */}
+          <Link href="/dashboard" className="flex items-center gap-2 group shrink-0">
+            <span className="text-2xl drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">🌶️</span>
+            <span className="text-sm font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
               APIMENTADAS
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1 sm:gap-2">
-            <Link href="/dashboard" data-tour="new-session">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <Home className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Dashboard</span>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="px-3 text-gray-300 hover:text-white hover:bg-red-900/30">
+                <Home className="h-4 w-4 mr-2" />Dashboard
               </Button>
             </Link>
             <Link href="/marketplace">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <Store className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Pimentinhas</span>
-              </Button>
-            </Link>
-            <Link href="/orders">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <Package className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Pedidos</span>
-              </Button>
-            </Link>
-            {profile?.isVendor && (
-              <Link href="/seller">
-                <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                  <ShoppingBag className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Vendas</span>
-                </Button>
-              </Link>
-            )}
-            <Link href="/profile" data-tour="profile">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <User className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Perfil</span>
-              </Button>
-            </Link>
-            <Link href="/connections" data-tour="connections">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <Users className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Conexões</span>
+              <Button variant="ghost" size="sm" className="px-3 text-gray-300 hover:text-white hover:bg-red-900/30">
+                <Store className="h-4 w-4 mr-2" />Pimentinhas
               </Button>
             </Link>
             <Link href="/explore">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <Compass className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Explorar</span>
+              <Button variant="ghost" size="sm" className="px-3 text-gray-300 hover:text-white hover:bg-red-900/30">
+                <Compass className="h-4 w-4 mr-2" />Explorar
+              </Button>
+            </Link>
+            <Link href="/connections">
+              <Button variant="ghost" size="sm" className="px-3 text-gray-300 hover:text-white hover:bg-red-900/30">
+                <Users className="h-4 w-4 mr-2" />Conexões
               </Button>
             </Link>
             <Link href="/posts">
-              <Button variant="ghost" size="sm" className="px-2 sm:px-3 text-gray-300 hover:text-white hover:bg-red-900/30 transition-colors">
-                <Newspaper className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Posts</span>
+              <Button variant="ghost" size="sm" className="px-3 text-gray-300 hover:text-white hover:bg-red-900/30">
+                <Newspaper className="h-4 w-4 mr-2" />Posts
               </Button>
             </Link>
+            <Link href="/profile">
+              <Button variant="ghost" size="sm" className="px-3 text-gray-300 hover:text-white hover:bg-red-900/30">
+                <User className="h-4 w-4 mr-2" />Perfil
+              </Button>
+            </Link>
+          </nav>
+
+          {/* Right side actions */}
+          <div className="flex items-center gap-1 shrink-0">
             <NotificationBell />
             <Button
               variant="ghost"
               size="sm"
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="px-2 sm:px-3 text-gray-300 hover:text-red-400 hover:bg-red-900/30 transition-colors"
+              className="px-2 text-gray-300 hover:text-red-400 hover:bg-red-900/30"
             >
-              <LogOut className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Sair</span>
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Sair</span>
             </Button>
-          </nav>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 overflow-x-hidden overflow-y-auto">{children}</main>
+      <main className="relative z-10 overflow-x-hidden overflow-y-auto pb-20 md:pb-0">{children}</main>
+
+      {/* Bottom Navigation — mobile only */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-zinc-900/95 border-t border-red-700/30 backdrop-blur-md">
+        <div className="flex items-center justify-around h-16 px-1">
+          {bottomNavItems.map(({ href, icon: Icon, label }) => {
+            const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors',
+                  isActive ? 'text-red-400' : 'text-gray-400 hover:text-gray-200'
+                )}
+              >
+                <Icon className={cn('h-5 w-5', isActive && 'drop-shadow-[0_0_6px_rgba(220,38,38,0.8)]')} />
+                <span className="text-[10px] font-medium">{label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Toast notifications */}
       <Toaster />
