@@ -7,6 +7,10 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { isAdminEmail } from '@/lib/admin';
 
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const hasGoogleCredentials = !!(googleClientId && googleClientSecret);
+
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
@@ -18,10 +22,14 @@ export const authConfig: NextAuthConfig = {
     signIn: '/login',
   },
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    }),
+    ...(hasGoogleCredentials
+      ? [
+          GoogleProvider({
+            clientId: googleClientId!,
+            clientSecret: googleClientSecret!,
+          }),
+        ]
+      : []),
     CredentialsProvider({
       name: 'credentials',
       credentials: {

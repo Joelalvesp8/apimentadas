@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { unauthorizedResponse } from '@/lib/utils/responses';
 
 // Force dynamic rendering for authenticated routes
 export const dynamic = 'force-dynamic';
@@ -13,10 +14,6 @@ function successResponse(data: any, status = 200) {
 
 function errorResponse(error: string, status = 400) {
   return NextResponse.json({ error }, { status });
-}
-
-function unauthorizedResponse() {
-  return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 }
 
 // GET /api/cart - Get user's cart

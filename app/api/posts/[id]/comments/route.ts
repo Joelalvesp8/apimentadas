@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { unauthorizedResponse } from '@/lib/utils/responses';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -12,7 +13,7 @@ export async function GET(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!user) return unauthorizedResponse('Não autorizado');
 
     const comments = await prisma.postComment.findMany({
       where: { postId: params.id },
@@ -52,7 +53,7 @@ export async function POST(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!user) return unauthorizedResponse('Não autorizado');
 
     const post = await prisma.post.findUnique({
       where: { id: params.id },
@@ -120,7 +121,7 @@ export async function DELETE(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!user) return unauthorizedResponse('Não autorizado');
 
     const { searchParams } = new URL(request.url);
     const commentId = searchParams.get('commentId');

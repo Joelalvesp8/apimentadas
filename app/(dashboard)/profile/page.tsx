@@ -95,7 +95,7 @@ export default function ProfilePage() {
         bio,
         orientation: orientation || undefined,
       });
-      alert('Perfil atualizado com sucesso!');
+      router.push(`/users/${nickname}`);
     } catch (error: any) {
       alert(error.message || 'Erro ao atualizar perfil');
     }

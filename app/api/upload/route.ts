@@ -4,6 +4,7 @@ import { join } from 'path';
 import { mkdirSync, existsSync } from 'fs';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
 import { isAdmin } from '@/lib/utils/admin-helper';
+import { unauthorizedResponse } from '@/lib/utils/responses';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -14,10 +15,6 @@ function errorResponse(error: string, status = 400) {
 
 function successResponse(data: any, status = 200) {
   return NextResponse.json({ data }, { status });
-}
-
-function unauthorizedResponse() {
-  return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 }
 
 // POST /api/upload - Upload image (admin only)

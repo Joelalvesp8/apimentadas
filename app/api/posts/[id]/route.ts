@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { unauthorizedResponse } from '@/lib/utils/responses';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -12,7 +13,7 @@ export async function DELETE(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!user) return unauthorizedResponse('Não autorizado');
 
     const profile = await prisma.profile.findUnique({
       where: { userId: user.id },
