@@ -46,7 +46,7 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
 
   return (
     <div
-      className={cn('flip-card w-full max-w-md h-80 cursor-pointer', className, {
+      className={cn('flip-card w-full max-w-md h-64 sm:h-72 md:h-80 cursor-pointer', className, {
         flipped: isFlipped,
       })}
       onClick={handleClick}

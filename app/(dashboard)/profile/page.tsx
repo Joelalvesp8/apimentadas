@@ -127,10 +127,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black py-6 px-4">
+    <div className="min-h-screen bg-black p-3 sm:p-4 md:p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2 text-white">Meu Perfil</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-white">Meu Perfil</h1>
           <p className="text-gray-400">
             Gerencie suas informações pessoais
           </p>
@@ -146,7 +146,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center gap-4">
-              <Avatar className="w-32 h-32 border-2 border-red-700/50">
+              <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-red-700/50">
                 <AvatarImage
                   src={imagePreview || profile?.user?.image || undefined}
                   alt={profile?.nickname || 'User'}

@@ -125,9 +125,9 @@ function ResetPasswordForm() {
           }}
         />
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-green-900/20 rounded-full blur-[100px] animate-pulse-slow" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] bg-green-900/20 rounded-full blur-[60px] sm:blur-[80px] md:blur-[100px] animate-pulse-slow" />
 
-        <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-green-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(34,197,94,0.3)]">
+        <Card className="w-full max-w-md mx-4 relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-green-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(34,197,94,0.3)]">
           <CardHeader>
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-green-900/40 border-2 border-green-700/50 rounded-full flex items-center justify-center">
@@ -227,9 +227,9 @@ function ResetPasswordForm() {
         }}
       />
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-900/20 rounded-full blur-[100px] animate-pulse-slow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] bg-red-900/20 rounded-full blur-[60px] sm:blur-[80px] md:blur-[100px] animate-pulse-slow" />
 
-      <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(220,38,38,0.3)]">
+      <Card className="w-full max-w-md mx-4 relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(220,38,38,0.3)]">
         <CardHeader>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-red-900/40 border-2 border-red-700/50 rounded-full flex items-center justify-center">

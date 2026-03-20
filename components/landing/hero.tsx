@@ -24,11 +24,11 @@ export function Hero() {
       />
 
       {/* Red halo glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-900/20 rounded-full blur-[120px] animate-pulse-slow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] md:w-[800px] md:h-[800px] bg-red-900/20 rounded-full blur-[80px] sm:blur-[100px] md:blur-[120px] animate-pulse-slow" />
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
           Você teria coragem de responder…
           <br />
           <span className="text-red-500 drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]">

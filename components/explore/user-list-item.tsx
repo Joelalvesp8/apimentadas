@@ -43,7 +43,7 @@ export function UserListItem({ user, onConnect, onInvite, onMessage, onPreview }
   };
 
   return (
-    <div className="flex items-center gap-3 py-3 px-4 hover:bg-zinc-900/50 transition-colors">
+    <div className="flex items-center gap-2 sm:gap-3 py-3 px-3 sm:px-4 hover:bg-zinc-900/50 transition-colors overflow-hidden">
       {/* Avatar */}
       <button onClick={() => onPreview?.(user)} className="shrink-0 rounded-full focus:outline-none">
         <Avatar className="h-12 w-12 border-2 border-red-600/30 hover:border-red-500/60 transition-colors">
@@ -86,7 +86,7 @@ export function UserListItem({ user, onConnect, onInvite, onMessage, onPreview }
             variant="ghost"
             size="sm"
             onClick={() => onMessage(user.id, user.nickname)}
-            className="text-blue-400 hover:bg-blue-950/30 hover:text-blue-300 text-xs h-8 px-2"
+            className="text-blue-400 hover:bg-blue-950/30 hover:text-blue-300 text-xs min-h-[44px] sm:min-h-0 h-8 px-2"
             title="Enviar mensagem única"
           >
             <MessageCircle className="w-4 h-4" />
@@ -97,17 +97,17 @@ export function UserListItem({ user, onConnect, onInvite, onMessage, onPreview }
           variant="outline"
           size="sm"
           onClick={() => onConnect(user.id)}
-          className="border-zinc-700 text-gray-300 hover:bg-zinc-800 hover:text-white text-xs h-8 px-3"
+          className="border-zinc-700 text-gray-300 hover:bg-zinc-800 hover:text-white text-xs sm:text-sm min-h-[44px] sm:min-h-0 h-8 px-2 sm:px-3"
         >
-          <UserPlus className="w-3 h-3 mr-1" />
+          <UserPlus className="w-4 h-4 mr-1" />
           Conectar
         </Button>
         <Button
           size="sm"
           onClick={() => onInvite(user.id)}
-          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs h-8 px-3"
+          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs sm:text-sm min-h-[44px] sm:min-h-0 h-8 px-2 sm:px-3"
         >
-          <Send className="w-3 h-3 mr-1" />
+          <Send className="w-4 h-4 mr-1" />
           Convidar
         </Button>
       </div>

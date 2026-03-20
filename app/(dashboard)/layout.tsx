@@ -67,8 +67,8 @@ export default function DashboardLayout({
       <div className="fixed top-20 right-1/4 w-[400px] h-[400px] bg-red-900/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-zinc-900/95 border-b-2 border-red-700/30 backdrop-blur-md shadow-[0_4px_20px_rgba(220,38,38,0.15)]">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between gap-2">
+      <header className="sticky top-0 z-50 bg-zinc-900/95 border-b-2 border-red-700/30 backdrop-blur-md shadow-[0_4px_20px_rgba(220,38,38,0.15)] overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between gap-2 min-h-[56px]">
           <Link href="/dashboard" className="flex items-center gap-1 sm:gap-2 group">
             <span className="text-2xl sm:text-3xl drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] transition-all group-hover:drop-shadow-[0_0_25px_rgba(220,38,38,1)]">🌶️</span>
             <span className="text-lg sm:text-2xl font-bold text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
@@ -142,7 +142,7 @@ export default function DashboardLayout({
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 overflow-y-auto">{children}</main>
+      <main className="relative z-10 overflow-x-hidden overflow-y-auto">{children}</main>
 
       {/* Toast notifications */}
       <Toaster />

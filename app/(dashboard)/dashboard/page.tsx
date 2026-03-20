@@ -81,16 +81,16 @@ export default function DashboardPage() {
     <div className="min-h-screen p-3 md:p-4 pb-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-4xl font-bold mb-2 text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.3)]">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.3)]">
             Olá, {profile?.nickname || session?.user?.name}!
           </h1>
-          <p className="text-sm md:text-base text-gray-400">
+          <p className="text-sm sm:text-base text-gray-400">
             Bem-vindo(a) ao seu painel de controle
           </p>
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
           <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_rgba(220,38,38,0.3)] transition-all duration-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-200">Conexões</CardTitle>

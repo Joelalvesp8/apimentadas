@@ -86,7 +86,7 @@ export function WaitlistForm() {
     >
       {/* Glow effect */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[600px] bg-red-900/20 rounded-full blur-[100px]" />
+        <div className="w-[280px] h-[280px] sm:w-[440px] sm:h-[440px] md:w-[600px] md:h-[600px] bg-red-900/20 rounded-full blur-[60px] sm:blur-[80px] md:blur-[100px]" />
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto text-center">

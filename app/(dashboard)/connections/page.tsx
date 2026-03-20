@@ -111,9 +111,9 @@ export default function ConnectionsPage() {
   };
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-3 sm:p-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-white drop-shadow-[0_0_10px_rgba(220,38,38,0.4)]">Conexões</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 md:mb-8 text-white drop-shadow-[0_0_10px_rgba(220,38,38,0.4)]">Conexões</h1>
 
         <Tabs defaultValue="accepted" className="space-y-4">
           <TabsList className="bg-zinc-900/90 border-2 border-zinc-700/50">
@@ -167,7 +167,7 @@ export default function ConnectionsPage() {
                             <div>
                               <p className="font-medium text-white">{profile.nickname}</p>
                               {profile.bio && (
-                                <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                                <p className="text-sm text-gray-400 truncate max-w-[120px] sm:max-w-[200px]">
                                   {profile.bio}
                                 </p>
                               )}
@@ -232,7 +232,7 @@ export default function ConnectionsPage() {
                             <div>
                               <p className="font-medium text-white">{profile.nickname}</p>
                               {profile.bio && (
-                                <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                                <p className="text-sm text-gray-400 truncate max-w-[120px] sm:max-w-[200px]">
                                   {profile.bio}
                                 </p>
                               )}
@@ -324,7 +324,7 @@ export default function ConnectionsPage() {
                           <div>
                             <p className="font-medium text-white">{profile.nickname}</p>
                             {profile.bio && (
-                              <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                              <p className="text-sm text-gray-400 truncate max-w-[120px] sm:max-w-[200px]">
                                 {profile.bio}
                               </p>
                             )}

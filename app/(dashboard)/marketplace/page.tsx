@@ -56,8 +56,8 @@ export default function MarketplacePage() {
 
         {/* Filters */}
         <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
               {/* Search */}
               <div className="flex-1">
                 <div className="relative">
