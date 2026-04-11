@@ -36,7 +36,19 @@ export interface Profile {
 export function useProfile() {
   return useQuery({
     queryKey: ['profile'],
-    queryFn: () => apiClient.get<Profile>('/api/profile'),
+    queryFn: async (): Promise<Profile | null> => {
+      const response = await fetch('/api/profile');
+      if (response.status === 404) {
+        // Profile doesn't exist yet — normal for new users
+        return null;
+      }
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'An error occurred' }));
+        throw new Error(errorData.error || 'An error occurred');
+      }
+      const data = await response.json();
+      return data.data || data;
+    },
     retry: 1, // Retry once to handle transient errors
     retryDelay: 1000, // Wait 1 second before retrying
   });
