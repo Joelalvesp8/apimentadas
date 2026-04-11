@@ -27,7 +27,7 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const { data: profile, isLoading: profileLoading } = useProfile();
+  const { data: profile, isLoading: profileLoading, error: profileError } = useProfile();
 
   // Redirect to login only on client-side
   useEffect(() => {
@@ -37,9 +37,10 @@ export default function DashboardLayout({
   }, [status, router]);
 
   // Check if user has completed profile (has nickname)
+  // Only redirect when the profile is definitively missing (null) — not when there is a fetch error.
+  // A fetch error means we could not reach the server, not that the profile doesn't exist.
   useEffect(() => {
-    // Only check after both session and profile are loaded
-    if (status === 'authenticated' && !profileLoading) {
+    if (status === 'authenticated' && !profileLoading && !profileError) {
       const isOnboardingPage = window.location.pathname === '/onboarding';
 
       // If no profile or no nickname, redirect to onboarding
@@ -47,7 +48,7 @@ export default function DashboardLayout({
         router.push('/onboarding');
       }
     }
-  }, [status, profile, profileLoading, router]);
+  }, [status, profile, profileLoading, profileError, router]);
 
   // Show loading state during auth check or profile check
   if (status === 'loading' || profileLoading) {

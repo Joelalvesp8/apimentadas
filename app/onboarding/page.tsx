@@ -27,6 +27,15 @@ export default function OnboardingPage() {
   const [orientation, setOrientation] = useState<string>('');
   const [error, setError] = useState('');
 
+  // If the user already has a complete profile, redirect to the app — they were sent here
+  // by mistake (e.g., a transient profile-fetch error in the dashboard layout).
+  useEffect(() => {
+    if (existingProfile && existingProfile.nickname && !profileError) {
+      console.log('[DEBUG] Onboarding - Profile is complete, redirecting to explore');
+      router.push('/explore');
+    }
+  }, [existingProfile, profileError, router]);
+
   // Load existing profile data into form fields
   useEffect(() => {
     if (existingProfile) {
