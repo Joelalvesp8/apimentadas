@@ -26,7 +26,6 @@ model User {
   resetToken         String?   @unique @map("reset_token")
   resetTokenExpiry   DateTime? @map("reset_token_expiry")
   approved           Boolean   @default(false) // User approved to access the app
-  isSystemUser       Boolean   @default(false) @map("is_system_user") // Ocultar de queries públicas
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 

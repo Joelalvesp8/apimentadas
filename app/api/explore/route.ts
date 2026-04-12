@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         not: currentProfile.id, // Não mostrar o próprio perfil
       },
       user: {
-        isSystemUser: false, // Ocultar contas de sistema
+        approved: true,
       },
     };
 
