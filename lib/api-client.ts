@@ -36,7 +36,7 @@ class ApiClient {
     }
 
     const data = await response.json();
-    return data.data || data;
+    return 'data' in data ? data.data : data;
   }
 
   async get<T>(endpoint: string): Promise<T> {

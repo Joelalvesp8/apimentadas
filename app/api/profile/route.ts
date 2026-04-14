@@ -42,7 +42,9 @@ export async function GET() {
 
     if (!profile) {
       console.log('[DEBUG] GET /api/profile - Profile not found for userId:', user.id);
-      return errorResponse('Perfil não encontrado', 404);
+      // Return null data with 200 — a missing profile is not an error,
+      // it just means the user hasn't completed onboarding yet.
+      return successResponse(null);
     }
 
     console.log('[DEBUG] GET /api/profile - Success, returning profile');
