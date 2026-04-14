@@ -58,11 +58,38 @@ export async function POST(request: NextRequest) {
       return errorResponse('Arquivo muito grande. Tamanho máximo: 5MB');
     }
 
+    // Validate file signature (magic bytes) to prevent extension spoofing
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const magicBytes = fileBuffer.subarray(0, 4);
+    const signatures: Record<string, number[][]> = {
+      'jpg': [[0xFF, 0xD8, 0xFF]],
+      'png': [[0x89, 0x50, 0x4E, 0x47]],
+      'gif': [[0x47, 0x49, 0x46, 0x38]],
+      'webp': [[0x52, 0x49, 0x46, 0x46]], // RIFF header
+    };
+
+    const isValidSignature = Object.entries(signatures).some(([, sigs]) =>
+      sigs.some(sig => sig.every((byte, i) => magicBytes[i] === byte))
+    );
+
+    if (!isValidSignature) {
+      return errorResponse('Arquivo inválido. O conteúdo não corresponde a uma imagem válida.');
+    }
+
+    // Derive extension from validated MIME type instead of user-provided filename
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    };
+    const safeExtension = mimeToExt[file.type] || 'jpg';
+
     // Generate unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop();
-    const filename = `${timestamp}-${randomString}.${extension}`;
+    const filename = `${timestamp}-${randomString}.${safeExtension}`;
 
     console.log('Generated filename:', filename);
 
@@ -132,14 +159,11 @@ export async function POST(request: NextRequest) {
 
     console.log('Using products directory:', productsDir);
 
-    // Save file
-    console.log('Converting file to buffer...');
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Save file (reuse fileBuffer from magic bytes validation)
     const filepath = join(productsDir, filename);
 
     console.log('Writing file to:', filepath);
-    await writeFile(filepath, buffer);
+    await writeFile(filepath, fileBuffer);
     console.log('File saved successfully');
 
     // Return public URL
@@ -149,7 +173,7 @@ export async function POST(request: NextRequest) {
     return successResponse({ url, filename }, 201);
   } catch (error: any) {
     console.error('Error uploading file:', error);
-    console.error('Error stack:', error.stack);
-    return errorResponse(`Erro ao fazer upload do arquivo: ${error.message}`, 500);
+    // Stack trace logged server-side only
+    return errorResponse('Erro ao fazer upload do arquivo', 500);
   }
 }

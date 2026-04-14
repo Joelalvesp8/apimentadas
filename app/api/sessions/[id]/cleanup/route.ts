@@ -88,7 +88,7 @@ export async function GET(
   } catch (error: any) {
     console.error('[CLEANUP] Error:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: 'Erro ao limpar sessão' },
       { status: 500 }
     );
   }

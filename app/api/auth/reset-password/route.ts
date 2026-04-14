@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { checkRateLimit, getClientIp } from '@/lib/utils/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -15,6 +16,9 @@ function errorResponse(error: string, status = 400) {
 
 // POST /api/auth/reset-password - Reset password with token
 export async function POST(request: NextRequest) {
+  const rateLimited = checkRateLimit('auth-reset-password', getClientIp(request));
+  if (rateLimited) return rateLimited;
+
   try {
     const body = await request.json();
     const { token, password } = body;
@@ -24,8 +28,8 @@ export async function POST(request: NextRequest) {
       return errorResponse('Token e senha são obrigatórios', 400);
     }
 
-    if (password.length < 6) {
-      return errorResponse('A senha deve ter no mínimo 6 caracteres', 400);
+    if (password.length < 8) {
+      return errorResponse('A senha deve ter no mínimo 8 caracteres', 400);
     }
 
     // Find user with this token

@@ -3,8 +3,12 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { registerSchema } from '@/lib/validations/auth';
 import { errorResponse, successResponse, validationErrorResponse } from '@/lib/utils/responses';
+import { checkRateLimit, getClientIp } from '@/lib/utils/rate-limit';
 
 export async function POST(request: NextRequest) {
+  const rateLimited = checkRateLimit('auth-register', getClientIp(request));
+  if (rateLimited) return rateLimited;
+
   try {
     const body = await request.json();
 

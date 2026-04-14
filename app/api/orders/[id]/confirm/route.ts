@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 import { unauthorizedResponse } from '@/lib/utils/responses';
 
 // Helper functions
@@ -37,8 +38,10 @@ export async function POST(
       return errorResponse('Pedido não encontrado', 404);
     }
 
-    // TODO: Add admin authorization check here
-    // For now, any authenticated user can confirm (should be restricted to admins only)
+    // SECURITY: Only admins can confirm orders
+    if (!isAdmin(user)) {
+      return errorResponse('Apenas administradores podem confirmar pedidos', 403);
+    }
 
     // Check if order is awaiting confirmation
     if (order.status !== 'paid_awaiting_confirmation') {

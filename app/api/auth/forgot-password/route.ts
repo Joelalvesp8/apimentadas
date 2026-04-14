@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { randomBytes } from 'crypto';
 import { sendPasswordResetEmail } from '@/lib/email-service';
+import { checkRateLimit, getClientIp } from '@/lib/utils/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -16,6 +17,9 @@ function errorResponse(error: string, status = 400) {
 
 // POST /api/auth/forgot-password - Request password reset
 export async function POST(request: NextRequest) {
+  const rateLimited = checkRateLimit('auth-forgot-password', getClientIp(request));
+  if (rateLimited) return rateLimited;
+
   try {
     const body = await request.json();
     const { email } = body;

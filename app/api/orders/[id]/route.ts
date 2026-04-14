@@ -166,6 +166,32 @@ export async function PATCH(
       return errorResponse('Status inválido');
     }
 
+    // Validate state transitions
+    const currentOrder = await prisma.order.findUnique({
+      where: { id: params.id },
+      select: { status: true },
+    });
+
+    if (!currentOrder) {
+      return errorResponse('Pedido não encontrado', 404);
+    }
+
+    const allowedTransitions: Record<string, string[]> = {
+      'pending': ['paid_awaiting_confirmation', 'cancelled'],
+      'paid_awaiting_confirmation': ['confirmed', 'cancelled'],
+      'confirmed': ['shipped', 'cancelled'],
+      'shipped': ['delivered'],
+      'delivered': [],
+      'cancelled': [],
+    };
+
+    const allowed = allowedTransitions[currentOrder.status] || [];
+    if (!allowed.includes(status)) {
+      return errorResponse(
+        `Transição inválida: não é possível mudar de "${currentOrder.status}" para "${status}"`
+      );
+    }
+
     // Prepare update data
     const updateData: any = { status };
 

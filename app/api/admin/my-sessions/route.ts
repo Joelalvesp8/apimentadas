@@ -123,7 +123,7 @@ export async function GET() {
   } catch (error: any) {
     console.error('[MY-SESSIONS] Error:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: 'Erro ao buscar sessões' },
       { status: 500 }
     );
   }

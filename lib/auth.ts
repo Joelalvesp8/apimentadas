@@ -6,6 +6,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { isAdminEmail } from '@/lib/admin';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -15,8 +16,8 @@ export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days - sessão permanece ativa por 30 dias
-    updateAge: 24 * 60 * 60, // 24 hours - atualiza a sessão a cada 24 horas de uso
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+    updateAge: 24 * 60 * 60, // 24 hours - refresh token on activity
   },
   pages: {
     signIn: '/login',
@@ -39,6 +40,12 @@ export const authConfig: NextAuthConfig = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email e senha são obrigatórios');
+        }
+
+        // Rate limit login attempts by email
+        const rateLimited = checkRateLimit('auth-login', (credentials.email as string).toLowerCase());
+        if (rateLimited) {
+          throw new Error('Muitas tentativas de login. Tente novamente mais tarde.');
         }
 
         const user = await prisma.user.findUnique({

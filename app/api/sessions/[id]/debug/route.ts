@@ -88,7 +88,7 @@ export async function GET(
   } catch (error: any) {
     console.error('[DEBUG] Error:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: 'Erro interno do servidor' },
       { status: 500 }
     );
   }

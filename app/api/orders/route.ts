@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
+import { isAdmin } from '@/lib/utils/admin-helper';
 import { unauthorizedResponse } from '@/lib/utils/responses';
 
 // Force dynamic rendering for authenticated routes
@@ -35,8 +36,9 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status'); // optional filter
 
     // For seller type (admin view), show all orders; for buyer, show only user's orders
-    const where: any = type === 'seller'
-      ? {} // Show all orders for admin
+    // SECURITY: Only admins can view all orders
+    const where: any = (type === 'seller' && isAdmin(user))
+      ? {}
       : { buyerId: profile.id };
 
     if (status) {

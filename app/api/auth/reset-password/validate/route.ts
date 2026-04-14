@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/utils/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -14,6 +15,9 @@ function errorResponse(error: string, status = 400) {
 
 // GET /api/auth/reset-password/validate?token=xxx - Validate reset token
 export async function GET(request: NextRequest) {
+  const rateLimited = checkRateLimit('auth-reset-password', getClientIp(request));
+  if (rateLimited) return rateLimited;
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const token = searchParams.get('token');

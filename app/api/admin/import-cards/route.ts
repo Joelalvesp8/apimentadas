@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Error importing cards:', error);
     return NextResponse.json(
-      { error: 'Erro ao importar cartas', details: error.message },
+      { error: 'Erro ao importar cartas' },
       { status: 500 }
     );
   }

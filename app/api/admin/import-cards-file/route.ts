@@ -182,8 +182,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: 'Erro ao importar arquivo',
-        details: err.message,
-        stack: err.stack,
       },
       { status: 500 }
     );

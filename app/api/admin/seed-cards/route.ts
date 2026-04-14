@@ -520,8 +520,7 @@ export async function POST() {
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
-        stack: error.stack,
+        error: 'Erro ao semear cartas',
       },
       { status: 500 }
     );
