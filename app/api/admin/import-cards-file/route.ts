@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     // XLSX
     else if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
       const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(buffer as unknown as Buffer);
+      await workbook.xlsx.load(buffer as any);
       const sheet = workbook.worksheets[0];
       if (sheet && sheet.rowCount > 1) {
         const headers = (sheet.getRow(1).values as any[]).slice(1).map((h: any) => String(h).trim());
