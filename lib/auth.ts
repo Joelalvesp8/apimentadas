@@ -39,42 +39,58 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email e senha são obrigatórios');
+          console.warn('[Auth] Login attempt with missing email or password');
+          return null;
         }
+
+        const email = (credentials.email as string).toLowerCase();
 
         // Rate limit login attempts by email
-        const rateLimited = checkRateLimit('auth-login', (credentials.email as string).toLowerCase());
+        const rateLimited = checkRateLimit('auth-login', email);
         if (rateLimited) {
-          throw new Error('Muitas tentativas de login. Tente novamente mais tarde.');
+          console.warn(`[Auth] Rate limited login for: ${email}`);
+          throw new Error('RATE_LIMITED');
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: (credentials.email as string).toLowerCase(),
-          },
-        });
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email },
+          });
 
-        if (!user || !user.password) {
-          throw new Error('Credenciais inválidas');
+          if (!user) {
+            console.warn(`[Auth] User not found: ${email}`);
+            return null;
+          }
+
+          if (!user.password) {
+            console.warn(`[Auth] User has no password (OAuth account): ${email}`);
+            throw new Error('OAUTH_ACCOUNT');
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            console.warn(`[Auth] Invalid password for: ${email}`);
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image || undefined,
+          };
+        } catch (error: any) {
+          // Re-throw known custom errors
+          if (error?.message === 'RATE_LIMITED' || error?.message === 'OAUTH_ACCOUNT') {
+            throw error;
+          }
+          console.error(`[Auth] Database error during login for ${email}:`, error);
+          throw new Error('DATABASE_ERROR');
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          throw new Error('Credenciais inválidas');
-        }
-
-        // No approval check needed - all users are auto-approved on registration
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image || undefined,
-        };
       },
     }),
   ],

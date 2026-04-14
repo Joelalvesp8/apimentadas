@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { SquarePen, HelpCircle, Sparkles, Flame, AlertTriangle, Check } from 'lucide-react';
 
 export default function CreateCardPage() {
   const router = useRouter();
@@ -67,26 +68,26 @@ export default function CreateCardPage() {
       <div className="max-w-3xl mx-auto">
         <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
           <CardHeader>
-            <CardTitle className="text-3xl text-white drop-shadow-[0_0_10px_rgba(220,38,38,0.4)]">🎴 Criar Nova Carta</CardTitle>
+            <CardTitle className="text-3xl text-white drop-shadow-[0_0_10px_rgba(220,38,38,0.4)] flex items-center gap-2"><SquarePen className="h-8 w-8 text-red-500" /> Criar Nova Carta</CardTitle>
             <CardDescription className="text-gray-400">
               Crie sua própria carta personalizada para o jogo Apimentadas!
               <br />
               <span className="text-sm text-red-400">
-                ⚠️ Sua carta será revisada por um administrador antes de ser aprovada
+                <AlertTriangle className="inline h-4 w-4 mr-1" /> Sua carta será revisada por um administrador antes de ser aprovada
               </span>
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                <div role="alert" className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
                   {error}
                 </div>
               )}
 
               {success && (
                 <div className="p-3 text-sm text-green-300 bg-green-950/50 border-2 border-green-700/50 rounded-md">
-                  ✅ Carta criada com sucesso! Aguardando aprovação do administrador.
+                  <Check className="inline h-4 w-4 mr-1" /> Carta criada com sucesso! Aguardando aprovação do administrador.
                   <br />
                   Redirecionando para o dashboard...
                 </div>
@@ -106,7 +107,7 @@ export default function CreateCardPage() {
                     }`}
                   >
                     <div className="text-center">
-                      <span className="text-2xl mb-2 block">❓</span>
+                      <HelpCircle className="h-6 w-6 mx-auto mb-2 text-red-400" />
                       <p className="font-medium text-white">Pergunta</p>
                       <p className="text-xs text-gray-400">
                         Uma pergunta para o outro responder
@@ -123,7 +124,7 @@ export default function CreateCardPage() {
                     }`}
                   >
                     <div className="text-center">
-                      <span className="text-2xl mb-2 block">✨</span>
+                      <Sparkles className="h-6 w-6 mx-auto mb-2 text-red-400" />
                       <p className="font-medium text-white">Tarefa</p>
                       <p className="text-xs text-gray-400">
                         Uma tarefa para executar
@@ -156,26 +157,30 @@ export default function CreateCardPage() {
 
               {/* Difficulty Selection */}
               <div className="space-y-2">
-                <Label className="text-gray-200 font-medium">Nível de Apimentada 🌶️</Label>
+                <Label className="text-gray-200 font-medium flex items-center gap-1">Nível de Apimentada <Flame className="h-4 w-4 text-red-500" /></Label>
                 <div className="grid grid-cols-4 gap-2">
                   {([
-                    { value: 'facil', label: 'Leve', emoji: '🌶️' },
-                    { value: 'medio', label: 'Média', emoji: '🌶️🌶️' },
-                    { value: 'dificil', label: 'Picante', emoji: '🌶️🌶️🌶️' },
-                    { value: 'extremo', label: 'Infernal', emoji: '🌶️🌶️🌶️🌶️' },
+                    { value: 'facil', label: 'Leve', count: 1 },
+                    { value: 'medio', label: 'Média', count: 2 },
+                    { value: 'dificil', label: 'Picante', count: 3 },
+                    { value: 'extremo', label: 'Infernal', count: 4 },
                   ] as const).map((diff) => (
                     <button
                       key={diff.value}
                       type="button"
                       onClick={() => setDifficulty(diff.value)}
-                      className={`p-3 border-2 rounded-lg transition-all duration-300 ${
+                      className={`p-3 border-2 rounded-lg transition-all duration-300 cursor-pointer ${
                         difficulty === diff.value
                           ? 'border-red-700/60 bg-zinc-900/70 shadow-[0_0_20px_rgba(220,38,38,0.3)]'
                           : 'border-zinc-700/40 bg-zinc-900/40 hover:border-zinc-600/60 hover:bg-zinc-900/60'
                       }`}
                     >
                       <div className="text-center">
-                        <p className="text-xs mb-1">{diff.emoji}</p>
+                        <div className="flex justify-center gap-0.5 mb-1">
+                          {Array.from({ length: diff.count }).map((_, i) => (
+                            <Flame key={i} className="h-3 w-3 text-red-500" />
+                          ))}
+                        </div>
                         <p className="text-xs font-medium text-gray-300">{diff.label}</p>
                       </div>
                     </button>
@@ -244,7 +249,7 @@ export default function CreateCardPage() {
                   disabled={createUserCard.isPending || success || !content.trim()}
                   className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {createUserCard.isPending ? 'Criando...' : success ? '✓ Criada!' : 'Criar Carta'}
+                  {createUserCard.isPending ? 'Criando...' : success ? <><Check className="h-4 w-4 mr-1 inline" /> Criada!</> : 'Criar Carta'}
                 </Button>
               </div>
             </form>

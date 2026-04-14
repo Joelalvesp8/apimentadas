@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Send, MessageCircle } from 'lucide-react';
+import { UserPlus, Send, MessageCircle, Star } from 'lucide-react';
 
 export interface ExploreUserData {
   id: string;
@@ -45,7 +45,7 @@ export function UserListItem({ user, onConnect, onInvite, onMessage, onPreview }
   return (
     <div className="flex items-center gap-2 sm:gap-3 py-3 px-3 sm:px-4 hover:bg-zinc-900/50 transition-colors overflow-hidden">
       {/* Avatar */}
-      <button onClick={() => onPreview?.(user)} className="shrink-0 rounded-full focus:outline-none">
+      <button onClick={() => onPreview?.(user)} className="shrink-0 rounded-full cursor-pointer focus-visible:ring-2 focus-visible:ring-red-500 focus:outline-none">
         <Avatar className="h-12 w-12 border-2 border-red-600/30 hover:border-red-500/60 transition-colors">
           <AvatarImage src={user.image || undefined} alt={user.nickname} />
           <AvatarFallback className="bg-gradient-to-br from-red-900 to-red-950 text-white font-semibold">
@@ -57,13 +57,13 @@ export function UserListItem({ user, onConnect, onInvite, onMessage, onPreview }
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <button onClick={() => onPreview?.(user)} className="focus:outline-none">
+          <button onClick={() => onPreview?.(user)} className="cursor-pointer focus-visible:ring-2 focus-visible:ring-red-500 focus:outline-none rounded">
             <h3 className="text-white font-semibold text-sm truncate hover:text-red-300 transition-colors">
               @{user.nickname}
             </h3>
           </button>
           {user.averageRating && user.averageRating >= 4 && (
-            <span className="text-xs">⭐</span>
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
           )}
         </div>
         <p className="text-gray-400 text-xs">

@@ -1,9 +1,11 @@
+import { Flame } from 'lucide-react';
+
 export function FooterMinimal() {
   return (
     <footer className="relative py-12 px-6 bg-black border-t border-zinc-900">
       <div className="max-w-6xl mx-auto text-center space-y-3">
         <div className="flex items-center justify-center gap-2 text-xl">
-          <span className="text-3xl">🌶️</span>
+          <Flame className="w-8 h-8 text-red-500" aria-hidden="true" />
           <span className="text-white font-bold">APIMENTADAS</span>
         </div>
 

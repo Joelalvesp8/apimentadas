@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home, Users, LogOut, Store, Compass, User, Newspaper, Menu } from 'lucide-react';
+import { Home, Users, LogOut, Store, Compass, User, Newspaper, Menu, Flame } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Toaster } from '@/components/ui/toaster';
 import { NotificationBell } from '@/components/notifications/notification-bell';
@@ -81,7 +81,7 @@ export default function DashboardLayout({
         <div className="px-3 sm:px-4 flex items-center justify-between gap-2 h-14">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2 group shrink-0">
-            <span className="text-2xl drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">🌶️</span>
+            <Flame className="w-6 h-6 text-red-500 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]" aria-hidden="true" />
             <span className="text-sm font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
               APIMENTADAS
             </span>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Flame } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -68,7 +69,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md mx-4 relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(220,38,38,0.3)] hover:shadow-[0_0_80px_rgba(220,38,38,0.4)] transition-all duration-500">
         <CardHeader>
           <div className="flex items-center justify-center gap-3 mb-6">
-            <span className="text-5xl drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer">🌶️</span>
+            <Flame className="w-12 h-12 text-red-500 drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer" aria-hidden="true" />
             <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">
               APIMENTADAS
             </h1>
@@ -83,7 +84,7 @@ export default function RegisterPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+              <div role="alert" className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
                 {error}
               </div>
             )}

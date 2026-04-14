@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { HelpCircle } from 'lucide-react';
 
 interface GameCardProps {
   card: {
@@ -56,7 +57,7 @@ export function GameCard({ card, onFlip, className }: GameCardProps) {
         <div className="flip-card-front">
           <Card className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 border-none text-white">
             <CardContent className="text-center p-8">
-              <div className="text-6xl mb-4">❓</div>
+              <HelpCircle className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
               <p className="text-xl font-bold">Clique para revelar</p>
               <div className="flex gap-2 mt-6 justify-center">
                 <Badge variant="secondary">

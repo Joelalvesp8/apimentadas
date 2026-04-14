@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, GamepadIcon, Star, Clock, Shield, User, TrendingUp, Layers } from 'lucide-react';
+import { Users, GamepadIcon, Star, Clock, Shield, User, TrendingUp, Layers, Heart, HeartHandshake, Users2, Globe, MapPin, Target, SquarePen, Flame } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -173,13 +173,13 @@ export default function DashboardPage() {
                 <div key={s.id} className="flex items-center justify-between py-2 border-b border-zinc-800/50 last:border-0">
                   <div className="flex items-center gap-3">
                     <Badge variant="outline" className="border-zinc-700 text-gray-400 text-xs">
-                      {s.sessionType === 'casal' ? '💑 Casal' : s.sessionType === 'trisal' ? '💞 Trisal' : '👥 Grupo'}
+                      {s.sessionType === 'casal' ? 'Casal' : s.sessionType === 'trisal' ? 'Trisal' : 'Grupo'}
                     </Badge>
                     <span className="text-gray-500 text-xs">{s.cardsPlayed} cartas</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {s.averageRating ? (
-                      <span className="text-xs text-yellow-400 font-medium">{s.averageRating.toFixed(1)} ⭐</span>
+                      <span className="text-xs text-yellow-400 font-medium flex items-center gap-1">{s.averageRating.toFixed(1)} <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" /></span>
                     ) : (
                       <span className="text-xs text-gray-600">—</span>
                     )}
@@ -231,10 +231,10 @@ export default function DashboardPage() {
                                 {gameSession.sessionType === 'casal' ? 'Casal' : gameSession.sessionType === 'trisal' ? 'Trisal' : 'Grupo'}
                               </Badge>
                               <Badge variant="outline" className={gameSession.mode === 'online' ? 'border-blue-700/50 text-blue-300 bg-blue-950/20' : 'border-zinc-600 text-gray-400 bg-zinc-900/20'}>
-                                {gameSession.mode === 'online' ? '🌐 Online' : '📍 Local'}
+                                <span className="flex items-center gap-1">{gameSession.mode === 'online' ? <><Globe className="h-3 w-3" /> Online</> : <><MapPin className="h-3 w-3" /> Local</>}</span>
                               </Badge>
                               {isMyTurn && (
-                                <Badge className="bg-red-600 border-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]">🎯 Sua vez!</Badge>
+                                <Badge className="bg-red-600 border-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] flex items-center gap-1"><Target className="h-3 w-3" /> Sua vez!</Badge>
                               )}
                               <span className="text-sm text-gray-400">
                                 {gameSession.cardsPlayed} cartas jogadas
@@ -329,7 +329,7 @@ export default function DashboardPage() {
             </Link>
             <Link href="/create-card" className="w-full" data-tour="create-card">
               <Button variant="outline" className="w-full h-24 md:h-20 bg-zinc-900/60 border-2 border-zinc-700/50 text-gray-300 hover:bg-zinc-800 hover:border-red-700/50 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 transition-all duration-300">
-                <span className="text-xl md:text-xl">🎴</span>
+                <SquarePen className="h-5 w-5" />
                 <span className="text-xs md:text-sm text-center leading-tight">Criar Carta</span>
               </Button>
             </Link>

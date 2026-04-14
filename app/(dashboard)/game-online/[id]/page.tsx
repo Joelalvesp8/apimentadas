@@ -22,7 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { OnlineAnswerCounter } from '@/components/online/online-answer-counter';
 import { OnlineAnswersDisplay } from '@/components/online/online-answers-display';
 import { RoundHistoryViewer } from '@/components/online/round-history-viewer';
-import { ArrowLeft, Play, Send, CheckCircle, XCircle, Bell, BellOff, History } from 'lucide-react';
+import { ArrowLeft, Play, Send, CheckCircle, XCircle, Bell, BellOff, History, Clock, HelpCircle } from 'lucide-react';
 
 export default function GameOnlinePage() {
   const params = useParams();
@@ -412,7 +412,7 @@ export default function GameOnlinePage() {
             ) : (
               <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-zinc-700/50">
                 <CardContent className="p-12 text-center">
-                  <div className="text-6xl mb-4">⏳</div>
+                  <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" aria-hidden="true" />
                   <h2 className="text-2xl font-bold text-gray-300 mb-2">Aguardando início...</h2>
                   <p className="text-gray-400">
                     {participants.find(p => p.profileId === nextTurnProfileId)?.profile?.nickname || 'Outro jogador'} irá virar a primeira carta
@@ -433,7 +433,7 @@ export default function GameOnlinePage() {
                   <CardHeader>
                     <CardTitle className="text-white flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-3xl">❓</span>
+                        <HelpCircle className="w-8 h-8 text-red-400 shrink-0" aria-hidden="true" />
                         Pergunta da Rodada #{effectiveCurrentRound.roundNumber}
                       </div>
                       {effectiveCurrentRound.metadata?.isCurrentUserTurn && (
@@ -562,7 +562,7 @@ export default function GameOnlinePage() {
                 {canStartNext && !isMyTurnNext && (
                   <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-zinc-700/50">
                     <CardContent className="p-6 text-center">
-                      <div className="text-4xl mb-3">⏳</div>
+                      <Clock className="w-10 h-10 text-gray-400 mx-auto mb-3" aria-hidden="true" />
                       <h3 className="text-lg font-bold text-gray-300 mb-2">
                         Aguardando próxima rodada...
                       </h3>

@@ -1,6 +1,6 @@
 import "@/lib/ssr-polyfill";
 import type { Metadata, Viewport } from "next";
-// import { Inter } from "next/font/google";
+import { Bebas_Neue, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import dynamic from "next/dynamic";
@@ -11,7 +11,19 @@ const PWARegister = dynamic(
   { ssr: false }
 );
 
-// const inter = Inter({ subsets: ["latin"] });
+const bebasNeue = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "APIMENTADAS 🌶️",
@@ -58,7 +70,7 @@ export default function RootLayout({
         {/* Prevent zooming on iOS inputs */}
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
       </head>
-      <body className="font-sans">
+      <body className={`${bebasNeue.variable} ${sourceSans.variable} font-body`}>
         <PWARegister />
         <Providers>{children}</Providers>
       </body>

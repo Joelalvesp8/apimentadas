@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Flame, AlertTriangle, XCircle, Lightbulb } from 'lucide-react';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -111,7 +112,7 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 backdrop-blur-md shadow-[0_0_60px_rgba(220,38,38,0.3)] hover:shadow-[0_0_80px_rgba(220,38,38,0.4)] transition-all duration-500">
         <CardHeader>
           <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer">🌶️</span>
+            <Flame className="w-12 h-12 text-red-500 drop-shadow-[0_0_25px_rgba(220,38,38,0.9)] animate-heat-shimmer" aria-hidden="true" />
           </div>
           <CardTitle className="text-2xl text-center text-white font-bold drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
             {existingProfile ? 'Atualize seu Perfil' : 'Complete seu Perfil'}
@@ -126,7 +127,7 @@ export default function OnboardingPage() {
           {profileError && (
             <div className="mb-4 p-3 bg-yellow-950/40 border border-yellow-700/50 rounded-md">
               <p className="text-sm text-yellow-200">
-                <strong>⚠️ Não foi possível carregar seu perfil.</strong>
+                <strong><AlertTriangle className="w-4 h-4 inline-block mr-1 text-yellow-400" aria-hidden="true" /> Não foi possível carregar seu perfil.</strong>
               </p>
               <p className="text-xs text-yellow-300 mt-1">
                 Isso pode indicar que o banco de dados precisa ser atualizado.
@@ -138,19 +139,19 @@ export default function OnboardingPage() {
           {!existingProfile && !profileError && (
             <div className="mb-4 p-3 bg-red-950/40 border border-red-700/50 rounded-md">
               <p className="text-sm text-red-200 text-center">
-                ⚠️ O nickname é <strong>obrigatório</strong> para participar do jogo
+                <AlertTriangle className="w-4 h-4 inline-block mr-1 text-red-400" aria-hidden="true" /> O nickname é <strong>obrigatório</strong> para participar do jogo
               </p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
-                <p className="font-bold mb-1">❌ Erro:</p>
+              <div role="alert" className="p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                <p className="font-bold mb-1"><XCircle className="w-4 h-4 inline-block mr-1 text-red-400" aria-hidden="true" /> Erro:</p>
                 <p>{error}</p>
                 {!existingProfile && (
                   <p className="mt-2 text-xs">
-                    💡 Dica: Se você já tem uma conta, tente fazer logout e login novamente.
+                    <Lightbulb className="w-3.5 h-3.5 inline-block mr-1 text-yellow-400" aria-hidden="true" /> Dica: Se você já tem uma conta, tente fazer logout e login novamente.
                   </p>
                 )}
               </div>

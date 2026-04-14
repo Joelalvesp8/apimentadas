@@ -108,7 +108,7 @@ export function WaitlistForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="max-w-md mx-auto">
           {error && (
-            <div className="mb-4 p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md">
+            <div role="alert" className="mb-4 p-3 text-sm text-red-200 bg-red-950/80 border-2 border-red-700/60 rounded-md">
               {error}
             </div>
           )}

@@ -5,7 +5,7 @@ import { useProducts, useCategories } from '@/hooks/useMarketplace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Store, Search } from 'lucide-react';
+import { ShoppingCart, Store, Search, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { STORE_NAME } from '@/lib/constants/store';
@@ -35,7 +35,7 @@ export default function MarketplacePage() {
             <div className="flex items-center gap-2">
               <Store className="w-6 h-6 text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.6)]" />
               <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
-                Pimentinhas 🌶️
+                Pimentinhas <Flame className="w-6 h-6 inline-block text-red-500 ml-1" aria-hidden="true" />
               </h1>
             </div>
             <Link href="/cart">

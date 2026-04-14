@@ -15,6 +15,7 @@ import {
   Gamepad2,
   Menu,
   X,
+  Flame,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -61,7 +62,7 @@ export function AdminNav() {
         <div className="flex items-center justify-between h-14">
           {/* Brand */}
           <div className="flex items-center space-x-2">
-            <div className="text-xl">🌶️</div>
+            <Flame className="w-5 h-5 text-red-500" aria-hidden="true" />
             <div>
               <h1 className="text-base font-bold text-white leading-tight">Apimentadas</h1>
               <p className="text-xs text-red-400 leading-tight">Admin</p>

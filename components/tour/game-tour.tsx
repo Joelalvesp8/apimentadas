@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Flame } from 'lucide-react';
 
 export interface TourStep {
   target: string; // CSS selector do elemento alvo
@@ -219,7 +219,7 @@ export function GameTour({ steps, onComplete, onSkip }: GameTourProps) {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">🌶️</span>
+                  <Flame className="w-6 h-6 text-red-500" aria-hidden="true" />
                   <div className="text-xs font-semibold text-red-400 bg-red-950/50 px-2 py-1 rounded">
                     Passo {currentStep + 1} de {steps.length}
                   </div>

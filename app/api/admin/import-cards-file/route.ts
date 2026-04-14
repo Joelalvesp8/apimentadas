@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { parse } from 'csv-parse/sync';
 import { getAuthenticatedUser } from '@/lib/utils/auth-helper';
 import { isAdmin } from '@/lib/utils/admin-helper';
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     let rows: any[] = [];
 
-    // 📄 CSV
+    // CSV
     if (filename.endsWith('.csv')) {
       rows = parse(buffer, {
         columns: true,
@@ -46,11 +46,24 @@ export async function POST(req: NextRequest) {
       });
       console.log('[IMPORT-FILE] Parsed CSV:', rows.length, 'rows');
     }
-    // 📊 XLSX
+    // XLSX
     else if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet);
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(buffer);
+      const sheet = workbook.worksheets[0];
+      if (sheet && sheet.rowCount > 1) {
+        const headers = (sheet.getRow(1).values as any[]).slice(1).map((h: any) => String(h).trim());
+        for (let i = 2; i <= sheet.rowCount; i++) {
+          const values = (sheet.getRow(i).values as any[]).slice(1);
+          const row: Record<string, any> = {};
+          headers.forEach((header, idx) => {
+            row[header] = values[idx] != null ? String(values[idx]).trim() : '';
+          });
+          if (Object.values(row).some((v) => v !== '')) {
+            rows.push(row);
+          }
+        }
+      }
       console.log('[IMPORT-FILE] Parsed XLSX:', rows.length, 'rows');
     } else {
       return NextResponse.json(

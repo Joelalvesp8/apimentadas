@@ -15,7 +15,7 @@ import {
 import { GameCard } from '@/components/game-card';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
-import { ThumbsDown, Meh, ThumbsUp, Users, Heart, HeartOff, SkipForward, Flame } from 'lucide-react';
+import { ThumbsDown, Meh, ThumbsUp, Users, Heart, HeartOff, SkipForward, Flame, PartyPopper, HelpCircle, Target, Clock, SquarePen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -222,7 +222,7 @@ export default function GamePage() {
           <Card className="mb-6 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-red-700/50 shadow-[0_0_40px_rgba(220,38,38,0.3)]">
             <CardHeader>
               <CardTitle className="text-center text-2xl text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">
-                🎉 Sessão Finalizada!
+                <PartyPopper className="w-7 h-7 inline-block mr-2 text-red-400" aria-hidden="true" /> Sessão Finalizada!
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -265,21 +265,21 @@ export default function GamePage() {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <Badge variant={playedCard.card.type === 'pergunta' ? 'default' : 'secondary'} className="bg-red-900/40 border-red-700/50 text-red-200">
-                                  {playedCard.card.type === 'pergunta' ? '❓ Pergunta' : '🎯 Tarefa'}
+                                  {playedCard.card.type === 'pergunta' ? <><HelpCircle className="w-3.5 h-3.5 inline-block mr-1" aria-hidden="true" /> Pergunta</> : <><Target className="w-3.5 h-3.5 inline-block mr-1" aria-hidden="true" /> Tarefa</>}
                                 </Badge>
                                 <Badge variant="outline" className="border-zinc-600 text-gray-300">
-                                  {playedCard.card.difficulty === 'facil' && '🟢 Fácil'}
-                                  {playedCard.card.difficulty === 'medio' && '🟡 Médio'}
-                                  {playedCard.card.difficulty === 'dificil' && '🟠 Difícil'}
-                                  {playedCard.card.difficulty === 'extremo' && '🔴 Extremo'}
+                                  {playedCard.card.difficulty === 'facil' && <><span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500 mr-1" aria-hidden="true" /> Fácil</>}
+                                  {playedCard.card.difficulty === 'medio' && <><span className="inline-block w-2.5 h-2.5 rounded-full bg-yellow-500 mr-1" aria-hidden="true" /> Médio</>}
+                                  {playedCard.card.difficulty === 'dificil' && <><span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-500 mr-1" aria-hidden="true" /> Difícil</>}
+                                  {playedCard.card.difficulty === 'extremo' && <><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-1" aria-hidden="true" /> Extremo</>}
                                 </Badge>
                               </div>
                               <p className="text-sm mb-2 text-gray-200">{playedCard.card.content}</p>
                               {playedCard.qualitativeRating && (
                                 <Badge variant="outline" className="text-xs border-zinc-600 text-gray-400">
-                                  Execução: {playedCard.qualitativeRating === 'ruim' && '👎 Ruim'}
-                                  {playedCard.qualitativeRating === 'satisfatoria' && '😐 Satisfatória'}
-                                  {playedCard.qualitativeRating === 'excelente' && '👍 Excelente'}
+                                  Execução: {playedCard.qualitativeRating === 'ruim' && <><ThumbsDown className="w-3.5 h-3.5 inline-block mr-1" aria-hidden="true" /> Ruim</>}
+                                  {playedCard.qualitativeRating === 'satisfatoria' && <><Meh className="w-3.5 h-3.5 inline-block mr-1" aria-hidden="true" /> Satisfatória</>}
+                                  {playedCard.qualitativeRating === 'excelente' && <><ThumbsUp className="w-3.5 h-3.5 inline-block mr-1" aria-hidden="true" /> Excelente</>}
                                 </Badge>
                               )}
                             </div>
@@ -339,7 +339,7 @@ export default function GamePage() {
               {isMyTurn ? (
                 <>
                   <h2 className="text-3xl font-bold text-red-500 mb-2 drop-shadow-[0_0_10px_rgba(220,38,38,0.6)]">
-                    🎯 SUA VEZ!
+                    <Target className="w-8 h-8 inline-block mr-2" aria-hidden="true" /> SUA VEZ!
                   </h2>
                   <p className="text-lg text-gray-300">
                     Pegue uma carta para {getAnswererName()} responder/executar
@@ -348,7 +348,7 @@ export default function GamePage() {
               ) : (
                 <>
                   <h2 className="text-2xl font-bold text-gray-300 mb-2">
-                    ⏳ Aguarde...
+                    <Clock className="w-6 h-6 inline-block mr-2" aria-hidden="true" /> Aguarde...
                   </h2>
                   <p className="text-lg text-gray-400">
                     {currentTurnParticipant?.profile.nickname} está pegando uma carta
@@ -397,10 +397,10 @@ export default function GamePage() {
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-zinc-700">
                   <SelectItem value="all" className="text-white text-xs">Todas</SelectItem>
-                  <SelectItem value="facil" className="text-white text-xs">🟢 Fácil</SelectItem>
-                  <SelectItem value="medio" className="text-white text-xs">🟡 Médio</SelectItem>
-                  <SelectItem value="dificil" className="text-white text-xs">🟠 Difícil</SelectItem>
-                  <SelectItem value="extremo" className="text-white text-xs">🔴 Extremo</SelectItem>
+                  <SelectItem value="facil" className="text-white text-xs"><span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500 mr-1.5" aria-hidden="true" />Fácil</SelectItem>
+                  <SelectItem value="medio" className="text-white text-xs"><span className="inline-block w-2.5 h-2.5 rounded-full bg-yellow-500 mr-1.5" aria-hidden="true" />Médio</SelectItem>
+                  <SelectItem value="dificil" className="text-white text-xs"><span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-500 mr-1.5" aria-hidden="true" />Difícil</SelectItem>
+                  <SelectItem value="extremo" className="text-white text-xs"><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-1.5" aria-hidden="true" />Extremo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -421,7 +421,7 @@ export default function GamePage() {
                       : 'px-3 py-1 border-zinc-600 text-gray-300'}
                   >
                     {participant.profile.nickname}
-                    {participant.profileId === session.currentTurnProfileId && ' 🎯'}
+                    {participant.profileId === session.currentTurnProfileId && <Target className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />}
                   </Badge>
                 ))}
               </div>
@@ -526,7 +526,7 @@ export default function GamePage() {
                       disabled={cardLoading}
                       className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold shadow-[0_0_25px_rgba(220,38,38,0.5)] hover:shadow-[0_0_40px_rgba(220,38,38,0.8)] transition-all duration-500 border-2 border-red-600/50"
                     >
-                      {cardLoading ? 'Buscando...' : '🎴 Buscar Carta'}
+                      {cardLoading ? 'Buscando...' : <><SquarePen className="w-5 h-5 inline-block mr-2" aria-hidden="true" /> Buscar Carta</>}
                     </Button>
                   </>
                 ) : (
@@ -540,7 +540,7 @@ export default function GamePage() {
                       variant="outline"
                       className="border-zinc-700 text-gray-500 cursor-not-allowed"
                     >
-                      ⏳ Não é sua vez
+                      <Clock className="w-4 h-4 inline-block mr-2" aria-hidden="true" /> Não é sua vez
                     </Button>
                   </>
                 )}

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { OnlineRound } from '@/hooks/useSessions';
-import { ChevronLeft, ChevronRight, History, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, History, X, HelpCircle, Clock } from 'lucide-react';
 import { OnlineAnswersDisplay } from './online-answers-display';
 
 interface RoundHistoryViewerProps {
@@ -135,7 +135,7 @@ export function RoundHistoryViewer({
           <Card className="bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 border-2 border-purple-700/50 shadow-[0_0_40px_rgba(168,85,247,0.3)]">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <span className="text-3xl">❓</span>
+                <HelpCircle className="w-8 h-8 text-purple-400 shrink-0" aria-hidden="true" />
                 Pergunta da Rodada #{selectedRound.roundNumber}
               </CardTitle>
             </CardHeader>
@@ -174,7 +174,7 @@ export function RoundHistoryViewer({
           {selectedRound.status === 'waiting' && (
             <Card className="bg-gradient-to-br from-yellow-950/20 to-yellow-900/10 border-2 border-yellow-700/50">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-2">⏳</div>
+                <Clock className="w-10 h-10 text-yellow-400 mx-auto mb-2" aria-hidden="true" />
                 <p className="text-yellow-300 font-semibold">
                   Rodada em andamento
                 </p>
